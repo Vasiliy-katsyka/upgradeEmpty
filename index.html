@@ -21,6 +21,7 @@
             --app-rarity-chip-bg: rgba(0,0,0,0.2);
             --app-action-button-bg: var(--tg-theme-secondary-bg-color);
             --app-profile-gradient-fallback: var(--tg-theme-secondary-bg-color);
+            --app-accent-blue: #5288c1;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -45,6 +46,12 @@
         }
         .page-header h2 { font-size: 1.15em; font-weight: 500; }
         
+        /* Action Bar for "Upgrade All", "Cancel Selection" */
+        #action-toolbar {
+            padding: 10px 15px; display: flex; justify-content: flex-end; gap: 10px;
+            background-color: var(--tg-theme-bg-color);
+        }
+        
         .profile-top-section {
             padding-top: 30px; padding-bottom: 20px;
             background: var(--app-profile-gradient-fallback);
@@ -54,13 +61,13 @@
         /* Pattern Overlay for Worn Gifts */
         #profile-pattern-overlay {
             position: absolute; top:0; left:0; right:0; bottom:0;
-            opacity: 0.15; pointer-events: none; overflow: hidden;
+            pointer-events: none; overflow: hidden;
         }
         .profile-pattern-item {
             position: absolute; width: 30px; height: 30px;
             background-color: currentColor; 
             -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
-            opacity: 0.2;
+            opacity: 0.15;
         }
 
         .profile-main-info { display: flex; flex-direction: column; align-items: center; z-index: 2; }
@@ -91,8 +98,9 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             aspect-ratio: 1 / 1; 
             cursor: pointer; position: relative; overflow: hidden;
-            transition: transform 0.1s ease-out;
+            transition: transform 0.1s ease-out; border: 2px solid transparent;
         }
+        .gift-card.selected { border-color: var(--tg-theme-link-color); background-color: rgba(98, 188, 249, 0.15); }
 
         .buy-gift-item {
             background-color: var(--tg-theme-secondary-bg-color);
@@ -116,14 +124,13 @@
 
         .image-container {
             width: 70%; height: 70%; display: flex; align-items: center; justify-content: center;
-            position: relative; z-index: 2; margin-bottom: 0px; /* Reduced from 5 */
+            position: relative; z-index: 2; margin-bottom: 0px; 
         }
         .buy-gift-item .image-container { height: 60%; margin-bottom: 5px; }
 
         .image-container img, .image-container .lottie-wrapper { max-width: 100%; max-height: 100%; object-fit: contain; }
         .lottie-wrapper { width: 100%; height: 100%; }
         
-        /* Hidden by default in Inventory card logic */
         .gift-name { font-size: 0.75em; text-align: center; margin-top: 5px; z-index: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
         .gift-price { font-size: 0.8em; color: var(--tg-theme-hint-color); margin-top: 4px; font-weight: bold; z-index: 2;}
 
@@ -145,9 +152,10 @@
 
         .action-button {
             background-color: var(--tg-theme-button-color); color: var(--tg-theme-button-text-color);
-            border: none; padding: 6px 14px; border-radius: 16px; font-size: 0.85em; cursor: pointer;
+            border: none; padding: 6px 14px; border-radius: 16px; font-size: 0.85em; cursor: pointer; font-weight: 500;
         }
         
+        /* Modals */
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background-color: var(--app-modal-backdrop-color);
@@ -163,7 +171,7 @@
             display: flex; flex-direction: column; overflow: hidden;
             max-height: 90vh;
         }
-        /* Increased height specifically for Customize modal */
+        
         #customize-modal .modal-content { height: 90vh; }
 
         .modal-header-bar { padding: 15px; text-align: center; font-weight: 500; border-bottom: 1px solid rgba(0,0,0,0.1); background: var(--tg-theme-secondary-bg-color); position: relative; z-index: 10; }
@@ -188,6 +196,7 @@
         .collectible-display-area h3 { margin-top: 15px; position: relative; z-index: 2; font-size: 1.5em; }
         .collectible-display-area p { color: rgba(255,255,255,0.7); position: relative; z-index: 2; margin-top: 5px; }
 
+        /* Long Press Menu */
         #long-press-menu {
             position: fixed; background: var(--tg-theme-secondary-bg-color);
             border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
@@ -203,15 +212,10 @@
         .filter-section { padding: 0 15px; margin-bottom: 15px; }
         .filter-section h4 { margin: 15px 0 10px; color: var(--tg-theme-hint-color); font-size: 0.9em; text-transform: uppercase; }
         
-        /* Updated Grid for Customization: 3 columns, Fixed Max Height for Independent Scroll */
         .filter-options-grid { 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 10px; 
-            overflow-y: auto; 
-            padding-bottom: 5px; 
-            max-height: 230px; /* ~2.5 rows visible */
-            border-radius: 8px;
+            display: grid; grid-template-columns: repeat(3, 1fr); 
+            gap: 10px; overflow-y: auto; padding-bottom: 5px; 
+            max-height: 230px; border-radius: 8px;
         }
         
         .filter-option {
@@ -241,17 +245,42 @@
         #qty-modal input {
             background: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); border: none; padding: 10px; border-radius: 8px; width: 100%; font-size: 1.2em; text-align: center; margin-bottom: 15px; outline: none;
         }
+
+        /* Loading Screen CSS */
+        .glass-panel {
+            position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center;
+            animation: glassFloat 4s ease-in-out infinite; 
+        }
+        .liquid-blob {
+            position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.6; z-index: 1;
+            animation: blobFloat 10s infinite alternate;
+        }
+        .blob-1 { width: 250px; height: 250px; background: #007AFF; top: 20%; left: 10%; }
+        .blob-2 { width: 300px; height: 300px; background: #5ac8fa; bottom: 20%; right: 10%; animation-delay: -2s; }
+        .blob-3 { width: 200px; height: 200px; background: #007AFF; bottom: 40%; left: 40%; animation-delay: -4s; opacity: 0.5; }
+        @keyframes blobFloat { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(40px, -40px) scale(1.1); } 100% { transform: translate(-20px, 20px) scale(0.9); } }
+        @keyframes glassFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
     </style>
 </head>
 <body>
 
+<!-- Loading Overlay -->
+<div id="loading-overlay" class="modal-overlay active" style="align-items: center; justify-content: center; background: var(--tg-theme-bg-color); z-index: 9999;">
+    <div class="liquid-blob blob-1"></div>
+    <div class="liquid-blob blob-2"></div>
+    <div class="liquid-blob blob-3"></div>
+    <div class="glass-panel">
+        <div id="loading-anim" style="width: 120px; height: 120px;"></div>
+        <h2 style="font-weight:600; margin-top:20px; color:var(--tg-theme-text-color);">Gift Simulator</h2>
+        <p style="color:var(--tg-theme-hint-color); font-size:0.9em; margin-top:5px;">@giftUpgradeRU</p>
+    </div>
+</div>
+
 <div class="app-container">
-    <div id="profile-page" class="page active">
+    <div id="profile-page" class="page">
         <div class="page-header">
             <h2>Profile</h2>
-            <div>
-                <button class="action-button" onclick="openSettingsModal()">Settings</button>
-            </div>
+            <div><button class="action-button" onclick="openSettingsModal()">Settings</button></div>
         </div>
         <div class="profile-top-section" id="profile-bg">
             <div id="profile-pattern-overlay"></div>
@@ -267,6 +296,7 @@
             <button class="active" onclick="switchTab('inventory')">Inventory</button>
             <button onclick="switchTab('shop')">Gift Shop</button>
         </div>
+        <div id="action-toolbar" class="hidden"></div>
         <div class="gifts-grid" id="inventory-grid"></div>
     </div>
 
@@ -299,7 +329,8 @@
                     <span class="slider"></span>
                 </label>
             </div>
-            <div style="padding: 20px;">
+            <div style="padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+                <button class="modal-button" style="width:100%; background: var(--app-accent-blue);" onclick="startSelectionMode('hide')">Select & Hide Multiple</button>
                 <button class="modal-button secondary" style="width:100%; color: #ff595a;" onclick="resetAppData()">Reset All Data</button>
             </div>
         </div>
@@ -420,7 +451,7 @@
     tg.enableClosingConfirmation();
 
     const CDN_BASE = "https://cdn.changes.tg/gifts/";
-    const LS_KEY = "web_gift_app_v4";
+    const LS_KEY = "web_gift_app_v5";
     const PIN_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z" /></svg>`;
     const WEAR_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>`;
 
@@ -442,24 +473,33 @@
         activeGiftId: null, // uniqueId of gift in context menu
         shopGiftData: null, // {id, name} for multi buy
         reordering: false,
-        sortable: null
+        sortable: null,
+        selectionMode: null, // 'hide' or null
+        selectedIds: new Set()
     };
 
     window.addEventListener('DOMContentLoaded', async () => {
+        // Init Loading Screen
+        const loadingScreen = document.getElementById('loading-overlay');
+        lottie.loadAnimation({ container: document.getElementById('loading-anim'), renderer: 'svg', loop: true, autoplay: true, path: 'https://cdn.changes.tg/gifts/models/Artisan%20Brick/lottie/Ice%20Mammoth.json' });
+        
+        setTimeout(() => {
+            loadingScreen.style.opacity = '0';
+            document.getElementById('profile-page').classList.add('active');
+            setTimeout(() => { loadingScreen.classList.remove('active'); }, 200);
+        }, Math.random() * 3000 + 3000);
+
         applyTelegramTheme();
         tg.onEvent('themeChanged', applyTelegramTheme);
 
         const user = tg.initDataUnsafe.user;
-        const nameEl = document.getElementById('user-name');
-        const avatarEl = document.getElementById('user-avatar');
-        
         if (user) {
-            nameEl.innerText = [user.first_name, user.last_name].filter(Boolean).join(' ');
-            if (user.photo_url) { avatarEl.src = user.photo_url; }
-            else { avatarEl.src = `https://i.pravatar.cc/150?u=${user.id}`; }
+            document.getElementById('user-name').innerText = [user.first_name, user.last_name].filter(Boolean).join(' ');
+            if (user.photo_url) document.getElementById('user-avatar').src = user.photo_url;
+            else document.getElementById('user-avatar').src = `https://i.pravatar.cc/150?u=${user.id}`;
         } else {
-            nameEl.innerText = "Web User";
-            avatarEl.src = "https://i.pravatar.cc/150?u=test";
+            document.getElementById('user-name').innerText = "Web User";
+            document.getElementById('user-avatar').src = "https://i.pravatar.cc/150?u=test";
         }
 
         loadState();
@@ -470,9 +510,7 @@
         
         document.addEventListener('click', (e) => {
             const menu = document.getElementById('long-press-menu');
-            if (!menu.classList.contains('hidden') && !menu.contains(e.target)) {
-                menu.classList.add('hidden');
-            }
+            if (!menu.classList.contains('hidden') && !menu.contains(e.target)) menu.classList.add('hidden');
         });
     });
 
@@ -511,13 +549,10 @@
             let backdrops = bRes.ok ? await bRes.json() : [];
             let patterns = pRes.ok ? await pRes.json() : [];
 
-            // Sort Models by Rarity Permille (ascending: low permille is rarer)
             models.sort((a, b) => (a.rarityPermille || 0) - (b.rarityPermille || 0));
-
-            // Sort Backdrops by Pinned, then Alpha
             const pinned = ["Black", "Onyx Black", "Gunmetal", "Midnight Blue", "Electric Purple"];
             backdrops.sort((a, b) => {
-                let idxA = pinned.indexOf(a.name); let idxB = pinned.indexOf(b.name);
+                let idxA = pinned.indexOf(a.name), idxB = pinned.indexOf(b.name);
                 if (idxA !== -1 && idxB !== -1) return idxA - idxB;
                 if (idxA !== -1) return -1;
                 if (idxB !== -1) return 1;
@@ -525,9 +560,7 @@
             });
 
             return { models, backdrops, patterns };
-        } catch (e) {
-            return { models: [], backdrops: [], patterns: [] };
-        }
+        } catch (e) { return { models: [], backdrops: [], patterns: [] }; }
     }
 
     function renderShop() {
@@ -554,15 +587,17 @@
         const grid = document.getElementById('inventory-grid');
         if (appRuntime.reordering) return;
         grid.innerHTML = '';
+        
         let displayList = state.settings.showHidden ? state.inventory : state.inventory.filter(g => !g.hidden);
         document.getElementById('gift-count-display').innerText = `${state.inventory.length} gifts`;
+
+        updateActionToolbar();
 
         if (displayList.length === 0) {
             grid.innerHTML = `<div style="grid-column:span 3; text-align:center; padding:40px 20px; color:var(--tg-theme-hint-color);">${state.inventory.length > 0 ? "All hidden." : "Empty."}</div>`;
             return;
         }
 
-        // Sort: Pinned Order, Collectibles, Newest
         displayList.sort((a, b) => {
             if (a.pinned && !b.pinned) return -1;
             if (!a.pinned && b.pinned) return 1;
@@ -576,14 +611,20 @@
             el.dataset.id = gift.uniqueId;
             if (gift.pinned) el.dataset.pinned = "true";
             if (gift.hidden) el.classList.add('is-hidden');
+            if (appRuntime.selectionMode === 'hide' && appRuntime.selectedIds.has(gift.uniqueId)) el.classList.add('selected');
             
-            el.addEventListener('touchstart', (e) => startInventoryLongPress(e, gift), {passive:false});
-            el.addEventListener('touchend', cancelLongPress);
-            el.addEventListener('contextmenu', (e) => { e.preventDefault(); openMenu(e, gift); });
+            if (appRuntime.selectionMode) {
+                el.onclick = () => toggleSelection(gift.uniqueId);
+            } else {
+                el.addEventListener('touchstart', (e) => startInventoryLongPress(e, gift), {passive:false});
+                el.addEventListener('touchend', cancelLongPress);
+                el.addEventListener('touchmove', cancelLongPress);
+                el.addEventListener('contextmenu', (e) => { e.preventDefault(); openMenu(e, gift); });
+            }
 
             let visualHtml = '', topIcon = '';
-            if(gift.pinned) topIcon = `<div class="status-icon">${PIN_ICON}</div>`;
-            if(gift.worn) topIcon = `<div class="status-icon">${WEAR_ICON}</div>`; // worn replaces pin icon for visual check
+            if(gift.pinned && !appRuntime.selectionMode) topIcon = `<div class="status-icon">${PIN_ICON}</div>`;
+            if(gift.worn && !appRuntime.selectionMode) topIcon = `<div class="status-icon">${WEAR_ICON}</div>`;
 
             if (gift.isCollectible) {
                 const cd = gift.collectibleData;
@@ -601,10 +642,9 @@
                     <div class="top-right-label">#${gift.collectibleNumber}</div>
                     <div class="gift-card-bg-pattern" style="background: ${bgStyle}"></div>
                     <div class="dynamic-pattern-container" id="pat-${gift.uniqueId}"></div>
-                    <div class="image-container">${visualHtml}</div>`; // Name Removed
-                
+                    <div class="image-container">${visualHtml}</div>`; 
                 setTimeout(() => generatePattern(`pat-${gift.uniqueId}`, cd.pattern, gift.name, true, cd.backdrop.hex.patternColor), 0);
-                el.onclick = () => openCollectibleModal(gift);
+                if (!appRuntime.selectionMode) el.onclick = () => openCollectibleModal(gift);
             } else {
                 const imgUrl = `${CDN_BASE}originals/${gift.originalId}/Original.png`;
                 if (state.settings.animations) {
@@ -613,29 +653,56 @@
                 } else visualHtml = `<img src="${imgUrl}" loading="lazy">`;
 
                 el.innerHTML = `<div class="image-container">${visualHtml}</div>`;
-                el.onclick = () => openDetailModal(gift);
+                if (!appRuntime.selectionMode) el.onclick = () => openDetailModal(gift);
             }
             grid.appendChild(el);
         });
     }
 
-    // --- Interaction ---
-    function startShopLongPress(e, id, name) {
-        appRuntime.longPressTimer = setTimeout(() => { haptic('medium'); openQtyModal(id, name); }, 500);
+    function updateActionToolbar() {
+        const toolbar = document.getElementById('action-toolbar');
+        toolbar.innerHTML = '';
+        toolbar.className = 'hidden';
+
+        if (appRuntime.selectionMode === 'hide') {
+            toolbar.className = '';
+            toolbar.innerHTML = `
+                <button class="action-button" onclick="cancelSelectionMode()" style="background:var(--tg-theme-button-color);">Cancel</button>
+                <button class="action-button" onclick="confirmHideSelected()" style="background:var(--app-accent-blue);">Hide (${appRuntime.selectedIds.size})</button>
+            `;
+            return;
+        }
+
+        // Upgrade All Button check
+        if (state.inventory.some(g => !g.isCollectible)) {
+            toolbar.className = '';
+            toolbar.innerHTML = `<button class="action-button" onclick="handleUpgradeAll()" style="background:var(--app-accent-blue);">✨ Upgrade All</button>`;
+        }
     }
-    function startInventoryLongPress(e, gift) {
-        appRuntime.longPressTimer = setTimeout(() => { haptic('medium'); openMenu(e.touches[0], gift); }, 500);
+
+    // --- Actions ---
+    function buyGift(id, name, qty = 1) {
+        for(let i=0; i<qty; i++) {
+            state.inventory.unshift({
+                uniqueId: Date.now() + Math.random() + i, originalId: id, name: name,
+                isCollectible: false, timestamp: Date.now() + i, pinned: false, hidden: false, worn: false
+            });
+        }
+        saveState(); renderInventory();
+        if(qty === 1) switchTab('inventory'); 
+        hapticNotify('success');
     }
+
+    function startShopLongPress(e, id, name) { appRuntime.longPressTimer = setTimeout(() => { haptic('medium'); openQtyModal(id, name); }, 500); }
+    function startInventoryLongPress(e, gift) { appRuntime.longPressTimer = setTimeout(() => { haptic('medium'); openMenu(e.touches[0], gift); }, 500); }
     function cancelLongPress() { clearTimeout(appRuntime.longPressTimer); }
 
     function openQtyModal(id, name) {
         appRuntime.shopGiftData = { id, name };
         document.getElementById('qty-modal').classList.add('active');
         document.getElementById('qty-input').value = 1;
-        tg.BackButton.show();
-        tg.BackButton.onClick(() => closeModal('qty-modal'));
+        tg.BackButton.show(); tg.BackButton.onClick(() => closeModal('qty-modal'));
     }
-
     function handleBuyMultiple() {
         const qty = parseInt(document.getElementById('qty-input').value);
         if(!qty || qty < 1) return;
@@ -643,25 +710,90 @@
         closeModal('qty-modal');
     }
 
-    function buyGift(id, name, qty = 1) {
-        for(let i=0; i<qty; i++) {
-            state.inventory.unshift({
-                uniqueId: Date.now() + Math.random() + i,
-                originalId: id,
-                name: name,
-                isCollectible: false,
-                timestamp: Date.now() + i, // slight diff to sort order logic
-                pinned: false,
-                hidden: false,
-                worn: false
-            });
-        }
-        saveState();
-        renderInventory();
-        if(qty === 1) switchTab('inventory'); // Only auto-switch for single buy
-        hapticNotify('success');
+    // --- Upgrade Logic ---
+    async function performUpgrade(gift, notify=true) {
+        const parts = await fetchGiftParts(gift.name);
+        if (!parts.models.length) return false;
+        
+        gift.isCollectible = true;
+        state.lastCollectibleNumber++;
+        gift.collectibleNumber = state.lastCollectibleNumber;
+        gift.collectibleData = {
+            model: parts.models[Math.floor(Math.random()*parts.models.length)],
+            backdrop: parts.backdrops[Math.floor(Math.random()*parts.backdrops.length)],
+            pattern: parts.patterns[Math.floor(Math.random()*parts.patterns.length)]
+        };
+        return true;
     }
 
+    async function handleUpgrade() {
+        document.getElementById('btn-upgrade').innerText = "Upgrading...";
+        const gift = state.inventory.find(g => g.uniqueId === appRuntime.activeGiftId);
+        const success = await performUpgrade(gift);
+        
+        if (success) {
+            hapticNotify('success');
+            saveState(); renderInventory(); closeModal('detail-modal');
+            openCollectibleModal(gift);
+        } else {
+            alert("No parts!");
+        }
+        document.getElementById('btn-upgrade').innerText = "Upgrade";
+    }
+
+    async function handleUpgradeAll() {
+        const toUpgrade = state.inventory.filter(g => !g.isCollectible);
+        if(!toUpgrade.length) return;
+        
+        // This button just disappears or changes text to Loading
+        const btn = document.querySelector('#action-toolbar button');
+        btn.innerText = `Upgrading ${toUpgrade.length}...`;
+        btn.disabled = true;
+
+        let changed = false;
+        for (let g of toUpgrade) {
+            if (await performUpgrade(g, false)) changed = true;
+        }
+        
+        if(changed) {
+            hapticNotify('success');
+            saveState(); renderInventory();
+        }
+    }
+
+    // --- Selection Logic (Hide Multiple) ---
+    function startSelectionMode(mode) {
+        appRuntime.selectionMode = mode;
+        appRuntime.selectedIds = new Set();
+        closeModal('settings-modal');
+        renderInventory();
+    }
+    function cancelSelectionMode() {
+        appRuntime.selectionMode = null;
+        appRuntime.selectedIds = new Set();
+        renderInventory();
+    }
+    function toggleSelection(id) {
+        if(appRuntime.selectedIds.has(id)) appRuntime.selectedIds.delete(id);
+        else appRuntime.selectedIds.add(id);
+        haptic('light');
+        renderInventory();
+    }
+    function confirmHideSelected() {
+        const ids = Array.from(appRuntime.selectedIds);
+        if(ids.length > 0) {
+            state.inventory.forEach(g => {
+                if(ids.includes(g.uniqueId)) {
+                    g.hidden = true; g.pinned = false; g.worn = false;
+                }
+            });
+            hapticNotify('success'); saveState();
+        }
+        cancelSelectionMode();
+        applyWornGiftVisuals();
+    }
+
+    // --- Single Gift Actions ---
     function openMenu(e, gift) {
         appRuntime.activeGiftId = gift.uniqueId;
         const menu = document.getElementById('long-press-menu');
@@ -670,22 +802,15 @@
         const reorderBtn = document.getElementById('menu-reorder');
         const hideBtn = document.getElementById('menu-hide');
 
-        pinBtn.style.display = 'none';
-        wearBtn.style.display = 'none';
-        reorderBtn.style.display = 'none';
+        pinBtn.style.display = 'none'; wearBtn.style.display = 'none'; reorderBtn.style.display = 'none';
 
         if (gift.isCollectible) {
             pinBtn.style.display = 'block';
             pinBtn.innerText = gift.pinned ? "Unpin" : "Pin";
-            
             wearBtn.style.display = 'block';
             wearBtn.innerText = gift.worn ? "Take Off" : "Wear";
-
-            if (gift.pinned && state.inventory.filter(g => g.pinned).length > 1) {
-                reorderBtn.style.display = 'block';
-            }
+            if (gift.pinned && state.inventory.filter(g => g.pinned).length > 1) reorderBtn.style.display = 'block';
         }
-
         hideBtn.innerText = gift.hidden ? "Unhide" : "Hide";
 
         let x = e.clientX, y = e.clientY;
@@ -695,100 +820,55 @@
         menu.classList.remove('hidden');
     }
 
-    async function handleUpgrade() {
-        document.getElementById('btn-upgrade').innerText = "Upgrading...";
-        const gift = state.inventory.find(g => g.uniqueId === appRuntime.activeGiftId);
-        const parts = await fetchGiftParts(gift.name);
-        
-        if (!parts.models.length) { alert("No parts!"); return; }
-
-        gift.isCollectible = true;
-        state.lastCollectibleNumber++;
-        gift.collectibleNumber = state.lastCollectibleNumber;
-        gift.collectibleData = {
-            model: parts.models[Math.floor(Math.random()*parts.models.length)],
-            backdrop: parts.backdrops[Math.floor(Math.random()*parts.backdrops.length)],
-            pattern: parts.patterns[Math.floor(Math.random()*parts.patterns.length)]
-        };
-        hapticNotify('success');
-        saveState(); renderInventory(); closeModal('detail-modal');
-        document.getElementById('btn-upgrade').innerText = "Upgrade";
-        openCollectibleModal(gift);
-    }
-
     function togglePin() {
         const gift = state.inventory.find(g => g.uniqueId === appRuntime.activeGiftId);
         if(!gift) return;
         if(gift.pinned) { gift.pinned = false; gift.pinOrder = null; }
         else {
-            if(state.inventory.filter(g => g.pinned).length >= 6) { tg.showAlert("Max 6 pins."); return; }
+            if(state.inventory.filter(g => g.pinned).length >= 6) { alert("Max 6 pins."); return; }
             gift.pinned = true; gift.pinOrder = 999;
         }
-        document.getElementById('long-press-menu').classList.add('hidden');
-        haptic('light'); saveState(); renderInventory();
+        closeMenu(); haptic('light'); saveState(); renderInventory();
     }
 
     function toggleWear() {
         const gift = state.inventory.find(g => g.uniqueId === appRuntime.activeGiftId);
         if(!gift) return;
-        if(gift.worn) {
-            gift.worn = false;
-        } else {
-            // Unwear others
-            state.inventory.forEach(g => g.worn = false);
-            gift.worn = true;
-        }
-        document.getElementById('long-press-menu').classList.add('hidden');
-        haptic('medium'); saveState(); renderInventory(); applyWornGiftVisuals();
-    }
-
-    function applyWornGiftVisuals() {
-        const worn = state.inventory.find(g => g.worn);
-        const overlay = document.getElementById('profile-pattern-overlay');
-        const bg = document.getElementById('profile-bg');
-        overlay.innerHTML = '';
-        
-        if (worn) {
-            const cd = worn.collectibleData;
-            bg.style.background = `radial-gradient(circle at 50% 0%, ${cd.backdrop.hex.centerColor}, ${cd.backdrop.hex.edgeColor})`;
-            generatePattern('profile-pattern-overlay', cd.pattern, worn.name, false, cd.backdrop.hex.patternColor, true);
-        } else {
-            bg.style.background = 'var(--app-profile-gradient-fallback)';
-        }
+        if(gift.worn) { gift.worn = false; } 
+        else { state.inventory.forEach(g => g.worn = false); gift.worn = true; }
+        closeMenu(); haptic('medium'); saveState(); renderInventory(); applyWornGiftVisuals();
     }
 
     function toggleHide() {
         const gift = state.inventory.find(g => g.uniqueId === appRuntime.activeGiftId);
         gift.hidden = !gift.hidden;
         if(gift.hidden) { gift.pinned = false; gift.worn = false; }
-        document.getElementById('long-press-menu').classList.add('hidden');
-        haptic('light'); saveState(); renderInventory(); applyWornGiftVisuals();
+        closeMenu(); haptic('light'); saveState(); renderInventory(); applyWornGiftVisuals();
     }
 
     function deleteGift() {
-        tg.showConfirm("Delete this gift?", (yes) => {
+        tg.showConfirm("Delete?", (yes) => {
             if(yes) {
                 state.inventory = state.inventory.filter(g => g.uniqueId !== appRuntime.activeGiftId);
                 haptic('heavy'); saveState(); renderInventory(); applyWornGiftVisuals();
             }
         });
-        document.getElementById('long-press-menu').classList.add('hidden');
+        closeMenu();
     }
+    
+    function closeMenu() { document.getElementById('long-press-menu').classList.add('hidden'); }
 
+    // --- Reorder & Visuals ---
     function startReorderMode() {
-        document.getElementById('long-press-menu').classList.add('hidden');
-        appRuntime.reordering = true;
+        closeMenu(); appRuntime.reordering = true;
         document.getElementById('reorder-controls').classList.remove('hidden');
         document.getElementById('inventory-grid').classList.add('reordering');
         haptic('medium');
         appRuntime.sortable = new Sortable(document.getElementById('inventory-grid'), {
-            animation: 150,
-            filter: ':not([data-pinned="true"])',
-            draggable: '[data-pinned="true"]',
+            animation: 150, filter: ':not([data-pinned="true"])', draggable: '[data-pinned="true"]',
             onMove: (evt) => evt.related.hasAttribute('data-pinned')
         });
     }
-
     function stopReorderMode() {
         appRuntime.reordering = false;
         document.getElementById('reorder-controls').classList.add('hidden');
@@ -798,28 +878,35 @@
                 const g = state.inventory.find(x => x.uniqueId == id);
                 if(g && g.pinned) g.pinOrder = index;
             });
-            appRuntime.sortable.destroy();
-            haptic('light'); saveState(); renderInventory();
+            appRuntime.sortable.destroy(); haptic('light'); saveState(); renderInventory();
         }
+    }
+
+    function applyWornGiftVisuals() {
+        const worn = state.inventory.find(g => g.worn);
+        const overlay = document.getElementById('profile-pattern-overlay');
+        const bg = document.getElementById('profile-bg');
+        overlay.innerHTML = '';
+        if (worn) {
+            const cd = worn.collectibleData;
+            bg.style.background = `radial-gradient(circle at 50% 0%, ${cd.backdrop.hex.centerColor}, ${cd.backdrop.hex.edgeColor})`;
+            generatePattern('profile-pattern-overlay', cd.pattern, worn.name, false, cd.backdrop.hex.patternColor, true);
+        } else { bg.style.background = 'var(--app-profile-gradient-fallback)'; }
     }
 
     // --- Customization ---
     async function openCustomizeModal() {
         document.getElementById('customize-modal').classList.add('active');
         document.getElementById('cust-parts-container').classList.add('hidden');
-        tg.MainButton.setText("Create");
-        tg.MainButton.disable();
-        tg.MainButton.show();
-        tg.MainButton.onClick(handleCreateCustom);
-        tg.BackButton.show();
-        tg.BackButton.onClick(() => closeModal('customize-modal'));
+        // Manual button for user action (No main button as requested)
+        document.getElementById('btn-create-custom').disabled = true;
+        tg.BackButton.show(); tg.BackButton.onClick(() => closeModal('customize-modal'));
         
         const grid = document.getElementById('cust-base-grid');
         grid.innerHTML = '';
         Object.entries(state.giftDefinitions).forEach(([id, name]) => {
             if (['custom_skebob', 'custom_baggin_cat'].includes(id)) return;
-            const el = document.createElement('div');
-            el.className = 'filter-option';
+            const el = document.createElement('div'); el.className = 'filter-option';
             el.innerHTML = `<img src="${CDN_BASE}originals/${id}/Original.png"><div class="label">${name}</div>`;
             el.onclick = () => selectBaseForCustom(id, name, el);
             grid.appendChild(el);
@@ -833,11 +920,9 @@
         customizationState = { selectedBaseId: id, selectedBaseName: name, cachedParts: customizationState.cachedParts };
         if(!customizationState.cachedParts[id]) customizationState.cachedParts[id] = await fetchGiftParts(name);
         const parts = customizationState.cachedParts[id];
-        
         renderPartGrid('cust-model-grid', parts.models, 'model', name);
         renderPartGrid('cust-backdrop-grid', parts.backdrops, 'backdrop', name);
         renderPartGrid('cust-pattern-grid', parts.patterns, 'pattern', name);
-        
         document.getElementById('cust-parts-container').classList.remove('hidden');
         checkCustomReady();
     }
@@ -846,13 +931,11 @@
         const grid = document.getElementById(elemId);
         grid.innerHTML = '';
         items.forEach(item => {
-            const el = document.createElement('div');
-            el.className = 'filter-option';
+            const el = document.createElement('div'); el.className = 'filter-option';
             let content = '';
             if (type === 'model') content = `<img src="${CDN_BASE}models/${encodeURIComponent(giftName)}/png/${encodeURIComponent(item.name)}.png">`;
             else if (type === 'backdrop') content = `<div class="gradient-square" style="background: radial-gradient(circle, ${item.hex.centerColor}, ${item.hex.edgeColor})"></div>`;
             else content = `<img src="${CDN_BASE}patterns/${encodeURIComponent(giftName)}/png/${encodeURIComponent(item.name)}.png">`;
-            
             el.innerHTML = `${content}<div class="label">${item.name}</div>`;
             el.onclick = () => {
                 haptic('light');
@@ -868,19 +951,14 @@
     }
 
     function checkCustomReady() {
-        if(customizationState.selectedModel && customizationState.selectedBackdrop) tg.MainButton.enable();
-        else tg.MainButton.disable();
+        document.getElementById('btn-create-custom').disabled = !(customizationState.selectedModel && customizationState.selectedBackdrop);
     }
 
     function handleCreateCustom() {
-        // Fallback for random pattern
         if(!customizationState.selectedPattern) {
             const parts = customizationState.cachedParts[customizationState.selectedBaseId];
-            if(parts && parts.patterns.length) {
-                customizationState.selectedPattern = parts.patterns[Math.floor(Math.random() * parts.patterns.length)];
-            }
+            if(parts && parts.patterns.length) customizationState.selectedPattern = parts.patterns[Math.floor(Math.random() * parts.patterns.length)];
         }
-
         const { selectedBaseId, selectedBaseName, selectedModel, selectedBackdrop, selectedPattern } = customizationState;
         state.lastCollectibleNumber++;
         state.inventory.unshift({
@@ -888,12 +966,9 @@
             pinned: false, collectibleNumber: state.lastCollectibleNumber,
             collectibleData: { model: selectedModel, backdrop: selectedBackdrop, pattern: selectedPattern }
         });
-        hapticNotify('success');
-        saveState(); renderInventory(); closeModal('customize-modal'); switchTab('inventory');
-        // Visual pop-up logic can be added here
+        hapticNotify('success'); saveState(); renderInventory(); closeModal('customize-modal'); switchTab('inventory');
     }
 
-    // --- Modal Logic ---
     function openDetailModal(gift) {
         appRuntime.activeGiftId = gift.uniqueId;
         document.getElementById('detail-title').innerText = gift.name;
@@ -909,38 +984,30 @@
         const cd = gift.collectibleData;
         document.getElementById('collectible-name').innerText = cd.model.name;
         document.getElementById('collectible-number').innerText = gift.collectibleNumber.toLocaleString();
-        
         document.getElementById('collectible-display-area').style.background = `radial-gradient(circle at 50% 0%, ${cd.backdrop.hex.centerColor}, ${cd.backdrop.hex.edgeColor})`;
         document.getElementById('collectible-image').style.display = 'none';
         document.getElementById('collectible-lottie').style.display = 'block';
         playLottie('collectible-lottie', `${CDN_BASE}models/${encodeURIComponent(gift.name)}/lottie/${encodeURIComponent(cd.model.name)}.json`);
-        
         const rarity = (val) => `<span class="rarity-chip">${(val/10).toFixed(1)}%</span>`;
         document.getElementById('info-model').innerHTML = `${cd.model.name} ${rarity(cd.model.rarityPermille)}`;
         document.getElementById('info-backdrop').innerHTML = `${cd.backdrop.name} ${rarity(cd.backdrop.rarityPermille)}`;
         document.getElementById('info-pattern').innerHTML = `${cd.pattern.name} ${rarity(cd.pattern.rarityPermille)}`;
-
         document.getElementById('collectible-pattern-container').innerHTML = '';
         generatePattern('collectible-pattern-container', cd.pattern, gift.name, false, cd.backdrop.hex.patternColor);
-
         document.getElementById('collectible-modal').classList.add('active');
         tg.BackButton.show(); tg.BackButton.onClick(() => closeModal('collectible-modal'));
     }
 
     function closeModal(id) {
         document.getElementById(id).classList.remove('active');
-        tg.MainButton.hide();
-        // Check context to determine if BackButton should hide or point elsewhere
-        if (id === 'qty-modal' || id === 'settings-modal') {
-            tg.BackButton.show(); 
-            tg.BackButton.onClick(() => switchTab('inventory')); // assumes came from profile
-        } else if (id === 'detail-modal' || id === 'collectible-modal' || id === 'customize-modal') {
-            const currentTab = document.getElementById('shop-page').classList.contains('active') ? 'shop' : 'inventory';
-            if (currentTab === 'shop') {
-                tg.BackButton.show(); tg.BackButton.onClick(() => switchTab('inventory'));
-            } else {
-                tg.BackButton.hide();
-            }
+        tg.BackButton.hide();
+        if(id === 'detail-modal') document.getElementById('detail-lottie').innerHTML = '';
+        if(id === 'collectible-modal') document.getElementById('collectible-lottie').innerHTML = '';
+        
+        // Restore BackButton logic if closing non-main windows inside Inventory
+        const currentTab = document.getElementById('shop-page').classList.contains('active') ? 'shop' : 'inventory';
+        if (currentTab === 'shop' && (id === 'qty-modal' || id === 'detail-modal' || id === 'collectible-modal' || id === 'customize-modal')) {
+            tg.BackButton.show(); tg.BackButton.onClick(() => switchTab('inventory'));
         }
     }
 
@@ -949,7 +1016,6 @@
         document.getElementById('profile-page').classList.remove('active');
         document.getElementById('shop-page').classList.remove('active');
         document.querySelectorAll('.profile-tabs button').forEach(b => b.classList.remove('active'));
-
         if (tab === 'inventory') {
             document.getElementById('profile-page').classList.add('active');
             document.querySelectorAll('.profile-tabs button')[0].classList.add('active');
@@ -961,7 +1027,6 @@
         }
     }
 
-    // --- Helpers ---
     function playLottie(id, path) {
         const container = document.getElementById(id);
         container.innerHTML = '';
@@ -972,32 +1037,15 @@
         const container = document.getElementById(containerId);
         if (!container) return;
         const url = `${CDN_BASE}patterns/${encodeURIComponent(giftName)}/png/${encodeURIComponent(patternObj.name)}.png`;
-        const width = container.offsetWidth;
-        const height = container.offsetHeight;
-        const centerX = width / 2;
-        const centerY = isSmall ? height / 2 : height * 0.4;
-
-        // Custom config for profile header vs card
-        let configs = [];
-        if (isHeader) {
-             configs = [{ count: 12, radius: 100, size: 40 }, { count: 16, radius: 150, size: 36 }];
-        } else {
-             configs = [
-                { count: 10, radius: isSmall ? 38 : 100, size: isSmall ? 12 : 36 },
-                { count: 12, radius: isSmall ? 62 : 150, size: isSmall ? 10 : 30 }
-            ];
-        }
-
+        const width = container.offsetWidth; const height = container.offsetHeight;
+        const centerX = width / 2; const centerY = isSmall ? height / 2 : height * 0.4;
+        let configs = isHeader ? [{ count: 12, radius: 100, size: 40 }, { count: 16, radius: 150, size: 36 }] : [{ count: 10, radius: isSmall ? 38 : 100, size: isSmall ? 12 : 36 }, { count: 12, radius: isSmall ? 62 : 150, size: isSmall ? 10 : 30 }];
         configs.forEach(conf => {
             for(let i=0; i<conf.count; i++) {
                 const angle = (i / conf.count) * 2 * Math.PI;
-                const x = centerX + conf.radius * Math.cos(angle);
-                const y = centerY + conf.radius * Math.sin(angle);
-                
+                const x = centerX + conf.radius * Math.cos(angle); const y = centerY + conf.radius * Math.sin(angle);
                 const el = document.createElement('div');
-                if(isHeader) el.className = 'profile-pattern-item';
-                else el.className = 'card-pattern-symbol';
-                
+                if(isHeader) el.className = 'profile-pattern-item'; else el.className = 'card-pattern-symbol';
                 el.style.webkitMaskImage = `url('${url}')`; el.style.maskImage = `url('${url}')`;
                 if (colorHex) el.style.backgroundColor = colorHex;
                 el.style.width = `${conf.size}px`; el.style.height = `${conf.size}px`;
@@ -1007,7 +1055,6 @@
         });
     }
 
-    // --- Settings & Persistence ---
     function openSettingsModal() {
         document.getElementById('settings-modal').classList.add('active');
         document.getElementById('setting-animations').checked = state.settings.animations;
@@ -1015,9 +1062,7 @@
         tg.BackButton.show(); tg.BackButton.onClick(() => closeModal('settings-modal'));
     }
     function initSettingsUI() { }
-    function toggleSetting(key, value) {
-        state.settings[key] = value; haptic('light'); saveState(); renderInventory();
-    }
+    function toggleSetting(key, value) { state.settings[key] = value; haptic('light'); saveState(); renderInventory(); }
     function saveState() { localStorage.setItem(LS_KEY, JSON.stringify(state)); }
     function loadState() {
         const saved = localStorage.getItem(LS_KEY);
