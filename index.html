@@ -50,18 +50,15 @@
             background: var(--app-profile-gradient-fallback);
             display: flex; justify-content: center; position: relative;
             transition: background 0.5s ease;
+            overflow: hidden; /* Clips patterns that go too far */
         }
+        /* Pattern Overlay Container */
         #profile-pattern-overlay {
             position: absolute; top:0; left:0; right:0; bottom:0;
-            pointer-events: none; overflow: hidden; opacity: 0.15;
+            pointer-events: none; opacity: 0.15;
         }
-        .profile-pattern-item {
-            position: absolute; width: 30px; height: 30px;
-            background-color: currentColor; 
-            -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
-        }
-
-        .profile-main-info { display: flex; flex-direction: column; align-items: center; z-index: 2; }
+        
+        .profile-main-info { display: flex; flex-direction: column; align-items: center; z-index: 2; position: relative; }
         .profile-avatar {
             width: 100px; height: 100px; border-radius: 50%;
             background-color: var(--tg-theme-hint-color); margin-bottom: 15px;
@@ -70,13 +67,14 @@
         .profile-name-status h1 { font-size: 1.4em; font-weight: 600; text-align: center; margin-bottom: 4px; }
         .profile-name-status p { font-size: 0.95em; opacity: 0.7; text-align: center; color: var(--tg-theme-text-color); margin: 0; }
 
-        /* Telegram-style Info Block */
-        .profile-info-block { padding: 15px 20px; background-color: var(--tg-theme-bg-color); border-bottom: 8px solid #00000020; }
+        /* Info Block */
+        .profile-info-block { padding: 15px 20px; background-color: var(--tg-theme-bg-color); border-bottom: 8px solid rgba(0,0,0,0.1); }
         .profile-info-header { color: var(--tg-theme-link-color); font-weight: 500; margin-bottom: 15px; }
-        .info-item { margin-bottom: 15px; }
-        .info-item .value { color: var(--tg-theme-text-color); font-size: 1.05em; display: block; margin-bottom: 2px; }
+        .info-item { margin-bottom: 18px; }
+        .info-item:last-child { margin-bottom: 0; }
+        .info-item .value { color: var(--tg-theme-text-color); font-size: 1.05em; display: block; margin-bottom: 3px; line-height: 1.2; }
         .info-item .label { color: var(--tg-theme-hint-color); font-size: 0.85em; }
-        .info-item .editable { cursor: pointer; border-bottom: 1px dashed var(--tg-theme-hint-color); }
+        .info-item .editable { cursor: pointer; } /* No more border */
 
         .profile-tabs { display: flex; justify-content: space-around; background-color: var(--tg-theme-bg-color); border-bottom: 1px solid var(--tg-theme-secondary-bg-color); }
         .profile-tabs button {
@@ -97,16 +95,14 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             aspect-ratio: 1 / 1; 
             cursor: pointer; position: relative; overflow: hidden;
-            transition: transform 0.1s ease-out; border: none; /* No outline */
+            transition: transform 0.1s ease-out; border: none; 
         }
-        /* Selected State for Multi-Hide */
-        .gift-card.selected { outline: 2px solid var(--tg-theme-link-color); background-color: rgba(98, 188, 249, 0.1); }
+        .gift-card.selected { background-color: rgba(98, 188, 249, 0.1); box-shadow: inset 0 0 0 2px var(--tg-theme-link-color); }
 
-        /* Taller shop card for text */
         .buy-gift-item {
             background-color: var(--tg-theme-secondary-bg-color);
             border-radius: 14px; padding: 8px;
-            display: flex; flex-direction: column; align-items: center; justify-content: flex-end; /* Align bottom */
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
             aspect-ratio: 1 / 1.35; 
             cursor: pointer; position: relative; overflow: hidden;
             transition: transform 0.1s ease-out;
@@ -115,10 +111,11 @@
         .gift-card:active, .buy-gift-item:active { transform: scale(0.96); }
         
         .status-icon {
-            position: absolute; top: 5px; left: 5px; z-index: 5;
-            width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; gap: 4px;
+            position: absolute; top: 6px; left: 6px; z-index: 5;
+            width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;
         }
-        .status-icon svg { fill: var(--tg-theme-text-color); width: 100%; height: 100%; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5)); }
+        /* White Pin Icon */
+        .status-icon svg { fill: #ffffff; width: 100%; height: 100%; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5)); }
 
         .gift-card.is-hidden { opacity: 0.5; filter: grayscale(1); }
 
@@ -126,7 +123,6 @@
             width: 70%; height: 70%; display: flex; align-items: center; justify-content: center;
             position: relative; z-index: 2; margin-bottom: 0px; 
         }
-        /* Shop specific image adjustments */
         .buy-gift-item .image-container { height: 60%; margin-bottom: auto; margin-top: 10px; }
 
         .image-container img, .image-container .lottie-wrapper { max-width: 100%; max-height: 100%; object-fit: contain; }
@@ -137,12 +133,14 @@
 
         .gift-card-bg-pattern { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0; }
         .dynamic-pattern-container { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1; overflow: hidden; pointer-events: none; }
-        .card-pattern-symbol { 
-            position: absolute; width: 30px; height: 30px;
+        
+        /* Unified Pattern Style */
+        .pattern-symbol { 
+            position: absolute;
             background-color: currentColor; 
-            -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
-            opacity: 0.15; transform-origin: center center; 
+            -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center;
         }
+        
         .top-right-label {
             position: absolute; top: 12px; right: -34px; transform: rotate(45deg);
             background: rgba(0,0,0,0.5); color: white; font-size: 0.65em;
@@ -217,7 +215,7 @@
         
         .filter-options-grid { 
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; 
-            overflow-y: auto; padding-bottom: 5px; max-height: 200px; /* Limits internal scroll */
+            overflow-y: auto; padding-bottom: 5px; max-height: 200px;
             background: var(--tg-theme-bg-color); padding: 10px; border-radius: 8px;
         }
         .filter-option {
@@ -286,7 +284,7 @@
             </div>
         </div>
         
-        <!-- Telegram Style Info Block -->
+        <!-- Info Block -->
         <div class="profile-info-block">
             <div class="profile-info-header">Info</div>
             <div class="info-item">
@@ -294,7 +292,7 @@
                 <span class="label">Mobile</span>
             </div>
             <div class="info-item">
-                <span class="value" id="profile-bio" onclick="editBio()">Hello world</span>
+                <span class="value editable" id="profile-bio" onclick="editBio()">Hello world</span>
                 <span class="label">Bio</span>
             </div>
             <div class="info-item">
@@ -415,6 +413,7 @@
     <div class="modal-content" style="height: 90vh;">
         <div class="modal-header-bar">Customize Gift</div>
         
+        <!-- Multi-add queue bar -->
         <div class="queue-bar" id="cust-queue-bar"></div>
 
         <div class="modal-scrollable-content" style="padding: 0; background: var(--tg-theme-secondary-bg-color);">
@@ -466,7 +465,7 @@
     tg.enableClosingConfirmation();
 
     const CDN_BASE = "https://cdn.changes.tg/gifts/";
-    const LS_KEY = "web_gift_app_v6";
+    const LS_KEY = "web_gift_app_v7";
     const PIN_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z" /></svg>`;
     const WEAR_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>`;
 
@@ -508,6 +507,8 @@
         tg.onEvent('themeChanged', applyTelegramTheme);
 
         loadState();
+        
+        // Random Phone +888
         if (!state.userPhone) state.userPhone = `+888 ${Math.floor(Math.random()*9000+1000)} ${Math.floor(Math.random()*9000+1000)}`;
         
         updateUserProfile();
@@ -940,7 +941,7 @@
                 if (e.target.classList.contains('close-x')) {
                     e.stopPropagation(); customizationQueue.splice(idx, 1);
                     if(editingIndex >= customizationQueue.length) editingIndex = customizationQueue.length - 1;
-                    selectQueueItem(editingIndex);
+                    if(customizationQueue.length===0) addGiftToQueue(); else selectQueueItem(editingIndex);
                 } else selectQueueItem(idx);
             };
             bar.appendChild(el);
@@ -978,10 +979,9 @@
         
         renderQueueBar();
         
-        // Visual selection in base grid
         const baseGrid = document.getElementById('cust-base-grid');
         Array.from(baseGrid.children).forEach(c => c.classList.remove('selected'));
-        // Find chip? It's rebuilt. Simple: Update highlighting if visible.
+        // Find chip is simple rerender
         
         if(!cachedParts[id]) cachedParts[id] = await fetchGiftParts(name);
         const parts = cachedParts[id];
@@ -1112,18 +1112,29 @@
         if (!container) return;
         const url = `${CDN_BASE}patterns/${encodeURIComponent(giftName)}/png/${encodeURIComponent(patternObj.name)}.png`;
         const width = container.offsetWidth; const height = container.offsetHeight;
-        const centerX = width / 2; const centerY = isSmall ? height / 2 : height * 0.4;
         let configs = isHeader ? [{ count: 12, radius: 100, size: 40 }, { count: 16, radius: 150, size: 36 }] : [{ count: 10, radius: isSmall ? 38 : 100, size: isSmall ? 12 : 36 }, { count: 12, radius: isSmall ? 62 : 150, size: isSmall ? 10 : 30 }];
         configs.forEach(conf => {
             for(let i=0; i<conf.count; i++) {
                 const angle = (i / conf.count) * 2 * Math.PI;
-                const x = centerX + conf.radius * Math.cos(angle); const y = centerY + conf.radius * Math.sin(angle);
+                // FIX: Calculating absolute left/top instead of fixed X/Y to avoid offsets 
+                // Using transform translation for center reference
+                const offsetX = conf.radius * Math.cos(angle);
+                const offsetY = conf.radius * Math.sin(angle);
+                
                 const el = document.createElement('div');
-                if(isHeader) el.className = 'profile-pattern-item'; else el.className = 'card-pattern-symbol';
+                if(isHeader) el.className = 'profile-pattern-item'; else el.className = 'pattern-symbol';
+                
+                // Coloring technique: background color + mask image
                 el.style.webkitMaskImage = `url('${url}')`; el.style.maskImage = `url('${url}')`;
                 if (colorHex) el.style.backgroundColor = colorHex;
+                else el.style.backgroundColor = 'currentColor'; // Fallback
+                
                 el.style.width = `${conf.size}px`; el.style.height = `${conf.size}px`;
-                el.style.left = `${x - conf.size/2}px`; el.style.top = `${y - conf.size/2}px`;
+                // Centering trick: absolute 50% + transform translate
+                const topP = isHeader ? 50 : (isSmall ? 50 : 40); // 40% vertical center for big modal
+                el.style.left = '50%'; el.style.top = `${topP}%`;
+                el.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px))`;
+                
                 container.appendChild(el);
             }
         });
