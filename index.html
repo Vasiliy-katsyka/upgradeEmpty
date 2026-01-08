@@ -19,6 +19,7 @@
             
             --app-modal-backdrop-color: rgba(0,0,0,0.7);
             --app-rarity-chip-bg: rgba(0,0,0,0.2);
+            --app-action-button-bg: var(--tg-theme-secondary-bg-color);
             --app-profile-gradient-fallback: var(--tg-theme-secondary-bg-color);
             --app-accent-blue: #5288c1;
         }
@@ -45,40 +46,57 @@
         }
         .page-header h2 { font-size: 1.15em; font-weight: 500; }
         
+        /* Action Bar for "Upgrade All" */
+        #action-toolbar {
+            padding: 10px 15px; display: flex; justify-content: flex-end; gap: 10px;
+            background-color: var(--tg-theme-bg-color);
+        }
+        
+        /* Profile Styling */
         .profile-top-section {
             padding-top: 30px; padding-bottom: 20px;
             background: var(--app-profile-gradient-fallback);
-            display: flex; justify-content: center; position: relative;
+            display: flex; flex-direction: column; align-items: center; position: relative;
             transition: background 0.5s ease;
         }
-        
         #profile-pattern-overlay {
             position: absolute; top:0; left:0; right:0; bottom:0;
-            pointer-events: none; overflow: hidden; opacity: 0.15;
+            pointer-events: none; overflow: hidden;
         }
         .profile-pattern-item {
             position: absolute; width: 30px; height: 30px;
             background-color: currentColor; 
             -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+            opacity: 0.15;
         }
 
-        .profile-main-info { display: flex; flex-direction: column; align-items: center; z-index: 2; width: 100%; }
         .profile-avatar {
             width: 100px; height: 100px; border-radius: 50%;
             background-color: var(--tg-theme-hint-color); margin-bottom: 15px;
-            object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 2;
         }
-        .profile-name-status h1 { font-size: 1.4em; font-weight: 600; text-align: center; }
-        .profile-name-status p { font-size: 0.95em; opacity: 0.7; text-align: center; margin-top: 3px; color: var(--tg-theme-link-color); }
-        
-        .profile-meta-info { margin-top: 12px; text-align: center; width: 100%; padding: 0 20px; }
-        .meta-username { color: var(--tg-theme-text-color); opacity: 0.6; font-size: 0.9em; margin-bottom: 4px; }
-        .meta-phone { color: var(--tg-theme-text-color); font-family: monospace; font-size: 1em; opacity: 0.8; margin-bottom: 8px; }
-        .meta-bio { 
-            color: var(--tg-theme-text-color); font-size: 0.95em; 
-            background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 12px;
-            display: inline-block; cursor: pointer; max-width: 90%;
+        .profile-name-status { text-align: center; z-index: 2; margin-bottom: 20px;}
+        .profile-name-status h1 { font-size: 1.4em; font-weight: 600; margin-bottom: 4px; }
+        .profile-name-status p { font-size: 0.9em; opacity: 0.7; }
+
+        /* New Info Section Styles (Left Aligned) */
+        .profile-info-container {
+            width: 100%; z-index: 2; background-color: var(--tg-theme-secondary-bg-color);
+            margin-bottom: 15px;
         }
+        .info-cell {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            display: flex; flex-direction: column; align-items: flex-start;
+        }
+        .info-cell:last-child { border-bottom: none; }
+        .info-cell-label {
+            color: var(--tg-theme-link-color); font-size: 0.85em; font-weight: 500; margin-bottom: 2px;
+        }
+        .info-cell-value {
+            color: var(--tg-theme-text-color); font-size: 1em; text-align: left;
+        }
+        .edit-icon { opacity: 0.5; font-size: 0.8em; margin-left: 5px; }
 
         .profile-tabs { display: flex; justify-content: space-around; background-color: var(--tg-theme-bg-color); border-bottom: 1px solid var(--tg-theme-secondary-bg-color); }
         .profile-tabs button {
@@ -97,17 +115,22 @@
             background-color: var(--tg-theme-secondary-bg-color);
             border-radius: 14px; padding: 8px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            aspect-ratio: 1 / 1; border: none; outline: none;
+            aspect-ratio: 1 / 1; 
             cursor: pointer; position: relative; overflow: hidden;
             transition: transform 0.1s ease-out;
+            /* REMOVED border to fix outline issue */
+            /* border: 2px solid transparent; */ 
         }
-        .gift-card.selected { box-shadow: inset 0 0 0 3px var(--tg-theme-link-color); background-color: rgba(98, 188, 249, 0.15); }
+        .gift-card.selected { 
+            box-shadow: inset 0 0 0 3px var(--tg-theme-link-color); 
+            background-color: rgba(98, 188, 249, 0.1);
+        }
 
         .buy-gift-item {
             background-color: var(--tg-theme-secondary-bg-color);
             border-radius: 14px; padding: 8px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            aspect-ratio: 1 / 1.35; border: none;
+            aspect-ratio: 1 / 1.35; 
             cursor: pointer; position: relative; overflow: hidden;
             transition: transform 0.1s ease-out;
         }
@@ -170,8 +193,7 @@
             display: flex; flex-direction: column; overflow: hidden;
             max-height: 90vh;
         }
-        
-        #customize-modal .modal-content { height: 90vh; }
+        #customize-modal .modal-content { height: 95vh; } /* Taller for multi-custom */
 
         .modal-header-bar { padding: 15px; text-align: center; font-weight: 500; border-bottom: 1px solid rgba(0,0,0,0.1); background: var(--tg-theme-secondary-bg-color); position: relative; z-index: 10; }
         .modal-scrollable-content { overflow-y: auto; padding: 0; flex-grow: 1; }
@@ -195,6 +217,7 @@
         .collectible-display-area h3 { margin-top: 15px; position: relative; z-index: 2; font-size: 1.5em; }
         .collectible-display-area p { color: rgba(255,255,255,0.7); position: relative; z-index: 2; margin-top: 5px; }
 
+        /* Long Press Menu */
         #long-press-menu {
             position: fixed; background: var(--tg-theme-secondary-bg-color);
             border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
@@ -244,28 +267,38 @@
             background: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); border: none; padding: 10px; border-radius: 8px; width: 100%; font-size: 1.2em; text-align: center; margin-bottom: 15px; outline: none;
         }
 
-        .glass-panel { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; animation: glassFloat 4s ease-in-out infinite; }
-        .liquid-blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.6; z-index: 1; animation: blobFloat 10s infinite alternate; }
+        /* Loading Screen CSS */
+        .glass-panel {
+            position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center;
+            animation: glassFloat 4s ease-in-out infinite; 
+        }
+        .liquid-blob {
+            position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.6; z-index: 1;
+            animation: blobFloat 10s infinite alternate;
+        }
         .blob-1 { width: 250px; height: 250px; background: #007AFF; top: 20%; left: 10%; }
         .blob-2 { width: 300px; height: 300px; background: #5ac8fa; bottom: 20%; right: 10%; animation-delay: -2s; }
         .blob-3 { width: 200px; height: 200px; background: #007AFF; bottom: 40%; left: 40%; animation-delay: -4s; opacity: 0.5; }
         @keyframes blobFloat { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(40px, -40px) scale(1.1); } 100% { transform: translate(-20px, 20px) scale(0.9); } }
         @keyframes glassFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
-        /* Customization Queue */
-        #cust-queue-container { padding: 10px 15px; display: flex; gap: 8px; overflow-x: auto; white-space: nowrap; border-bottom: 1px solid rgba(0,0,0,0.1); background: rgba(0,0,0,0.1); margin-bottom: 10px; min-height: 60px; align-items: center; }
-        .queue-item { background: var(--tg-theme-button-color); color: white; padding: 5px 12px; border-radius: 16px; font-size: 0.8em; cursor: pointer; display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
-        .queue-remove { background: rgba(0,0,0,0.2); border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-size: 10px; }
-        
-        /* Floating add button inside customization */
-        #btn-add-more { 
-            display: none; width: calc(100% - 30px); margin: 10px auto; 
-            background: var(--tg-theme-secondary-bg-color); border: 1px solid var(--tg-theme-button-color); color: var(--tg-theme-button-color); 
+        /* Customization Queue Styles */
+        #custom-queue {
+            display: flex; overflow-x: auto; gap: 8px; padding: 10px 15px; background: rgba(0,0,0,0.1); margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05);
         }
+        .queue-item {
+            position: relative; width: 60px; height: 60px; background: var(--tg-theme-bg-color); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .queue-item img { width: 45px; height: 45px; object-fit: contain; }
+        .queue-badge {
+            position: absolute; top: -5px; right: -5px; background: #ff595a; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: flex; align-items: center; justify-content: center;
+        }
+        #add-to-queue-btn { margin-top: 15px; }
     </style>
 </head>
 <body>
 
+<!-- Loading Overlay -->
 <div id="loading-overlay" class="modal-overlay active" style="align-items: center; justify-content: center; background: var(--tg-theme-bg-color); z-index: 9999;">
     <div class="liquid-blob blob-1"></div>
     <div class="liquid-blob blob-2"></div>
@@ -291,10 +324,21 @@
                     <h1 id="user-name">Loading...</h1>
                     <p id="gift-count-display">0 gifts</p>
                 </div>
-                <div class="profile-meta-info">
-                    <div class="meta-username" id="meta-username"></div>
-                    <div class="meta-phone" id="meta-phone"></div>
-                    <div class="meta-bio" id="meta-bio" onclick="editBio()">Loading...</div>
+            </div>
+            
+            <!-- Metadata Row Section (Left Aligned) -->
+            <div class="profile-info-container">
+                <div class="info-cell">
+                    <span class="info-cell-label">Mobile</span>
+                    <span class="info-cell-value" id="profile-mobile">Loading...</span>
+                </div>
+                <div class="info-cell" onclick="editBio()">
+                    <span class="info-cell-label">Bio</span>
+                    <span class="info-cell-value"><span id="profile-bio">Loading...</span> <span class="edit-icon">✎</span></span>
+                </div>
+                <div class="info-cell">
+                    <span class="info-cell-label">Username</span>
+                    <span class="info-cell-value" id="profile-username">Loading...</span>
                 </div>
             </div>
         </div>
@@ -407,11 +451,10 @@
 
 <div id="customize-modal" class="modal-overlay">
     <div class="modal-content">
-        <div class="modal-header-bar">Customize Gift</div>
+        <div class="modal-header-bar">Customize & Batch Add</div>
+        <!-- Queue Display -->
+        <div id="custom-queue" class="hidden"></div>
         <div class="modal-scrollable-content" style="padding: 0;">
-            <!-- Queue Display -->
-            <div id="cust-queue-container" class="hidden"></div>
-            
             <div class="filter-section">
                 <h4>Select Base Gift</h4>
                 <div class="filter-options-grid" id="cust-base-grid"></div>
@@ -430,12 +473,14 @@
                     <h4>Select Symbol (Optional)</h4>
                     <div class="filter-options-grid" id="cust-pattern-grid"></div>
                 </div>
-                
-                <button class="modal-button" id="btn-add-more" onclick="handleAddMoreToQueue()">+ Add Another</button>
+                <div class="filter-section">
+                    <button id="btn-add-queue" class="modal-button secondary" onclick="handleAddToQueue()" style="width:100%; border: 1px solid var(--tg-theme-button-color);">+ Add to List</button>
+                </div>
             </div>
         </div>
         <div class="modal-buttons-footer">
-            <button class="modal-button secondary" onclick="closeModal('customize-modal')">Cancel</button>
+            <button class="modal-button" id="btn-create-batch" onclick="handleBatchCreate()">Create</button>
+            <button class="modal-button secondary" onclick="closeModal('customize-modal')">Close</button>
         </div>
     </div>
 </div>
@@ -456,7 +501,9 @@
 
 <script>
     const tg = window.Telegram.WebApp;
-    tg.ready(); tg.expand(); tg.enableClosingConfirmation();
+    tg.ready();
+    tg.expand();
+    tg.enableClosingConfirmation();
 
     const CDN_BASE = "https://cdn.changes.tg/gifts/";
     const LS_KEY = "web_gift_app_v6";
@@ -464,49 +511,69 @@
     const WEAR_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>`;
 
     let state = {
-        inventory: [], giftDefinitions: {}, lastCollectibleNumber: 100,
+        inventory: [], 
+        giftDefinitions: {}, 
+        lastCollectibleNumber: 100,
         settings: { animations: true, showHidden: false },
-        userMeta: { bio: "Hello world", phone: "" } // New field
+        userMeta: { mobile: null, bio: "Hello world" } // Added Metadata
     };
 
     let customizationState = {
-        queue: [], // Array of gift objects pending creation
         selectedBaseId: null, selectedBaseName: null,
         selectedModel: null, selectedBackdrop: null, selectedPattern: null,
-        cachedParts: {}
+        cachedParts: {},
+        queue: [] // Batch creation queue
     };
 
     let appRuntime = {
-        longPressTimer: null, activeGiftId: null, shopGiftData: null, 
-        reordering: false, sortable: null, selectionMode: null, selectedIds: new Set()
+        longPressTimer: null,
+        activeGiftId: null, 
+        shopGiftData: null,
+        reordering: false,
+        sortable: null,
+        selectionMode: null,
+        selectedIds: new Set()
     };
 
     window.addEventListener('DOMContentLoaded', async () => {
-        // Init Loading Screen
+        // Loading
         const loadingScreen = document.getElementById('loading-overlay');
         lottie.loadAnimation({ container: document.getElementById('loading-anim'), renderer: 'svg', loop: true, autoplay: true, path: 'https://cdn.changes.tg/gifts/models/Artisan%20Brick/lottie/Ice%20Mammoth.json' });
+        
         setTimeout(() => {
             loadingScreen.style.opacity = '0';
             document.getElementById('profile-page').classList.add('active');
             setTimeout(() => { loadingScreen.classList.remove('active'); }, 200);
         }, Math.random() * 3000 + 3000);
 
-        applyTelegramTheme(); tg.onEvent('themeChanged', applyTelegramTheme);
-
-        const user = tg.initDataUnsafe.user;
-        const uMetaName = document.getElementById('meta-username');
-        if (user) {
-            document.getElementById('user-name').innerText = [user.first_name, user.last_name].filter(Boolean).join(' ');
-            document.getElementById('user-avatar').src = user.photo_url || `https://i.pravatar.cc/150?u=${user.id}`;
-            if(user.username) uMetaName.innerText = `@${user.username}`;
-        } else {
-            document.getElementById('user-name').innerText = "Web User";
-            document.getElementById('user-avatar').src = "https://i.pravatar.cc/150?u=test";
-            uMetaName.innerText = "@web_user";
-        }
+        applyTelegramTheme();
+        tg.onEvent('themeChanged', applyTelegramTheme);
 
         loadState();
-        renderMeta();
+        
+        // Metadata Rendering
+        const user = tg.initDataUnsafe.user;
+        if (user) {
+            document.getElementById('user-name').innerText = [user.first_name, user.last_name].filter(Boolean).join(' ');
+            document.getElementById('profile-username').innerText = user.username ? `@${user.username}` : "None";
+            if (user.photo_url) document.getElementById('user-avatar').src = user.photo_url;
+            else document.getElementById('user-avatar').src = `https://i.pravatar.cc/150?u=${user.id}`;
+        } else {
+            document.getElementById('user-name').innerText = "Web User";
+            document.getElementById('profile-username').innerText = "@web_user";
+            document.getElementById('user-avatar').src = "https://i.pravatar.cc/150?u=test";
+        }
+        
+        // Generate Phone if missing
+        if(!state.userMeta.mobile) {
+            const p1 = Math.floor(1000 + Math.random() * 9000);
+            const p2 = Math.floor(1000 + Math.random() * 9000);
+            state.userMeta.mobile = `+888 ${p1} ${p2}`;
+            saveState();
+        }
+        document.getElementById('profile-mobile').innerText = state.userMeta.mobile;
+        document.getElementById('profile-bio').innerText = state.userMeta.bio;
+
         applyWornGiftVisuals();
         await fetchGiftDefinitions();
         renderShop();
@@ -517,6 +584,15 @@
             if (!menu.classList.contains('hidden') && !menu.contains(e.target)) menu.classList.add('hidden');
         });
     });
+
+    function editBio() {
+        const newBio = prompt("Enter Bio:", state.userMeta.bio);
+        if(newBio !== null) {
+            state.userMeta.bio = newBio.substring(0, 70); // Telegram limits
+            document.getElementById('profile-bio').innerText = state.userMeta.bio;
+            saveState();
+        }
+    }
 
     function applyTelegramTheme() {
         const p = tg.themeParams;
@@ -533,23 +609,12 @@
     function haptic(style) { if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred(style || 'light'); }
     function hapticNotify(type) { if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred(type); }
 
-    // --- Profile Meta ---
-    function renderMeta() {
-        // Init phone if missing
-        if(!state.userMeta.phone) {
-            state.userMeta.phone = "+888 " + Math.floor(1000 + Math.random() * 9000) + " " + Math.floor(1000 + Math.random() * 9000);
-            saveState();
-        }
-        document.getElementById('meta-phone').innerText = state.userMeta.phone;
-        document.getElementById('meta-bio').innerText = state.userMeta.bio;
-    }
-    function editBio() {
-        const newBio = prompt("Enter new bio:", state.userMeta.bio);
-        if(newBio !== null) { state.userMeta.bio = newBio.substring(0, 70); saveState(); renderMeta(); }
-    }
-
     async function fetchGiftDefinitions() {
-        try { state.giftDefinitions = await (await fetch(`${CDN_BASE}id-to-name.json`)).json(); } catch(e){}
+        try {
+            const res = await fetch(`${CDN_BASE}id-to-name.json`);
+            if (!res.ok) throw new Error("Failed");
+            state.giftDefinitions = await res.json();
+        } catch (e) { console.error(e); }
     }
 
     async function fetchGiftParts(giftName) {
@@ -573,6 +638,7 @@
                 if (idxB !== -1) return 1;
                 return a.name.localeCompare(b.name);
             });
+
             return { models, backdrops, patterns };
         } catch (e) { return { models: [], backdrops: [], patterns: [] }; }
     }
@@ -601,8 +667,10 @@
         const grid = document.getElementById('inventory-grid');
         if (appRuntime.reordering) return;
         grid.innerHTML = '';
+        
         let displayList = state.settings.showHidden ? state.inventory : state.inventory.filter(g => !g.hidden);
         document.getElementById('gift-count-display').innerText = `${state.inventory.length} gifts`;
+
         updateActionToolbar();
 
         if (displayList.length === 0) {
@@ -625,8 +693,9 @@
             if (gift.hidden) el.classList.add('is-hidden');
             if (appRuntime.selectionMode === 'hide' && appRuntime.selectedIds.has(gift.uniqueId)) el.classList.add('selected');
             
-            if (appRuntime.selectionMode) { el.onclick = () => toggleSelection(gift.uniqueId); } 
-            else {
+            if (appRuntime.selectionMode) {
+                el.onclick = () => toggleSelection(gift.uniqueId);
+            } else {
                 el.addEventListener('touchstart', (e) => startInventoryLongPress(e, gift), {passive:false});
                 el.addEventListener('touchend', cancelLongPress);
                 el.addEventListener('touchmove', cancelLongPress);
@@ -648,7 +717,12 @@
                     setTimeout(() => playLottie(`lot-${gift.uniqueId}`, lottieUrl), 0);
                 } else visualHtml = `<img src="${imgUrl}" loading="lazy">`;
 
-                el.innerHTML = `${topIcon}<div class="top-right-label">#${gift.collectibleNumber}</div><div class="gift-card-bg-pattern" style="background: ${bgStyle}"></div><div class="dynamic-pattern-container" id="pat-${gift.uniqueId}"></div><div class="image-container">${visualHtml}</div>`; 
+                el.innerHTML = `
+                    ${topIcon}
+                    <div class="top-right-label">#${gift.collectibleNumber}</div>
+                    <div class="gift-card-bg-pattern" style="background: ${bgStyle}"></div>
+                    <div class="dynamic-pattern-container" id="pat-${gift.uniqueId}"></div>
+                    <div class="image-container">${visualHtml}</div>`; 
                 setTimeout(() => generatePattern(`pat-${gift.uniqueId}`, cd.pattern, gift.name, true, cd.backdrop.hex.patternColor), 0);
                 if (!appRuntime.selectionMode) el.onclick = () => openCollectibleModal(gift);
             } else {
@@ -657,6 +731,7 @@
                     visualHtml = `<div class="lottie-wrapper" id="lot-${gift.uniqueId}"></div>`;
                     setTimeout(() => playLottie(`lot-${gift.uniqueId}`, `${CDN_BASE}originals/${gift.originalId}/Original.json`), 0);
                 } else visualHtml = `<img src="${imgUrl}" loading="lazy">`;
+
                 el.innerHTML = `<div class="image-container">${visualHtml}</div>`;
                 if (!appRuntime.selectionMode) el.onclick = () => openDetailModal(gift);
             }
@@ -666,12 +741,19 @@
 
     function updateActionToolbar() {
         const toolbar = document.getElementById('action-toolbar');
-        toolbar.innerHTML = ''; toolbar.className = 'hidden';
+        toolbar.innerHTML = '';
+        toolbar.className = 'hidden';
+
         if (appRuntime.selectionMode === 'hide') {
             toolbar.className = '';
-            toolbar.innerHTML = `<button class="action-button" onclick="cancelSelectionMode()" style="background:var(--tg-theme-button-color);">Cancel</button><button class="action-button" onclick="confirmHideSelected()" style="background:var(--app-accent-blue);">Hide (${appRuntime.selectedIds.size})</button>`;
+            toolbar.innerHTML = `
+                <button class="action-button" onclick="cancelSelectionMode()" style="background:var(--tg-theme-button-color);">Cancel</button>
+                <button class="action-button" onclick="confirmHideSelected()" style="background:var(--app-accent-blue);">Hide (${appRuntime.selectedIds.size})</button>
+            `;
             return;
         }
+
+        // Upgrade All Button check
         if (state.inventory.some(g => !g.isCollectible)) {
             toolbar.className = '';
             toolbar.innerHTML = `<button class="action-button" onclick="handleUpgradeAll()" style="background:var(--app-accent-blue);">✨ Upgrade All</button>`;
@@ -708,10 +790,14 @@
         closeModal('qty-modal');
     }
 
-    async function performUpgrade(gift) {
+    // --- Upgrade Logic ---
+    async function performUpgrade(gift, notify=true) {
         const parts = await fetchGiftParts(gift.name);
         if (!parts.models.length) return false;
-        gift.isCollectible = true; state.lastCollectibleNumber++; gift.collectibleNumber = state.lastCollectibleNumber;
+        
+        gift.isCollectible = true;
+        state.lastCollectibleNumber++;
+        gift.collectibleNumber = state.lastCollectibleNumber;
         gift.collectibleData = {
             model: parts.models[Math.floor(Math.random()*parts.models.length)],
             backdrop: parts.backdrops[Math.floor(Math.random()*parts.backdrops.length)],
@@ -724,54 +810,97 @@
         document.getElementById('btn-upgrade').innerText = "Upgrading...";
         const gift = state.inventory.find(g => g.uniqueId === appRuntime.activeGiftId);
         const success = await performUpgrade(gift);
-        if (success) { hapticNotify('success'); saveState(); renderInventory(); closeModal('detail-modal'); openCollectibleModal(gift); } 
-        else alert("No parts!");
+        
+        if (success) {
+            hapticNotify('success');
+            saveState(); renderInventory(); closeModal('detail-modal');
+            openCollectibleModal(gift);
+        } else {
+            alert("No parts!");
+        }
         document.getElementById('btn-upgrade').innerText = "Upgrade";
     }
 
     async function handleUpgradeAll() {
         const toUpgrade = state.inventory.filter(g => !g.isCollectible);
+        if(!toUpgrade.length) return;
+        
+        // This button just disappears or changes text to Loading
         const btn = document.querySelector('#action-toolbar button');
-        btn.innerText = `Upgrading ${toUpgrade.length}...`; btn.disabled = true;
+        btn.innerText = `Upgrading ${toUpgrade.length}...`;
+        btn.disabled = true;
+
         let changed = false;
-        for (let g of toUpgrade) if (await performUpgrade(g)) changed = true;
-        if(changed) { hapticNotify('success'); saveState(); renderInventory(); }
+        for (let g of toUpgrade) {
+            if (await performUpgrade(g, false)) changed = true;
+        }
+        
+        if(changed) {
+            hapticNotify('success');
+            saveState(); renderInventory();
+        }
     }
 
+    // --- Selection Logic (Hide Multiple) ---
     function startSelectionMode(mode) {
-        appRuntime.selectionMode = mode; appRuntime.selectedIds = new Set();
-        closeModal('settings-modal'); renderInventory();
+        appRuntime.selectionMode = mode;
+        appRuntime.selectedIds = new Set();
+        closeModal('settings-modal');
+        renderInventory();
     }
-    function cancelSelectionMode() { appRuntime.selectionMode = null; appRuntime.selectedIds = new Set(); renderInventory(); }
+    function cancelSelectionMode() {
+        appRuntime.selectionMode = null;
+        appRuntime.selectedIds = new Set();
+        renderInventory();
+    }
     function toggleSelection(id) {
-        if(appRuntime.selectedIds.has(id)) appRuntime.selectedIds.delete(id); else appRuntime.selectedIds.add(id);
-        haptic('light'); renderInventory();
+        if(appRuntime.selectedIds.has(id)) appRuntime.selectedIds.delete(id);
+        else appRuntime.selectedIds.add(id);
+        haptic('light');
+        renderInventory();
     }
     function confirmHideSelected() {
         const ids = Array.from(appRuntime.selectedIds);
         if(ids.length > 0) {
-            state.inventory.forEach(g => { if(ids.includes(g.uniqueId)) { g.hidden = true; g.pinned = false; g.worn = false; }});
+            state.inventory.forEach(g => {
+                if(ids.includes(g.uniqueId)) {
+                    g.hidden = true; g.pinned = false; g.worn = false;
+                }
+            });
             hapticNotify('success'); saveState();
         }
-        cancelSelectionMode(); applyWornGiftVisuals();
+        cancelSelectionMode();
+        applyWornGiftVisuals();
     }
 
+    // --- Single Gift Actions ---
     function openMenu(e, gift) {
         appRuntime.activeGiftId = gift.uniqueId;
         const menu = document.getElementById('long-press-menu');
-        const pinBtn = document.getElementById('menu-pin'), wearBtn = document.getElementById('menu-wear'), reorderBtn = document.getElementById('menu-reorder');
+        const pinBtn = document.getElementById('menu-pin');
+        const wearBtn = document.getElementById('menu-wear');
+        const reorderBtn = document.getElementById('menu-reorder');
+        const hideBtn = document.getElementById('menu-hide');
+
         pinBtn.style.display = 'none'; wearBtn.style.display = 'none'; reorderBtn.style.display = 'none';
 
         if (gift.isCollectible) {
-            pinBtn.style.display = 'block'; pinBtn.innerText = gift.pinned ? "Unpin" : "Pin";
-            wearBtn.style.display = 'block'; wearBtn.innerText = gift.worn ? "Take Off" : "Wear Gift";
+            pinBtn.style.display = 'block';
+            pinBtn.innerText = gift.pinned ? "Unpin" : "Pin";
+            
+            // This is critical: Ensures Wear button is shown for collectibles
+            wearBtn.style.display = 'block';
+            wearBtn.innerText = gift.worn ? "Take Off" : "Wear Gift";
+
             if (gift.pinned && state.inventory.filter(g => g.pinned).length > 1) reorderBtn.style.display = 'block';
         }
-        document.getElementById('menu-hide').innerText = gift.hidden ? "Unhide" : "Hide";
+        hideBtn.innerText = gift.hidden ? "Unhide" : "Hide";
+
         let x = e.clientX, y = e.clientY;
         if (x + 180 > window.innerWidth) x = window.innerWidth - 190;
         if (y + 160 > window.innerHeight) y = window.innerHeight - 170;
-        menu.style.left = x + 'px'; menu.style.top = y + 'px'; menu.classList.remove('hidden');
+        menu.style.left = x + 'px'; menu.style.top = y + 'px';
+        menu.classList.remove('hidden');
     }
 
     function togglePin() {
@@ -779,7 +908,7 @@
         if(!gift) return;
         if(gift.pinned) { gift.pinned = false; gift.pinOrder = null; }
         else {
-            if(state.inventory.filter(g => g.pinned).length >= 6) { alert("Max 6 pins."); return; }
+            if(state.inventory.filter(g => g.pinned).length >= 6) { tg.showAlert("Max 6 pins."); return; }
             gift.pinned = true; gift.pinOrder = 999;
         }
         closeMenu(); haptic('light'); saveState(); renderInventory();
@@ -788,9 +917,18 @@
     function toggleWear() {
         const gift = state.inventory.find(g => g.uniqueId === appRuntime.activeGiftId);
         if(!gift) return;
-        if(gift.worn) { gift.worn = false; } 
-        else { state.inventory.forEach(g => g.worn = false); gift.worn = true; }
-        closeMenu(); haptic('medium'); saveState(); renderInventory(); applyWornGiftVisuals();
+        if(gift.worn) { 
+            gift.worn = false; 
+        } else { 
+            // Unwear everything else first
+            state.inventory.forEach(g => g.worn = false); 
+            gift.worn = true; 
+        }
+        closeMenu(); 
+        hapticNotify('success'); 
+        saveState(); 
+        renderInventory(); 
+        applyWornGiftVisuals();
     }
 
     function applyWornGiftVisuals() {
@@ -798,7 +936,7 @@
         const overlay = document.getElementById('profile-pattern-overlay');
         const bg = document.getElementById('profile-bg');
         overlay.innerHTML = '';
-        if (worn && !worn.hidden) {
+        if (worn) {
             const cd = worn.collectibleData;
             bg.style.background = `radial-gradient(circle at 50% 0%, ${cd.backdrop.hex.centerColor}, ${cd.backdrop.hex.edgeColor})`;
             generatePattern('profile-pattern-overlay', cd.pattern, worn.name, false, cd.backdrop.hex.patternColor, true);
@@ -813,12 +951,18 @@
     }
 
     function deleteGift() {
-        tg.showConfirm("Delete?", (yes) => { if(yes) { state.inventory = state.inventory.filter(g => g.uniqueId !== appRuntime.activeGiftId); haptic('heavy'); saveState(); renderInventory(); applyWornGiftVisuals(); }});
+        tg.showConfirm("Delete?", (yes) => {
+            if(yes) {
+                state.inventory = state.inventory.filter(g => g.uniqueId !== appRuntime.activeGiftId);
+                haptic('heavy'); saveState(); renderInventory(); applyWornGiftVisuals();
+            }
+        });
         closeMenu();
     }
     
     function closeMenu() { document.getElementById('long-press-menu').classList.add('hidden'); }
 
+    // --- Reorder & Visuals ---
     function startReorderMode() {
         closeMenu(); appRuntime.reordering = true;
         document.getElementById('reorder-controls').classList.remove('hidden');
@@ -838,20 +982,19 @@
                 const g = state.inventory.find(x => x.uniqueId == id);
                 if(g && g.pinned) g.pinOrder = index;
             });
-            appRuntime.sortable.destroy(); haptic('light'); saveState(); renderInventory();
+            appRuntime.sortable.destroy();
+            haptic('light'); saveState(); renderInventory();
         }
     }
 
-    // --- Customization ---
+    // --- Customization (Updated for Batch Queue) ---
     async function openCustomizeModal() {
         document.getElementById('customize-modal').classList.add('active');
+        document.getElementById('cust-parts-container').classList.add('hidden');
+        document.getElementById('btn-create-custom').textContent = "Create"; // reset text
         customizationState.queue = [];
         renderQueue();
-        document.getElementById('cust-parts-container').classList.add('hidden');
-        document.getElementById('btn-add-more').style.display = 'none'; // hide until base selected
         
-        // Reset TG buttons to start state (queue mode)
-        updateCustomizeMainButton();
         tg.BackButton.show(); tg.BackButton.onClick(() => closeModal('customize-modal'));
         
         const grid = document.getElementById('cust-base-grid');
@@ -870,23 +1013,22 @@
         document.querySelectorAll('#cust-base-grid .filter-option').forEach(e => e.classList.remove('selected'));
         el.classList.add('selected');
         
-        // Save base details
+        // Store current selection data but don't reset Queue
         customizationState.selectedBaseId = id; 
         customizationState.selectedBaseName = name; 
-        customizationState.selectedModel = null; customizationState.selectedBackdrop = null; customizationState.selectedPattern = null;
+        customizationState.selectedModel = null;
+        customizationState.selectedBackdrop = null;
+        customizationState.selectedPattern = null;
 
-        // Fetch parts
         if(!customizationState.cachedParts[id]) customizationState.cachedParts[id] = await fetchGiftParts(name);
         const parts = customizationState.cachedParts[id];
         
-        // Render Grids
         renderPartGrid('cust-model-grid', parts.models, 'model', name);
         renderPartGrid('cust-backdrop-grid', parts.backdrops, 'backdrop', name);
         renderPartGrid('cust-pattern-grid', parts.patterns, 'pattern', name);
         
         document.getElementById('cust-parts-container').classList.remove('hidden');
-        document.getElementById('btn-add-more').style.display = 'block';
-        updateCustomizeMainButton();
+        document.getElementById('btn-add-queue').innerText = "+ Add to List"; // Reset
     }
 
     function renderPartGrid(elemId, items, type, giftName) {
@@ -898,6 +1040,7 @@
             if (type === 'model') content = `<img src="${CDN_BASE}models/${encodeURIComponent(giftName)}/png/${encodeURIComponent(item.name)}.png">`;
             else if (type === 'backdrop') content = `<div class="gradient-square" style="background: radial-gradient(circle, ${item.hex.centerColor}, ${item.hex.edgeColor})"></div>`;
             else content = `<img src="${CDN_BASE}patterns/${encodeURIComponent(giftName)}/png/${encodeURIComponent(item.name)}.png">`;
+            
             el.innerHTML = `${content}<div class="label">${item.name}</div>`;
             el.onclick = () => {
                 haptic('light');
@@ -906,112 +1049,89 @@
                 if(type === 'model') customizationState.selectedModel = item;
                 if(type === 'backdrop') customizationState.selectedBackdrop = item;
                 if(type === 'pattern') customizationState.selectedPattern = item;
-                updateCustomizeMainButton();
             };
             grid.appendChild(el);
         });
     }
 
-    function handleAddMoreToQueue() {
-        const { selectedBaseId, selectedBaseName, selectedModel, selectedBackdrop } = customizationState;
-        if (!selectedBaseId || !selectedModel || !selectedBackdrop) { tg.showAlert("Select a Gift, Model and Backdrop."); return; }
+    function handleAddToQueue() {
+        if(!customizationState.selectedModel || !customizationState.selectedBackdrop) {
+            tg.showAlert("Select Model and Backdrop."); return;
+        }
         
-        let pattern = customizationState.selectedPattern;
-        // Auto random pattern
-        if(!pattern) {
-            const parts = customizationState.cachedParts[selectedBaseId];
-            if(parts && parts.patterns.length) pattern = parts.patterns[Math.floor(Math.random() * parts.patterns.length)];
+        // Random pattern logic
+        let pat = customizationState.selectedPattern;
+        if(!pat) {
+            const parts = customizationState.cachedParts[customizationState.selectedBaseId];
+            if(parts && parts.patterns.length) pat = parts.patterns[Math.floor(Math.random() * parts.patterns.length)];
         }
 
-        // Add to queue
-        customizationState.queue.push({ baseId: selectedBaseId, baseName: selectedBaseName, model: selectedModel, backdrop: selectedBackdrop, pattern: pattern });
+        const config = {
+            baseId: customizationState.selectedBaseId,
+            baseName: customizationState.selectedBaseName,
+            model: customizationState.selectedModel,
+            backdrop: customizationState.selectedBackdrop,
+            pattern: pat
+        };
+        
+        customizationState.queue.push(config);
         haptic('light');
         renderQueue();
         
-        // Reset parts selection visually for new add
-        customizationState.selectedModel = null; customizationState.selectedBackdrop = null; customizationState.selectedPattern = null;
-        document.querySelectorAll('#cust-parts-container .filter-option.selected').forEach(e => e.classList.remove('selected'));
-        updateCustomizeMainButton();
+        // Visual confirmation within the "Add" button
+        const btn = document.getElementById('btn-add-queue');
+        btn.innerText = "✓ Added";
+        setTimeout(() => btn.innerText = "+ Add to List", 800);
     }
 
     function renderQueue() {
-        const container = document.getElementById('cust-queue-container');
+        const container = document.getElementById('custom-queue');
+        const createBtn = document.getElementById('btn-create-batch');
+        container.innerHTML = '';
+        
         if (customizationState.queue.length === 0) {
             container.classList.add('hidden');
+            createBtn.disabled = true;
+            createBtn.innerText = "Create";
             return;
         }
+        
         container.classList.remove('hidden');
-        container.innerHTML = '';
+        createBtn.disabled = false;
+        createBtn.innerText = `Create (${customizationState.queue.length})`;
+
         customizationState.queue.forEach((item, index) => {
-            const q = document.createElement('div');
-            q.className = 'queue-item';
-            q.innerHTML = `<span>${item.baseName}</span><div class="queue-remove">×</div>`;
-            q.onclick = () => {
-                customizationState.queue.splice(index, 1);
-                renderQueue();
-                updateCustomizeMainButton();
-            };
-            container.appendChild(q);
+            const el = document.createElement('div');
+            el.className = 'queue-item';
+            const imgUrl = `${CDN_BASE}models/${encodeURIComponent(item.baseName)}/png/${encodeURIComponent(item.model.name)}.png`;
+            el.innerHTML = `<img src="${imgUrl}"><div class="queue-badge">${index+1}</div>`;
+            container.appendChild(el);
         });
     }
 
-    function updateCustomizeMainButton() {
-        const canCreateSingle = (customizationState.selectedModel && customizationState.selectedBackdrop);
-        const count = customizationState.queue.length;
-
-        if (count > 0) {
-            tg.MainButton.setText(`Create ${count + (canCreateSingle?1:0)} Gifts`);
-            tg.MainButton.enable();
-            tg.MainButton.show();
-            tg.MainButton.offClick(handleCreateCustom);
-            tg.MainButton.onClick(processCustomQueueCreation);
-        } else if (canCreateSingle) {
-            tg.MainButton.setText("Create Gift");
-            tg.MainButton.enable();
-            tg.MainButton.show();
-            tg.MainButton.offClick(processCustomQueueCreation);
-            tg.MainButton.onClick(() => processCustomQueueCreation(true));
-        } else {
-            tg.MainButton.hide();
-        }
-    }
-
-    function processCustomQueueCreation(includeCurrentSelection = false) {
-        // If "Add" wasn't clicked but parts are selected, add to queue temp
-        if (includeCurrentSelection === true || (customizationState.selectedModel && customizationState.selectedBackdrop)) {
-             // Re-check pattern fallback logic for the current selection
-             let pattern = customizationState.selectedPattern;
-             if(!pattern && customizationState.selectedBaseId) {
-                const parts = customizationState.cachedParts[customizationState.selectedBaseId];
-                if(parts && parts.patterns.length) pattern = parts.patterns[Math.floor(Math.random() * parts.patterns.length)];
-             }
-             if (customizationState.selectedBaseId) {
-                 customizationState.queue.push({ 
-                    baseId: customizationState.selectedBaseId, 
-                    baseName: customizationState.selectedBaseName, 
-                    model: customizationState.selectedModel, 
-                    backdrop: customizationState.selectedBackdrop, 
-                    pattern: pattern 
-                 });
-             }
-        }
-
-        // Process Queue
+    function handleBatchCreate() {
+        if(customizationState.queue.length === 0) return;
+        
+        // Loop backward so index 0 is at bottom (oldest), preserving queue order visual when displayed as inventory list (newest first)
+        // Actually inventoryunshift puts last added at top.
         customizationState.queue.forEach(cfg => {
             state.lastCollectibleNumber++;
             state.inventory.unshift({
                 uniqueId: Date.now() + Math.random(), originalId: cfg.baseId, name: cfg.baseName,
-                isCollectible: true, timestamp: Date.now(), pinned: false, collectibleNumber: state.lastCollectibleNumber,
+                isCollectible: true, timestamp: Date.now(), pinned: false,
+                collectibleNumber: state.lastCollectibleNumber,
                 collectibleData: { model: cfg.model, backdrop: cfg.backdrop, pattern: cfg.pattern }
             });
         });
 
         hapticNotify('success');
-        saveState(); renderInventory(); 
-        closeModal('customize-modal'); switchTab('inventory');
-        if(customizationState.queue.length === 1) setTimeout(() => openCollectibleModal(state.inventory[0]), 300);
+        saveState();
+        renderInventory();
+        closeModal('customize-modal');
+        switchTab('inventory');
     }
 
+    // --- Modal Logic ---
     function openDetailModal(gift) {
         appRuntime.activeGiftId = gift.uniqueId;
         document.getElementById('detail-title').innerText = gift.name;
@@ -1032,23 +1152,29 @@
         document.getElementById('collectible-image').style.display = 'none';
         document.getElementById('collectible-lottie').style.display = 'block';
         playLottie('collectible-lottie', `${CDN_BASE}models/${encodeURIComponent(gift.name)}/lottie/${encodeURIComponent(cd.model.name)}.json`);
+        
         const rarity = (val) => `<span class="rarity-chip">${(val/10).toFixed(1)}%</span>`;
         document.getElementById('info-model').innerHTML = `${cd.model.name} ${rarity(cd.model.rarityPermille)}`;
         document.getElementById('info-backdrop').innerHTML = `${cd.backdrop.name} ${rarity(cd.backdrop.rarityPermille)}`;
         document.getElementById('info-pattern').innerHTML = `${cd.pattern.name} ${rarity(cd.pattern.rarityPermille)}`;
+
         document.getElementById('collectible-pattern-container').innerHTML = '';
         generatePattern('collectible-pattern-container', cd.pattern, gift.name, false, cd.backdrop.hex.patternColor);
+
         document.getElementById('collectible-modal').classList.add('active');
         tg.BackButton.show(); tg.BackButton.onClick(() => closeModal('collectible-modal'));
     }
 
     function closeModal(id) {
         document.getElementById(id).classList.remove('active');
-        tg.MainButton.hide();
+        
+        // Restore BackButton logic
         const currentTab = document.getElementById('shop-page').classList.contains('active') ? 'shop' : 'inventory';
         if (currentTab === 'shop' && (id === 'qty-modal' || id === 'detail-modal' || id === 'collectible-modal' || id === 'customize-modal')) {
             tg.BackButton.show(); tg.BackButton.onClick(() => switchTab('inventory'));
-        } else { tg.BackButton.hide(); }
+        } else if (id === 'settings-modal' || id === 'qty-modal') {
+            tg.BackButton.hide();
+        }
     }
 
     function switchTab(tab) {
@@ -1056,6 +1182,7 @@
         document.getElementById('profile-page').classList.remove('active');
         document.getElementById('shop-page').classList.remove('active');
         document.querySelectorAll('.profile-tabs button').forEach(b => b.classList.remove('active'));
+
         if (tab === 'inventory') {
             document.getElementById('profile-page').classList.add('active');
             document.querySelectorAll('.profile-tabs button')[0].classList.add('active');
@@ -1068,12 +1195,14 @@
     }
 
     function playLottie(id, path) {
-        const container = document.getElementById(id); container.innerHTML = '';
+        const container = document.getElementById(id);
+        container.innerHTML = '';
         lottie.loadAnimation({ container, renderer:'svg', loop:true, autoplay:true, path });
     }
 
     function generatePattern(containerId, patternObj, giftName, isSmall, colorHex, isHeader=false) {
-        const container = document.getElementById(containerId); if (!container) return;
+        const container = document.getElementById(containerId);
+        if (!container) return;
         const url = `${CDN_BASE}patterns/${encodeURIComponent(giftName)}/png/${encodeURIComponent(patternObj.name)}.png`;
         const width = container.offsetWidth; const height = container.offsetHeight;
         const centerX = width / 2; const centerY = isSmall ? height / 2 : height * 0.4;
@@ -1093,7 +1222,13 @@
         });
     }
 
-    function openSettingsModal() { document.getElementById('settings-modal').classList.add('active'); document.getElementById('setting-animations').checked = state.settings.animations; document.getElementById('setting-hidden').checked = state.settings.showHidden; tg.BackButton.show(); tg.BackButton.onClick(() => closeModal('settings-modal')); }
+    // --- Settings & Persistence ---
+    function openSettingsModal() {
+        document.getElementById('settings-modal').classList.add('active');
+        document.getElementById('setting-animations').checked = state.settings.animations;
+        document.getElementById('setting-hidden').checked = state.settings.showHidden;
+        tg.BackButton.show(); tg.BackButton.onClick(() => closeModal('settings-modal'));
+    }
     function initSettingsUI() { }
     function toggleSetting(key, value) { state.settings[key] = value; haptic('light'); saveState(); renderInventory(); }
     function saveState() { localStorage.setItem(LS_KEY, JSON.stringify(state)); }
@@ -1103,11 +1238,13 @@
             const parsed = JSON.parse(saved);
             state.inventory = parsed.inventory || [];
             state.lastCollectibleNumber = parsed.lastCollectibleNumber || 100;
+            state.userMeta = parsed.userMeta || { mobile: null, bio: "Hello world" };
             if(parsed.settings) state.settings = parsed.settings;
-            if(parsed.userMeta) state.userMeta = parsed.userMeta;
         }
     }
-    function resetAppData() { tg.showConfirm("Reset App?", (confirmed) => { if(confirmed) { localStorage.removeItem(LS_KEY); location.reload(); }}); }
+    function resetAppData() {
+        tg.showConfirm("Reset App?", (confirmed) => { if(confirmed) { localStorage.removeItem(LS_KEY); location.reload(); }});
+    }
 </script>
 </body>
-    </html>
+</html>
