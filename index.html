@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Telegram Gift Simulator</title>
+    <title>Gift Upgrade</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
@@ -18,7 +18,7 @@
             --tg-theme-secondary-bg-color: #17212b;
             --app-accent-blue: #5288c1;
             
-            --app-modal-backdrop-color: rgba(0,0,0,0.7);
+            --app-modal-backdrop-color: rgba(0,0,0,0.8);
             --app-rarity-chip-bg: rgba(0,0,0,0.2);
             --app-profile-gradient-fallback: var(--tg-theme-secondary-bg-color);
         }
@@ -43,117 +43,122 @@
             padding: 10px 15px; background-color: var(--tg-theme-secondary-bg-color);
             min-height: 56px; position: sticky; top: 0; z-index: 10;
         }
-        .page-header h2 { font-size: 1.15em; font-weight: 500; }
+        .page-header h2 { font-size: 1.15em; font-weight: 500; margin: 0; }
         
         .profile-top-section {
             padding-top: 30px; padding-bottom: 20px;
             background: var(--app-profile-gradient-fallback);
             display: flex; justify-content: center; position: relative;
             transition: background 0.5s ease;
-            overflow: hidden; /* Clips patterns that go too far */
-        }
-        /* Pattern Overlay Container */
-        #profile-pattern-overlay {
-            position: absolute; top:0; left:0; right:0; bottom:0;
-            pointer-events: none; opacity: 0.15;
         }
         
+        #profile-pattern-overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            overflow: hidden; pointer-events: none; opacity: 0.15;
+        }
+        
+        .profile-pattern-item {
+            position: absolute; width: 30px; height: 30px;
+            left: 50%; top: 50%; /* Center anchor */
+            background-color: currentColor; 
+            -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+        }
+
         .profile-main-info { display: flex; flex-direction: column; align-items: center; z-index: 2; position: relative; }
         .profile-avatar {
             width: 100px; height: 100px; border-radius: 50%;
-            background-color: var(--tg-theme-hint-color); margin-bottom: 15px;
+            background-color: var(--tg-theme-hint-color); margin-bottom: 12px;
             object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
-        .profile-name-status h1 { font-size: 1.4em; font-weight: 600; text-align: center; margin-bottom: 4px; }
-        .profile-name-status p { font-size: 0.95em; opacity: 0.7; text-align: center; color: var(--tg-theme-text-color); margin: 0; }
+        .profile-name-status h1 { font-size: 1.4em; font-weight: 700; text-align: center; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.5px; }
+        .profile-name-status p { font-size: 0.9em; opacity: 0.7; text-align: center; margin: 0; color: var(--tg-theme-text-color); }
 
-        /* Info Block */
-        .profile-info-block { padding: 15px 20px; background-color: var(--tg-theme-bg-color); border-bottom: 8px solid rgba(0,0,0,0.1); }
-        .profile-info-header { color: var(--tg-theme-link-color); font-weight: 500; margin-bottom: 15px; }
-        .info-item { margin-bottom: 18px; }
-        .info-item:last-child { margin-bottom: 0; }
-        .info-item .value { color: var(--tg-theme-text-color); font-size: 1.05em; display: block; margin-bottom: 3px; line-height: 1.2; }
+        /* Telegram-style Info Block */
+        .profile-info-block { padding: 20px 20px; background-color: var(--tg-theme-bg-color); }
+        .profile-info-header { color: var(--tg-theme-link-color); font-weight: 500; font-size: 0.95em; margin-bottom: 15px; }
+        .info-item { margin-bottom: 18px; cursor: default; }
+        .info-item .value { color: var(--tg-theme-text-color); font-size: 1.1em; display: block; margin-bottom: 2px; line-height: 1.2;}
         .info-item .label { color: var(--tg-theme-hint-color); font-size: 0.85em; }
-        .info-item .editable { cursor: pointer; } /* No more border */
+        .info-item .clickable { cursor: pointer; }
 
-        .profile-tabs { display: flex; justify-content: space-around; background-color: var(--tg-theme-bg-color); border-bottom: 1px solid var(--tg-theme-secondary-bg-color); }
+        .profile-tabs { display: flex; justify-content: space-around; background-color: var(--tg-theme-bg-color); border-bottom: 1px solid #000; }
         .profile-tabs button {
             background: none; border: none; color: var(--tg-theme-hint-color);
-            padding: 14px 10px; font-size: 1em; cursor: pointer; flex-grow: 1;
-            font-weight: 500; border-bottom: 3px solid transparent;
+            padding: 14px 10px; font-size: 0.95em; cursor: pointer; flex-grow: 1;
+            font-weight: 500; border-bottom: 2px solid transparent; text-transform: uppercase;
         }
         .profile-tabs button.active { color: var(--tg-theme-link-color); border-bottom-color: var(--tg-theme-link-color); }
 
         .gifts-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px;
-            flex-grow: 1; overflow-y: auto; align-content: start;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px;
+            flex-grow: 1; overflow-y: auto; align-content: start; background: #000;
         }
         
         .gift-card {
             background-color: var(--tg-theme-secondary-bg-color);
-            border-radius: 14px; padding: 8px;
+            border-radius: 12px; padding: 6px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             aspect-ratio: 1 / 1; 
             cursor: pointer; position: relative; overflow: hidden;
             transition: transform 0.1s ease-out; border: none; 
         }
-        .gift-card.selected { background-color: rgba(98, 188, 249, 0.1); box-shadow: inset 0 0 0 2px var(--tg-theme-link-color); }
+        /* Selection Highlight */
+        .gift-card.selected { box-shadow: inset 0 0 0 3px var(--tg-theme-link-color); background-color: rgba(98, 188, 249, 0.15); }
 
+        /* Taller shop card for text visibility */
         .buy-gift-item {
             background-color: var(--tg-theme-secondary-bg-color);
-            border-radius: 14px; padding: 8px;
-            display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+            border-radius: 12px; padding: 8px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
             aspect-ratio: 1 / 1.35; 
             cursor: pointer; position: relative; overflow: hidden;
             transition: transform 0.1s ease-out;
         }
 
-        .gift-card:active, .buy-gift-item:active { transform: scale(0.96); }
+        .gift-card:active, .buy-gift-item:active { transform: scale(0.97); }
         
         .status-icon {
             position: absolute; top: 6px; left: 6px; z-index: 5;
-            width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;
+            width: 14px; height: 14px; display: flex; align-items: center; justify-content: center;
         }
-        /* White Pin Icon */
-        .status-icon svg { fill: #ffffff; width: 100%; height: 100%; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5)); }
+        .status-icon svg { fill: #fff; width: 100%; height: 100%; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8)); }
 
-        .gift-card.is-hidden { opacity: 0.5; filter: grayscale(1); }
+        .gift-card.is-hidden { opacity: 0.4; filter: grayscale(1); }
 
         .image-container {
-            width: 70%; height: 70%; display: flex; align-items: center; justify-content: center;
+            width: 75%; height: 75%; display: flex; align-items: center; justify-content: center;
             position: relative; z-index: 2; margin-bottom: 0px; 
         }
-        .buy-gift-item .image-container { height: 60%; margin-bottom: auto; margin-top: 10px; }
+        .buy-gift-item .image-container { height: 55%; margin-bottom: 4px; margin-top: 8px; }
 
         .image-container img, .image-container .lottie-wrapper { max-width: 100%; max-height: 100%; object-fit: contain; }
         .lottie-wrapper { width: 100%; height: 100%; }
         
-        .gift-name { font-size: 0.8em; text-align: center; margin-top: 5px; z-index: 2; width: 100%; line-height: 1.2; padding: 0 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .gift-name { font-size: 0.85em; font-weight: 500; text-align: center; margin-top: 4px; z-index: 2; width: 100%; line-height: 1.2; padding: 0 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .gift-price { font-size: 0.8em; color: var(--tg-theme-hint-color); margin: 4px 0 8px; font-weight: bold; z-index: 2;}
 
         .gift-card-bg-pattern { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0; }
         .dynamic-pattern-container { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1; overflow: hidden; pointer-events: none; }
-        
-        /* Unified Pattern Style */
-        .pattern-symbol { 
-            position: absolute;
+        .card-pattern-symbol { 
+            position: absolute; width: 30px; height: 30px;
+            left: 50%; top: 50%;
             background-color: currentColor; 
-            -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center;
+            -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+            opacity: 0.15;
         }
-        
         .top-right-label {
-            position: absolute; top: 12px; right: -34px; transform: rotate(45deg);
-            background: rgba(0,0,0,0.5); color: white; font-size: 0.65em;
-            padding: 2px 35px; z-index: 4; font-weight: 500;
+            position: absolute; top: 12px; right: -32px; transform: rotate(45deg);
+            background: rgba(0,0,0,0.6); color: white; font-size: 0.6em;
+            padding: 2px 35px; z-index: 4; font-weight: 600; letter-spacing: 0.5px;
         }
 
         .action-button {
             background-color: var(--tg-theme-button-color); color: var(--tg-theme-button-text-color);
-            border: none; padding: 6px 14px; border-radius: 16px; font-size: 0.85em; cursor: pointer; font-weight: 500;
+            border: none; padding: 6px 14px; border-radius: 16px; font-size: 0.9em; cursor: pointer; font-weight: 500;
         }
         #action-toolbar {
             padding: 10px 15px; display: flex; justify-content: flex-end; gap: 10px;
-            background-color: var(--tg-theme-bg-color); border-bottom: 1px solid rgba(255,255,255,0.05);
+            background-color: var(--tg-theme-bg-color);
         }
 
         .modal-overlay {
@@ -165,76 +170,77 @@
         .modal-overlay.active { opacity: 1; visibility: visible; }
         .modal-content {
             background-color: var(--tg-theme-secondary-bg-color);
-            border-top-left-radius: 12px; border-top-right-radius: 12px;
+            border-top-left-radius: 14px; border-top-right-radius: 14px;
             width: 100%; max-width: 600px; display: flex; flex-direction: column; overflow: hidden;
             max-height: 90vh;
         }
-        
-        .modal-header-bar { padding: 15px; text-align: center; font-weight: 500; border-bottom: 1px solid rgba(0,0,0,0.1); background: var(--tg-theme-secondary-bg-color); position: relative; z-index: 10; }
+        #customize-modal .modal-content { height: 90vh; }
+
+        .modal-header-bar { padding: 16px; text-align: center; font-weight: 600; font-size: 1.1em; background: var(--tg-theme-secondary-bg-color); position: relative; z-index: 10; }
         .modal-scrollable-content { overflow-y: auto; padding: 0; flex-grow: 1; }
-        .modal-buttons-footer { padding: 15px; display: flex; gap: 10px; background: var(--tg-theme-secondary-bg-color); border-top: 1px solid rgba(0,0,0,0.1); }
+        .modal-buttons-footer { padding: 15px; display: flex; gap: 10px; background: var(--tg-theme-secondary-bg-color); }
         .modal-button {
-            flex: 1; padding: 12px; border-radius: 8px; border: none; font-size: 1em; font-weight: 500; cursor: pointer;
+            flex: 1; padding: 12px; border-radius: 10px; border: none; font-size: 1em; font-weight: 600; cursor: pointer;
             background-color: var(--tg-theme-button-color); color: var(--tg-theme-button-text-color);
         }
         .modal-button.secondary { background-color: var(--tg-theme-bg-color); color: var(--tg-theme-link-color); }
         
-        .info-row { display: flex; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid rgba(0,0,0,0.1); }
+        .info-row { display: flex; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid rgba(0,0,0,0.1); }
         .info-label { color: var(--tg-theme-hint-color); }
-        .rarity-chip { background: var(--app-rarity-chip-bg); padding: 2px 6px; border-radius: 4px; font-size: 0.8em; margin-left: 5px; }
+        .rarity-chip { background: var(--app-rarity-chip-bg); padding: 3px 8px; border-radius: 6px; font-size: 0.8em; margin-left: 6px; }
 
         .collectible-display-area {
-            position: relative; padding: 40px 0; text-align: center; overflow: hidden;
+            position: relative; padding: 50px 0; text-align: center; overflow: hidden;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .collectible-display-area h3 { margin-top: 15px; position: relative; z-index: 2; font-size: 1.5em; }
-        .collectible-display-area p { color: rgba(255,255,255,0.7); position: relative; z-index: 2; margin-top: 5px; }
+        .collectible-display-area h3 { margin-top: 15px; position: relative; z-index: 2; font-size: 1.6em; margin-bottom: 4px; }
+        .collectible-display-area p { color: rgba(255,255,255,0.7); position: relative; z-index: 2; margin-top: 0; font-size: 0.95em; }
 
         /* Menu */
         #long-press-menu {
             position: fixed; background: var(--tg-theme-secondary-bg-color);
-            border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-            z-index: 2000; min-width: 180px; padding: 5px 0;
+            border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 2000; min-width: 200px; padding: 6px 0; overflow: hidden;
         }
-        #long-press-menu li { padding: 12px 16px; list-style: none; cursor: pointer; color: var(--tg-theme-text-color); font-size: 0.95em; }
+        #long-press-menu li { padding: 14px 20px; list-style: none; cursor: pointer; color: var(--tg-theme-text-color); font-size: 1em; font-weight: 500; display:flex; align-items:center; gap: 10px; }
         #long-press-menu li:hover { background: rgba(255,255,255,0.05); }
         #long-press-menu li.danger { color: #ff595a; }
 
-        /* Customization Queue */
-        .queue-bar { display: flex; overflow-x: auto; padding: 10px 15px; gap: 8px; border-bottom: 1px solid rgba(0,0,0,0.1); background: var(--tg-theme-bg-color); white-space: nowrap; }
+        /* Queue Bar */
+        .queue-bar { display: flex; overflow-x: auto; padding: 12px 15px; gap: 8px; background: var(--tg-theme-bg-color); white-space: nowrap; scrollbar-width: none; }
+        .queue-bar::-webkit-scrollbar { display: none; }
         .queue-chip { 
-            padding: 6px 12px; background: var(--tg-theme-secondary-bg-color); border-radius: 16px; font-size: 0.85em; cursor: pointer; border: 1px solid transparent; 
-            display: flex; align-items: center; gap: 6px;
+            padding: 8px 14px; background: var(--tg-theme-secondary-bg-color); border-radius: 20px; font-size: 0.9em; cursor: pointer; border: 1px solid transparent; 
+            display: flex; align-items: center; gap: 8px; font-weight: 500;
         }
-        .queue-chip.active { border-color: var(--tg-theme-link-color); background: rgba(98, 188, 249, 0.1); }
-        .queue-chip .close-x { opacity: 0.6; font-size: 1.1em; }
+        .queue-chip.active { border-color: var(--tg-theme-link-color); background: rgba(98, 188, 249, 0.1); color: var(--tg-theme-link-color); }
+        .queue-chip .close-x { opacity: 0.6; font-size: 1.2em; font-weight: 300; }
         .add-gift-chip { background: var(--tg-theme-button-color); color: var(--tg-theme-button-text-color); }
 
-        .filter-section { padding: 0 15px; margin-bottom: 15px; }
-        .filter-section h4 { margin: 15px 0 10px; color: var(--tg-theme-hint-color); font-size: 0.9em; text-transform: uppercase; }
+        .filter-section { padding: 0 15px; margin-bottom: 20px; }
+        .filter-section h4 { margin: 15px 0 8px; color: var(--tg-theme-hint-color); font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; padding-left: 4px; }
         
         .filter-options-grid { 
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; 
-            overflow-y: auto; padding-bottom: 5px; max-height: 200px;
-            background: var(--tg-theme-bg-color); padding: 10px; border-radius: 8px;
+            overflow-y: auto; padding: 4px; max-height: 220px; border-radius: 8px;
         }
         .filter-option {
-            background: var(--tg-theme-secondary-bg-color); border-radius: 8px; padding: 8px;
+            background: var(--tg-theme-secondary-bg-color); border-radius: 12px; padding: 10px;
             cursor: pointer; border: 2px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            min-height: 90px;
+            min-height: 100px;
         }
-        .filter-option.selected { border-color: var(--tg-theme-link-color); }
-        .filter-option img { width: 50px; height: 50px; object-fit: contain; }
-        .filter-option .label { font-size: 0.7em; margin-top: 6px; text-align: center; overflow: hidden; white-space: nowrap; width: 100%; text-overflow: ellipsis;}
-        .gradient-square { width: 50px; height: 50px; border-radius: 50%; }
+        .filter-option.selected { border-color: var(--tg-theme-link-color); background: rgba(98, 188, 249, 0.05); }
+        .filter-option img { width: 55px; height: 55px; object-fit: contain; margin-bottom: 5px; }
+        .filter-option .label { font-size: 0.75em; text-align: center; overflow: hidden; white-space: nowrap; width: 100%; text-overflow: ellipsis;}
+        .gradient-square { width: 55px; height: 55px; border-radius: 50%; margin-bottom: 5px; }
 
-        .switch-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid rgba(0,0,0,0.1); }
-        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+        .switch-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid rgba(0,0,0,0.1); font-weight: 500; }
+        .switch { position: relative; display: inline-block; width: 50px; height: 30px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--tg-theme-hint-color); transition: .4s; border-radius: 34px; opacity: 0.3; }
-        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         input:checked + .slider { background-color: var(--tg-theme-button-color); opacity: 1; }
-        input:checked + .slider:before { transform: translateX(22px); }
+        input:checked + .slider:before { transform: translateX(20px); }
 
         .spinner { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--tg-theme-link-color); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -242,15 +248,14 @@
         .reordering .gift-card { opacity: 0.5; }
         .reordering .gift-card[data-pinned="true"] { opacity: 1; cursor: grab; box-shadow: 0 0 0 2px var(--tg-theme-link-color); }
         
-        #qty-modal input { background: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); border: none; padding: 10px; border-radius: 8px; width: 100%; font-size: 1.2em; text-align: center; margin-bottom: 15px; outline: none; }
+        #qty-modal input { background: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); border: none; padding: 12px; border-radius: 12px; width: 100%; font-size: 1.4em; text-align: center; margin-bottom: 15px; outline: none; font-weight: bold; }
 
         /* Loading */
         .glass-panel { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; animation: glassFloat 4s ease-in-out infinite; }
-        .liquid-blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.6; z-index: 1; animation: blobFloat 10s infinite alternate; }
-        .blob-1 { width: 250px; height: 250px; background: #007AFF; top: 20%; left: 10%; }
-        .blob-2 { width: 300px; height: 300px; background: #5ac8fa; bottom: 20%; right: 10%; animation-delay: -2s; }
-        .blob-3 { width: 200px; height: 200px; background: #007AFF; bottom: 40%; left: 40%; animation-delay: -4s; opacity: 0.5; }
-        @keyframes blobFloat { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(40px, -40px) scale(1.1); } 100% { transform: translate(-20px, 20px) scale(0.9); } }
+        .liquid-blob { position: absolute; border-radius: 50%; filter: blur(50px); opacity: 0.5; z-index: 1; animation: blobFloat 10s infinite alternate; }
+        .blob-1 { width: 200px; height: 200px; background: #007AFF; top: 20%; left: 15%; }
+        .blob-2 { width: 250px; height: 250px; background: #5ac8fa; bottom: 20%; right: 10%; animation-delay: -2s; }
+        @keyframes blobFloat { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(20px, -20px) scale(1.1); } 100% { transform: translate(-20px, 20px) scale(0.9); } }
         @keyframes glassFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
     </style>
 </head>
@@ -259,11 +264,9 @@
 <div id="loading-overlay" class="modal-overlay active" style="align-items: center; justify-content: center; background: var(--tg-theme-bg-color); z-index: 9999;">
     <div class="liquid-blob blob-1"></div>
     <div class="liquid-blob blob-2"></div>
-    <div class="liquid-blob blob-3"></div>
     <div class="glass-panel">
-        <div id="loading-anim" style="width: 120px; height: 120px;"></div>
-        <h2 style="font-weight:600; margin-top:20px; color:var(--tg-theme-text-color);">Gift Simulator</h2>
-        <p style="color:var(--tg-theme-hint-color); font-size:0.9em; margin-top:5px;">@giftUpgradeRU</p>
+        <div id="loading-anim" style="width: 100px; height: 100px;"></div>
+        <h2 style="font-weight:700; margin-top:15px; color:var(--tg-theme-text-color);">Gift Simulator</h2>
     </div>
 </div>
 
@@ -284,15 +287,14 @@
             </div>
         </div>
         
-        <!-- Info Block -->
         <div class="profile-info-block">
             <div class="profile-info-header">Info</div>
             <div class="info-item">
-                <span class="value" id="profile-phone">Loading...</span>
+                <span class="value" id="profile-phone">+888 0000 0000</span>
                 <span class="label">Mobile</span>
             </div>
-            <div class="info-item">
-                <span class="value editable" id="profile-bio" onclick="editBio()">Hello world</span>
+            <div class="info-item clickable" onclick="editBio()">
+                <span class="value" id="profile-bio">Hello world</span>
                 <span class="label">Bio</span>
             </div>
             <div class="info-item">
@@ -410,10 +412,9 @@
 </div>
 
 <div id="customize-modal" class="modal-overlay">
-    <div class="modal-content" style="height: 90vh;">
-        <div class="modal-header-bar">Customize Gift</div>
-        
-        <!-- Multi-add queue bar -->
+    <div class="modal-content">
+        <div class="modal-header-bar">Customize</div>
+        <!-- Scrollable list of gifts being configured -->
         <div class="queue-bar" id="cust-queue-bar"></div>
 
         <div class="modal-scrollable-content" style="padding: 0; background: var(--tg-theme-secondary-bg-color);">
@@ -465,7 +466,10 @@
     tg.enableClosingConfirmation();
 
     const CDN_BASE = "https://cdn.changes.tg/gifts/";
-    const LS_KEY = "web_gift_app_v7";
+    // Keeping key stable to try preservation of data, though file updates might reset if URL changes in test environment.
+    const LS_KEY = "telegram_gift_simulator_data_v2"; 
+    
+    // SVGs
     const PIN_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z" /></svg>`;
     const WEAR_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>`;
 
@@ -493,7 +497,7 @@
     };
 
     window.addEventListener('DOMContentLoaded', async () => {
-        // Init Loading Screen
+        // Init Loading Screen (Fake delay)
         const loadingScreen = document.getElementById('loading-overlay');
         lottie.loadAnimation({ container: document.getElementById('loading-anim'), renderer: 'svg', loop: true, autoplay: true, path: 'https://cdn.changes.tg/gifts/models/Artisan%20Brick/lottie/Ice%20Mammoth.json' });
         
@@ -501,14 +505,12 @@
             loadingScreen.style.opacity = '0';
             document.getElementById('profile-page').classList.add('active');
             setTimeout(() => { loadingScreen.classList.remove('active'); }, 200);
-        }, Math.random() * 3000 + 3000);
+        }, Math.random() * 3000 + 2000);
 
         applyTelegramTheme();
         tg.onEvent('themeChanged', applyTelegramTheme);
 
         loadState();
-        
-        // Random Phone +888
         if (!state.userPhone) state.userPhone = `+888 ${Math.floor(Math.random()*9000+1000)} ${Math.floor(Math.random()*9000+1000)}`;
         
         updateUserProfile();
@@ -528,16 +530,17 @@
         const user = tg.initDataUnsafe.user;
         const nameEl = document.getElementById('user-name');
         const avatarEl = document.getElementById('user-avatar');
+        const usernameEl = document.getElementById('profile-username');
         
         if (user) {
             nameEl.innerText = [user.first_name, user.last_name].filter(Boolean).join(' ');
             if (user.photo_url) avatarEl.src = user.photo_url;
             else avatarEl.src = `https://i.pravatar.cc/150?u=${user.id}`;
-            document.getElementById('profile-username').innerText = user.username ? `@${user.username}` : '@unknown';
+            usernameEl.innerText = user.username ? `@${user.username}` : '@unknown';
         } else {
             nameEl.innerText = "Web User";
             avatarEl.src = "https://i.pravatar.cc/150?u=test";
-            document.getElementById('profile-username').innerText = "@webuser";
+            usernameEl.innerText = "@webuser";
         }
         
         document.getElementById('profile-phone').innerText = state.userPhone;
@@ -715,11 +718,12 @@
 
         if (state.inventory.some(g => !g.isCollectible)) {
             toolbar.className = '';
-            toolbar.style.borderBottom = 'none'; // Only button
+            toolbar.style.borderBottom = 'none'; 
             toolbar.innerHTML = `<button class="action-button" onclick="handleUpgradeAll()" style="background:var(--app-accent-blue);">✨ Upgrade All</button>`;
         }
     }
 
+    // --- Actions ---
     function buyGift(id, name, qty = 1) {
         for(let i=0; i<qty; i++) {
             state.inventory.unshift({
@@ -749,6 +753,7 @@
         closeModal('qty-modal');
     }
 
+    // --- Upgrade ---
     async function performUpgrade(gift, notify=true) {
         const parts = await fetchGiftParts(gift.name);
         if (!parts.models.length) return false;
@@ -768,7 +773,6 @@
         document.getElementById('btn-upgrade').innerText = "Upgrading...";
         const gift = state.inventory.find(g => g.uniqueId === appRuntime.activeGiftId);
         const success = await performUpgrade(gift);
-        
         if (success) {
             hapticNotify('success');
             saveState(); renderInventory(); closeModal('detail-modal');
@@ -790,6 +794,7 @@
         if(changed) { hapticNotify('success'); saveState(); renderInventory(); }
     }
 
+    // --- Selection ---
     function startSelectionMode(mode) {
         appRuntime.selectionMode = mode;
         appRuntime.selectedIds = new Set();
@@ -812,6 +817,7 @@
         cancelSelectionMode(); applyWornGiftVisuals();
     }
 
+    // --- Menu ---
     function openMenu(e, gift) {
         appRuntime.activeGiftId = gift.uniqueId;
         const menu = document.getElementById('long-press-menu');
@@ -853,10 +859,18 @@
     function toggleWear() {
         const gift = state.inventory.find(g => g.uniqueId === appRuntime.activeGiftId);
         if(!gift) return;
-        if(gift.worn) { gift.worn = false; } 
-        else { state.inventory.forEach(g => g.worn = false); gift.worn = true; }
+        
+        if(gift.worn) { 
+            gift.worn = false; 
+        } else { 
+            // Unwear all others first
+            state.inventory.forEach(g => g.worn = false); 
+            gift.worn = true; 
+        }
+        
         document.getElementById('long-press-menu').classList.add('hidden');
-        haptic('medium'); saveState(); renderInventory(); applyWornGiftVisuals();
+        hapticNotify('success');
+        saveState(); renderInventory(); applyWornGiftVisuals();
     }
 
     function applyWornGiftVisuals() {
@@ -864,6 +878,7 @@
         const overlay = document.getElementById('profile-pattern-overlay');
         const bg = document.getElementById('profile-bg');
         overlay.innerHTML = '';
+        
         if (worn) {
             const cd = worn.collectibleData;
             bg.style.background = `radial-gradient(circle at 50% 0%, ${cd.backdrop.hex.centerColor}, ${cd.backdrop.hex.edgeColor})`;
@@ -880,10 +895,12 @@
     }
 
     function deleteGift() {
-        if(confirm("Delete this gift?")) {
-            state.inventory = state.inventory.filter(g => g.uniqueId !== appRuntime.activeGiftId);
-            haptic('heavy'); saveState(); renderInventory(); applyWornGiftVisuals();
-        }
+        tg.showConfirm("Delete?", (yes) => {
+            if(yes) {
+                state.inventory = state.inventory.filter(g => g.uniqueId !== appRuntime.activeGiftId);
+                haptic('heavy'); saveState(); renderInventory(); applyWornGiftVisuals();
+            }
+        });
         document.getElementById('long-press-menu').classList.add('hidden');
     }
 
@@ -911,24 +928,39 @@
         }
     }
 
-    // --- Customization Multi Queue ---
+    // --- Customization Queue ---
     function initCustomizationQueue() {
         customizationQueue = []; editingIndex = -1;
         addGiftToQueue();
     }
     function addGiftToQueue() {
+        // Reset selections visual before adding new logic
+        document.querySelectorAll('.filter-option.selected').forEach(el => el.classList.remove('selected'));
+        
         customizationQueue.push({ id:null, name:null, parts: { model:null, backdrop:null, pattern:null } });
+        // Auto select last
         selectQueueItem(customizationQueue.length - 1);
+        
+        // Render base again for new item
+        document.getElementById('cust-base-grid').classList.remove('hidden');
+        document.getElementById('cust-parts-container').classList.add('hidden');
     }
     function selectQueueItem(index) {
         editingIndex = index;
         renderQueueBar();
-        renderBaseSelection();
-        // If has base, load it
-        const item = customizationQueue[index];
-        if (item.id) loadBaseConfig(item.id, item.name, false); 
-        else document.getElementById('cust-parts-container').classList.add('hidden');
-        updateCreateButton();
+        
+        const curr = customizationQueue[editingIndex];
+        
+        if(curr.id) {
+            // Restore visual state for this gift
+            loadBaseConfig(curr.id, curr.name, false);
+        } else {
+            // New empty item
+            const baseGrid = document.getElementById('cust-base-grid');
+            Array.from(baseGrid.children).forEach(c => c.classList.remove('selected'));
+            document.getElementById('cust-parts-container').classList.add('hidden');
+            updateCreateButton();
+        }
     }
     function renderQueueBar() {
         const bar = document.getElementById('cust-queue-bar');
@@ -941,7 +973,8 @@
                 if (e.target.classList.contains('close-x')) {
                     e.stopPropagation(); customizationQueue.splice(idx, 1);
                     if(editingIndex >= customizationQueue.length) editingIndex = customizationQueue.length - 1;
-                    if(customizationQueue.length===0) addGiftToQueue(); else selectQueueItem(editingIndex);
+                    if(customizationQueue.length === 0) addGiftToQueue();
+                    else selectQueueItem(editingIndex);
                 } else selectQueueItem(idx);
             };
             bar.appendChild(el);
@@ -956,9 +989,8 @@
         document.getElementById('customize-modal').classList.add('active');
         tg.BackButton.show(); tg.BackButton.onClick(() => closeModal('customize-modal'));
         initCustomizationQueue();
-    }
-
-    function renderBaseSelection() {
+        
+        // Init Base Grid
         const grid = document.getElementById('cust-base-grid');
         grid.innerHTML = '';
         Object.entries(state.giftDefinitions).forEach(([id, name]) => {
@@ -966,7 +998,6 @@
             const el = document.createElement('div'); el.className = 'filter-option';
             el.innerHTML = `<img src="${CDN_BASE}originals/${id}/Original.png"><div class="label">${name}</div>`;
             el.onclick = () => loadBaseConfig(id, name, true);
-            if (customizationQueue[editingIndex].id === id) el.classList.add('selected');
             grid.appendChild(el);
         });
     }
@@ -974,14 +1005,21 @@
     async function loadBaseConfig(id, name, resetParts) {
         haptic('light');
         const curr = customizationQueue[editingIndex];
-        curr.id = id; curr.name = name;
-        if(resetParts) curr.parts = { model:null, backdrop:null, pattern:null };
+        
+        // Logic update: only update if changed
+        if(curr.id !== id || resetParts) {
+            curr.id = id; curr.name = name;
+            curr.parts = { model:null, backdrop:null, pattern:null };
+        }
         
         renderQueueBar();
         
+        // Highlight Base
         const baseGrid = document.getElementById('cust-base-grid');
-        Array.from(baseGrid.children).forEach(c => c.classList.remove('selected'));
-        // Find chip is simple rerender
+        Array.from(baseGrid.children).forEach(c => {
+            c.classList.remove('selected');
+            if(c.innerText === name) c.classList.add('selected'); // rough check by name
+        });
         
         if(!cachedParts[id]) cachedParts[id] = await fetchGiftParts(name);
         const parts = cachedParts[id];
@@ -1006,6 +1044,8 @@
             else content = `<img src="${CDN_BASE}patterns/${encodeURIComponent(giftName)}/png/${encodeURIComponent(item.name)}.png">`;
             
             el.innerHTML = `${content}<div class="label">${item.name}</div>`;
+            
+            // Highlight
             if (curr.parts[type] && curr.parts[type].name === item.name) el.classList.add('selected');
             
             el.onclick = () => {
@@ -1021,17 +1061,24 @@
 
     function updateCreateButton() {
         const btn = document.getElementById('btn-create-custom');
+        // Require Model & Backdrop. Pattern optional.
         const allReady = customizationQueue.every(q => q.id && q.parts.model && q.parts.backdrop);
         btn.disabled = !allReady;
         btn.innerText = customizationQueue.length > 1 ? `Create All (${customizationQueue.length})` : 'Create';
     }
 
     function handleCreateQueue() {
-        // Generate random pattern if missing
         customizationQueue.forEach(q => {
-            if(!q.parts.pattern && cachedParts[q.id].patterns.length) {
-                q.parts.pattern = cachedParts[q.id].patterns[Math.floor(Math.random() * cachedParts[q.id].patterns.length)];
+            if(!q.id) return;
+            // Fallback for pattern
+            if(!q.parts.pattern) {
+                const parts = cachedParts[q.id];
+                if(parts && parts.patterns.length) {
+                    q.parts.pattern = parts.patterns[Math.floor(Math.random() * parts.patterns.length)];
+                }
             }
+            if(!q.parts.model || !q.parts.backdrop || !q.parts.pattern) return; // Should allow null pattern if random failed? Just in case.
+
             state.lastCollectibleNumber++;
             state.inventory.unshift({
                 uniqueId: Date.now() + Math.random(), originalId: q.id, name: q.name, isCollectible: true, timestamp: Date.now(),
@@ -1058,19 +1105,17 @@
         const cd = gift.collectibleData;
         document.getElementById('collectible-name').innerText = cd.model.name;
         document.getElementById('collectible-number').innerText = gift.collectibleNumber.toLocaleString();
+        
         document.getElementById('collectible-display-area').style.background = `radial-gradient(circle at 50% 0%, ${cd.backdrop.hex.centerColor}, ${cd.backdrop.hex.edgeColor})`;
         document.getElementById('collectible-image').style.display = 'none';
         document.getElementById('collectible-lottie').style.display = 'block';
         playLottie('collectible-lottie', `${CDN_BASE}models/${encodeURIComponent(gift.name)}/lottie/${encodeURIComponent(cd.model.name)}.json`);
-        
         const rarity = (val) => `<span class="rarity-chip">${(val/10).toFixed(1)}%</span>`;
         document.getElementById('info-model').innerHTML = `${cd.model.name} ${rarity(cd.model.rarityPermille)}`;
         document.getElementById('info-backdrop').innerHTML = `${cd.backdrop.name} ${rarity(cd.backdrop.rarityPermille)}`;
         document.getElementById('info-pattern').innerHTML = `${cd.pattern.name} ${rarity(cd.pattern.rarityPermille)}`;
-
         document.getElementById('collectible-pattern-container').innerHTML = '';
         generatePattern('collectible-pattern-container', cd.pattern, gift.name, false, cd.backdrop.hex.patternColor);
-
         document.getElementById('collectible-modal').classList.add('active');
         tg.BackButton.show(); tg.BackButton.onClick(() => closeModal('collectible-modal'));
     }
@@ -1111,30 +1156,24 @@
         const container = document.getElementById(containerId);
         if (!container) return;
         const url = `${CDN_BASE}patterns/${encodeURIComponent(giftName)}/png/${encodeURIComponent(patternObj.name)}.png`;
-        const width = container.offsetWidth; const height = container.offsetHeight;
+        // Centered coordinates relative to container size is handled via CSS centering + transform
+        // We simulate "spread" by moving items away from the center (0,0) with translate
+        
         let configs = isHeader ? [{ count: 12, radius: 100, size: 40 }, { count: 16, radius: 150, size: 36 }] : [{ count: 10, radius: isSmall ? 38 : 100, size: isSmall ? 12 : 36 }, { count: 12, radius: isSmall ? 62 : 150, size: isSmall ? 10 : 30 }];
         configs.forEach(conf => {
             for(let i=0; i<conf.count; i++) {
                 const angle = (i / conf.count) * 2 * Math.PI;
-                // FIX: Calculating absolute left/top instead of fixed X/Y to avoid offsets 
-                // Using transform translation for center reference
-                const offsetX = conf.radius * Math.cos(angle);
-                const offsetY = conf.radius * Math.sin(angle);
+                // Calculate OFFSET from center
+                const x = conf.radius * Math.cos(angle); 
+                const y = conf.radius * Math.sin(angle);
                 
                 const el = document.createElement('div');
-                if(isHeader) el.className = 'profile-pattern-item'; else el.className = 'pattern-symbol';
-                
-                // Coloring technique: background color + mask image
+                if(isHeader) el.className = 'profile-pattern-item'; else el.className = 'card-pattern-symbol';
                 el.style.webkitMaskImage = `url('${url}')`; el.style.maskImage = `url('${url}')`;
                 if (colorHex) el.style.backgroundColor = colorHex;
-                else el.style.backgroundColor = 'currentColor'; // Fallback
-                
                 el.style.width = `${conf.size}px`; el.style.height = `${conf.size}px`;
-                // Centering trick: absolute 50% + transform translate
-                const topP = isHeader ? 50 : (isSmall ? 50 : 40); // 40% vertical center for big modal
-                el.style.left = '50%'; el.style.top = `${topP}%`;
-                el.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px))`;
-                
+                // Centered by CSS, then moved by translate
+                el.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
                 container.appendChild(el);
             }
         });
