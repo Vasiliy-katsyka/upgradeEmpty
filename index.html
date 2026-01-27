@@ -469,6 +469,28 @@
     // Keeping key stable to try preservation of data, though file updates might reset if URL changes in test environment.
     const LS_KEY = "telegram_gift_simulator_data_v2"; 
     
+    // CUSTOM GIFTS CONFIGURATION
+    const MY_CUSTOM_ADDITIONS = {
+        "Heart Locket": [
+            {
+                name: "Midnight Club",
+                rarityPermille: 10,
+                isCustom: true,
+                imageUrl: "https://raw.githubusercontent.com/Vasiliy-katsyka/upgradeEmpty/main/MidnightClubEmoji_AgADoJIAAkOhuEs.png",
+                lottieUrl: "https://raw.githubusercontent.com/Vasiliy-katsyka/upgradeEmpty/main/MidnightClubEmoji_AgADoJIAAkOhuEs.json"
+            }
+        ],
+        "Jolly Chimp": [
+            {
+                name: "Midnight Club",
+                rarityPermille: 10,
+                isCustom: true,
+                imageUrl: "https://raw.githubusercontent.com/Vasiliy-katsyka/upgradeEmpty/main/MidnightClubEmoji_AgADNpwAArR-oUs.png",
+                lottieUrl: "https://raw.githubusercontent.com/Vasiliy-katsyka/upgradeEmpty/main/MidnightClubEmoji_AgADNpwAArR-oUs.json"
+            }
+        ]
+    };
+    
     // SVGs
     const PIN_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z" /></svg>`;
     const WEAR_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>`;
@@ -591,6 +613,11 @@
             let backdrops = bRes.ok ? await bRes.json() : [];
             let patterns = pRes.ok ? await pRes.json() : [];
 
+            // INJECT CUSTOM MODELS
+            if (MY_CUSTOM_ADDITIONS[giftName]) {
+                models.push(...MY_CUSTOM_ADDITIONS[giftName]);
+            }
+
             models.sort((a, b) => (a.rarityPermille || 0) - (b.rarityPermille || 0));
             const pinned = ["Black", "Onyx Black", "Gunmetal", "Midnight Blue", "Electric Purple"];
             backdrops.sort((a, b) => {
@@ -671,8 +698,15 @@
             if (gift.isCollectible) {
                 const cd = gift.collectibleData;
                 const bgStyle = `radial-gradient(circle, ${cd.backdrop.hex.centerColor}, ${cd.backdrop.hex.edgeColor})`;
-                const imgUrl = `${CDN_BASE}models/${encodeURIComponent(gift.name)}/png/${encodeURIComponent(cd.model.name)}.png`;
-                const lottieUrl = `${CDN_BASE}models/${encodeURIComponent(gift.name)}/lottie/${encodeURIComponent(cd.model.name)}.json`;
+                
+                let imgUrl, lottieUrl;
+                if (cd.model.isCustom) {
+                    imgUrl = cd.model.imageUrl;
+                    lottieUrl = cd.model.lottieUrl;
+                } else {
+                    imgUrl = `${CDN_BASE}models/${encodeURIComponent(gift.name)}/png/${encodeURIComponent(cd.model.name)}.png`;
+                    lottieUrl = `${CDN_BASE}models/${encodeURIComponent(gift.name)}/lottie/${encodeURIComponent(cd.model.name)}.json`;
+                }
                 
                 if (state.settings.animations) {
                     visualHtml = `<div class="lottie-wrapper" id="lot-${gift.uniqueId}"></div>`;
@@ -1039,7 +1073,11 @@
         items.forEach(item => {
             const el = document.createElement('div'); el.className = 'filter-option';
             let content = '';
-            if (type === 'model') content = `<img src="${CDN_BASE}models/${encodeURIComponent(giftName)}/png/${encodeURIComponent(item.name)}.png">`;
+            
+            if (type === 'model') {
+                const src = item.isCustom ? item.imageUrl : `${CDN_BASE}models/${encodeURIComponent(giftName)}/png/${encodeURIComponent(item.name)}.png`;
+                content = `<img src="${src}">`;
+            }
             else if (type === 'backdrop') content = `<div class="gradient-square" style="background: radial-gradient(circle, ${item.hex.centerColor}, ${item.hex.edgeColor})"></div>`;
             else content = `<img src="${CDN_BASE}patterns/${encodeURIComponent(giftName)}/png/${encodeURIComponent(item.name)}.png">`;
             
@@ -1107,9 +1145,16 @@
         document.getElementById('collectible-number').innerText = gift.collectibleNumber.toLocaleString();
         
         document.getElementById('collectible-display-area').style.background = `radial-gradient(circle at 50% 0%, ${cd.backdrop.hex.centerColor}, ${cd.backdrop.hex.edgeColor})`;
+        
         document.getElementById('collectible-image').style.display = 'none';
         document.getElementById('collectible-lottie').style.display = 'block';
-        playLottie('collectible-lottie', `${CDN_BASE}models/${encodeURIComponent(gift.name)}/lottie/${encodeURIComponent(cd.model.name)}.json`);
+        
+        const lottiePath = cd.model.isCustom ? cd.model.lottieUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/lottie/${encodeURIComponent(cd.model.name)}.json`;
+        playLottie('collectible-lottie', lottiePath);
+        
+        const imgPath = cd.model.isCustom ? cd.model.imageUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/png/${encodeURIComponent(cd.model.name)}.png`;
+        document.getElementById('collectible-image').src = imgPath;
+
         const rarity = (val) => `<span class="rarity-chip">${(val/10).toFixed(1)}%</span>`;
         document.getElementById('info-model').innerHTML = `${cd.model.name} ${rarity(cd.model.rarityPermille)}`;
         document.getElementById('info-backdrop').innerHTML = `${cd.backdrop.name} ${rarity(cd.backdrop.rarityPermille)}`;
