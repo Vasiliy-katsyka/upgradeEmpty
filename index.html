@@ -19,7 +19,8 @@
             --app-accent-blue: #5288c1;
             
             --app-modal-backdrop-color: rgba(0,0,0,0.8);
-            --app-rarity-chip-bg: rgba(0,0,0,0.2);
+            --app-rarity-chip-bg: rgba(62, 188, 249, 0.15);
+            --app-rarity-text: #62bcf9;
             --app-profile-gradient-fallback: var(--tg-theme-secondary-bg-color);
         }
 
@@ -185,16 +186,93 @@
         }
         .modal-button.secondary { background-color: var(--tg-theme-bg-color); color: var(--tg-theme-link-color); }
         
-        .info-row { display: flex; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid rgba(0,0,0,0.1); }
-        .info-label { color: var(--tg-theme-hint-color); }
-        .rarity-chip { background: var(--app-rarity-chip-bg); padding: 3px 8px; border-radius: 6px; font-size: 0.8em; margin-left: 6px; }
-
-        .collectible-display-area {
-            position: relative; padding: 50px 0; text-align: center; overflow: hidden;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        /* New Collectible Modal Styles */
+        .collectible-header {
+            position: relative;
+            padding: 40px 0 30px;
+            text-align: center;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff; /* Always white on gradient */
         }
-        .collectible-display-area h3 { margin-top: 15px; position: relative; z-index: 2; font-size: 1.6em; margin-bottom: 4px; }
-        .collectible-display-area p { color: rgba(255,255,255,0.7); position: relative; z-index: 2; margin-top: 0; font-size: 0.95em; }
+        .collectible-header h3 {
+            margin-top: 15px;
+            position: relative;
+            z-index: 2;
+            font-size: 1.5em;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+        .collectible-header .sub-header {
+            position: relative; z-index: 2;
+            font-size: 1em;
+            opacity: 0.9;
+        }
+
+        .stats-table {
+            background-color: var(--tg-theme-secondary-bg-color);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 0;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(0,0,0,0.1); /* Subtle divider */
+        }
+        .stat-row:last-child { border-bottom: none; }
+        
+        .stat-label {
+            font-weight: 500;
+            color: var(--tg-theme-text-color);
+            font-size: 0.95em;
+        }
+        
+        .stat-value {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95em;
+            color: var(--tg-theme-text-color);
+        }
+        
+        .owner-chip {
+            display: flex; align-items: center; gap: 6px;
+        }
+        .owner-chip img {
+            width: 20px; height: 20px; border-radius: 50%;
+        }
+        .owner-chip span { color: var(--tg-theme-link-color); }
+        
+        .percentage-pill {
+            background-color: var(--app-rarity-chip-bg);
+            color: var(--app-rarity-text);
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        
+        .learn-more { font-size: 0.8em; color: var(--tg-theme-link-color); margin-left: 4px; opacity: 0.8; }
+        
+        .big-rounded-btn {
+            width: 100%;
+            background-color: var(--tg-theme-button-color);
+            color: var(--tg-theme-button-text-color);
+            border: none;
+            padding: 14px;
+            border-radius: 12px; /* Circle borders roughly */
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
 
         /* Menu */
         #long-press-menu {
@@ -385,28 +463,76 @@
     </div>
 </div>
 
+<!-- REDESIGNED COLLECTIBLE MODAL -->
 <div id="collectible-modal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-scrollable-content" style="padding: 0;">
-            <div id="collectible-display-area" class="collectible-display-area">
-                <div id="collectible-pattern-container" class="dynamic-pattern-container"></div>
-                <div style="position: relative; z-index: 2; width: 100%; display: flex; flex-direction: column; align-items: center;">
-                    <div style="width: 180px; height: 180px; display:flex; align-items:center; justify-content:center;">
-                        <img id="collectible-image" src="" style="max-width: 100%; max-height: 100%; object-fit: contain; display:none;">
-                        <div id="collectible-lottie" class="lottie-wrapper"></div>
-                    </div>
-                    <h3 id="collectible-name">Name</h3>
-                    <p>Collectible #<span id="collectible-number"></span></p>
+    <div class="modal-content" style="background-color: var(--tg-theme-bg-color);">
+        <!-- Top Gradient Section -->
+        <div id="collectible-header" class="collectible-header">
+            <div id="collectible-pattern-container" class="dynamic-pattern-container"></div>
+            <div style="position: relative; z-index: 2; width: 100%; display: flex; flex-direction: column; align-items: center;">
+                <div style="width: 160px; height: 160px; display:flex; align-items:center; justify-content:center;">
+                    <img id="collectible-image" src="" style="max-width: 100%; max-height: 100%; object-fit: contain; display:none;">
+                    <div id="collectible-lottie" class="lottie-wrapper"></div>
                 </div>
-            </div>
-            <div style="background: var(--tg-theme-secondary-bg-color);">
-                <div class="info-row"><span class="info-label">Model</span><span class="info-value" id="info-model"></span></div>
-                <div class="info-row"><span class="info-label">Backdrop</span><span class="info-value" id="info-backdrop"></span></div>
-                <div class="info-row"><span class="info-label">Symbol</span><span class="info-value" id="info-pattern"></span></div>
+                <h3 id="collectible-title">Gift Name #000</h3>
+                <div class="sub-header" id="collectible-model-name">Model Name</div>
             </div>
         </div>
-        <div class="modal-buttons-footer">
-            <button class="modal-button secondary" onclick="closeModal('collectible-modal')">Close</button>
+
+        <!-- Scrollable Content with Table -->
+        <div class="modal-scrollable-content" style="padding: 16px;">
+            <div class="stats-table">
+                <!-- Owner -->
+                <div class="stat-row">
+                    <div class="stat-label">Owner</div>
+                    <div class="stat-value owner-chip">
+                        <img id="col-owner-img" src="">
+                        <span id="col-owner-name">User</span>
+                    </div>
+                </div>
+                <!-- Model -->
+                <div class="stat-row">
+                    <div class="stat-label">Model</div>
+                    <div class="stat-value">
+                        <span id="col-model-val">Name</span>
+                        <span class="percentage-pill" id="col-model-pct">0%</span>
+                    </div>
+                </div>
+                <!-- Symbol -->
+                <div class="stat-row">
+                    <div class="stat-label">Symbol</div>
+                    <div class="stat-value">
+                        <span id="col-symbol-val">Name</span>
+                        <span class="percentage-pill" id="col-symbol-pct">0%</span>
+                    </div>
+                </div>
+                <!-- Backdrop -->
+                <div class="stat-row">
+                    <div class="stat-label">Backdrop</div>
+                    <div class="stat-value">
+                        <span id="col-backdrop-val">Name</span>
+                        <span class="percentage-pill" id="col-backdrop-pct">0%</span>
+                    </div>
+                </div>
+                <!-- Quantity -->
+                <div class="stat-row">
+                    <div class="stat-label">Quantity</div>
+                    <div class="stat-value" id="col-quantity">100/1000 issued</div>
+                </div>
+                <!-- Value -->
+                <div class="stat-row">
+                    <div class="stat-label">Value</div>
+                    <div class="stat-value" style="color: var(--tg-theme-link-color);">
+                        <span id="col-value">~10 TON</span> 
+                        <span class="learn-more">learn more</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-buttons-footer" style="padding-top: 0; background: var(--tg-theme-bg-color);">
+            <button class="big-rounded-btn" onclick="closeModal('collectible-modal')">OK</button>
         </div>
     </div>
 </div>
@@ -1193,11 +1319,16 @@
     function openCollectibleModal(gift) {
         haptic('light');
         const cd = gift.collectibleData;
-        document.getElementById('collectible-name').innerText = cd.model.name;
-        document.getElementById('collectible-number').innerText = gift.collectibleNumber.toLocaleString();
         
-        document.getElementById('collectible-display-area').style.background = `radial-gradient(circle at 50% 0%, ${cd.backdrop.hex.centerColor}, ${cd.backdrop.hex.edgeColor})`;
+        // 1. Header Styling (Gradient)
+        const header = document.getElementById('collectible-header');
+        header.style.background = `radial-gradient(circle at 50% 0%, ${cd.backdrop.hex.centerColor}, ${cd.backdrop.hex.edgeColor})`;
         
+        // 2. Titles
+        document.getElementById('collectible-title').innerText = `${gift.name} #${gift.collectibleNumber.toLocaleString()}`;
+        document.getElementById('collectible-model-name').innerText = cd.model.name;
+        
+        // 3. Image / Lottie
         document.getElementById('collectible-image').style.display = 'none';
         document.getElementById('collectible-lottie').style.display = 'block';
         
@@ -1207,12 +1338,39 @@
         const imgPath = cd.model.isCustom ? cd.model.imageUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/png/${encodeURIComponent(cd.model.name)}.png`;
         document.getElementById('collectible-image').src = imgPath;
 
-        const rarity = (val) => `<span class="rarity-chip">${(val/10).toFixed(1)}%</span>`;
-        document.getElementById('info-model').innerHTML = `${cd.model.name} ${rarity(cd.model.rarityPermille)}`;
-        document.getElementById('info-backdrop').innerHTML = `${cd.backdrop.name} ${rarity(cd.backdrop.rarityPermille)}`;
-        document.getElementById('info-pattern').innerHTML = `${cd.pattern.name} ${rarity(cd.pattern.rarityPermille)}`;
+        // 4. Pattern Overlay
         document.getElementById('collectible-pattern-container').innerHTML = '';
         generatePattern('collectible-pattern-container', cd.pattern, gift.name, false, cd.backdrop.hex.patternColor);
+
+        // 5. Populate Stats Table
+        
+        // Owner
+        const user = tg.initDataUnsafe.user;
+        const ownerImg = document.getElementById('col-owner-img');
+        if (user && user.photo_url) ownerImg.src = user.photo_url;
+        else ownerImg.src = "https://i.pravatar.cc/150?u=user";
+        document.getElementById('col-owner-name').innerText = user ? (user.first_name || 'You') : 'You';
+
+        // Model
+        document.getElementById('col-model-val').innerText = cd.model.name;
+        document.getElementById('col-model-pct').innerText = `${(cd.model.rarityPermille/10).toFixed(1)}%`;
+        
+        // Symbol
+        document.getElementById('col-symbol-val').innerText = cd.pattern.name;
+        document.getElementById('col-symbol-pct').innerText = `${(cd.pattern.rarityPermille/10).toFixed(1)}%`;
+        
+        // Backdrop
+        document.getElementById('col-backdrop-val').innerText = cd.backdrop.name;
+        document.getElementById('col-backdrop-pct').innerText = `${(cd.backdrop.rarityPermille/10).toFixed(1)}%`;
+
+        // Fake Data for Quantity and Value
+        const total = Math.floor(Math.random() * 500000) + 10000;
+        const issued = Math.floor(Math.random() * total);
+        document.getElementById('col-quantity').innerText = `${issued.toLocaleString()} / ${total.toLocaleString()} issued`;
+        
+        const val = Math.floor(Math.random() * 100) + 5;
+        document.getElementById('col-value').innerText = `~${val} TON`;
+
         document.getElementById('collectible-modal').classList.add('active');
         tg.BackButton.show(); tg.BackButton.onClick(() => closeModal('collectible-modal'));
     }
