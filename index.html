@@ -761,15 +761,19 @@
         document.getElementById('col-owner-name').innerText = user?.first_name || 'You';
 
         // Stats (Final Values)
-        const setTextAndPct = (idVal, idPct, val, permille) => {
-            const valEl = document.getElementById(idVal);
-            // If strictly upgrading, we'll set slots later. If viewing, set text.
-            if(!isUpgrading) { valEl.innerHTML = val; valEl.className = 'stat-value'; }
-            document.getElementById(idPct).innerText = `${(permille/10).toFixed(1)}%`;
+        const setTextAndPct = (idSlot, idPct, val, permille) => {
+            const slotEl = document.getElementById(idSlot);
+            // Only manually set innerHTML if we are NOT in roulette/upgrading mode
+            if(!isUpgrading && slotEl) {
+                slotEl.innerHTML = `<div class="slot-item">${val}</div>`;
+            }
+            const pctEl = document.getElementById(idPct);
+            if(pctEl) pctEl.innerText = `${(permille/10).toFixed(1)}%`;
         };
-        setTextAndPct('col-model-val', 'col-model-pct', cd.model.name, cd.model.rarityPermille);
-        setTextAndPct('col-symbol-val', 'col-symbol-pct', cd.pattern.name, cd.pattern.rarityPermille);
-        setTextAndPct('col-backdrop-val', 'col-backdrop-pct', cd.backdrop.name, cd.backdrop.rarityPermille);
+        // Changed 'col-model-val' to 'slot-model', etc.
+        setTextAndPct('slot-model', 'col-model-pct', cd.model.name, cd.model.rarityPermille);
+        setTextAndPct('slot-symbol', 'col-symbol-pct', cd.pattern.name, cd.pattern.rarityPermille);
+        setTextAndPct('slot-backdrop', 'col-backdrop-pct', cd.backdrop.name, cd.backdrop.rarityPermille);
 
         // Random Secondary Stats
         const issued = Math.floor(Math.random() * 500000) + 10000;
