@@ -576,6 +576,12 @@
         loadState();
         if (!state.userPhone) state.userPhone = `+888 ${Math.floor(Math.random()*9000+1000)} ${Math.floor(Math.random()*9000+1000)}`;
         updateUserProfile(); applyWornGiftVisuals(); await fetchGiftDefinitions(); renderShop(); renderInventory();
+        document.addEventListener('click', (e) => {
+            // If the user clicks exactly on the modal-overlay (the dark background)
+            if (e.target.classList.contains('modal-overlay')) {
+                closeModal(e.target.id);
+            }
+        });
         document.addEventListener('click', (e) => { 
             const menu = document.getElementById('long-press-menu'); 
             if (!menu.classList.contains('hidden') && !menu.contains(e.target)) menu.classList.add('hidden');
@@ -784,6 +790,10 @@
             // === ANIMATION MODE ===
             btn.innerText = "Skip";
             btn.onclick = skipAnimation;
+
+            const subHeader = document.getElementById('collectible-model-name');
+            subHeader.style.filter = 'blur(5px)';
+            subHeader.style.transition = 'filter 0.5s ease';
             
             // 1. Prepare Horizontal Roulette
             rouletteStrip.style.display = 'flex';
@@ -855,7 +865,7 @@
                 header.style.background = `radial-gradient(circle at 50% 0%, ${cd.backdrop.hex.centerColor}, ${cd.backdrop.hex.edgeColor})`;
                 stopSlotMachine('slot-backdrop', cd.backdrop.name);
                 haptic('medium');
-            }, 2000));
+            }, 4000));
 
             // Stop Symbol (~4s)
             appRuntime.animationState.timeouts.push(setTimeout(() => {
@@ -864,12 +874,12 @@
                 generatePattern('collectible-pattern-container', cd.pattern, gift.name, false, cd.backdrop.hex.patternColor);
                 stopSlotMachine('slot-symbol', cd.pattern.name);
                 haptic('medium');
-            }, 4000));
+            }, 6000));
 
             // Stop Model & Finish (~6s)
             appRuntime.animationState.timeouts.push(setTimeout(() => {
                 finishAnimation();
-            }, 6000));
+            }, 7500));
 
         } else {
             // === STATIC MODE ===
@@ -943,6 +953,8 @@
 
     function finishAnimation() {
         if (!appRuntime.animationState) return;
+        const subHeader = document.getElementById('collectible-model-name');
+        subHeader.style.filter = 'blur(0px)';
         const st = appRuntime.animationState;
         const cd = st.finalData;
         const giftName = st.giftName;
@@ -991,30 +1003,32 @@
     async function openDetailModal(gift) {
         appRuntime.activeGiftId = gift.uniqueId;
         document.getElementById('detail-title').innerText = gift.name;
-        document.getElementById('detail-image').style.display = 'block';
+        const imgEl = document.getElementById('detail-image');
+        imgEl.style.display = 'block';
         document.getElementById('detail-lottie').style.display = 'none';
         
-        // Fetch models for slideshow
-        const imgEl = document.getElementById('detail-image');
         const parts = await fetchGiftParts(gift.name);
-        
         if (parts.models.length > 0) {
-            let partIndex = 0;
-            // Set initial
-            imgEl.src = parts.models[0].isCustom ? parts.models[0].imageUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/png/${encodeURIComponent(parts.models[0].name)}.png`;
+            // Corrected: Start from a random index
+            let partIndex = Math.floor(Math.random() * parts.models.length);
             
-            // Start Slideshow
+            const setModel = (idx) => {
+                const model = parts.models[idx];
+                imgEl.src = model.isCustom ? model.imageUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/png/${encodeURIComponent(model.name)}.png`;
+            };
+    
+            setModel(partIndex);
+            
             if(parts.models.length > 1) {
+                // Corrected: Interval changed to 2000ms
                 appRuntime.detailInterval = setInterval(() => {
                     partIndex = (partIndex + 1) % parts.models.length;
-                    const model = parts.models[partIndex];
-                    imgEl.src = model.isCustom ? model.imageUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/png/${encodeURIComponent(model.name)}.png`;
-                }, 3000);
+                    setModel(partIndex);
+                }, 2000);
             }
         } else {
             imgEl.src = `${CDN_BASE}originals/${gift.originalId}/Original.png`;
         }
-
         document.getElementById('detail-modal').classList.add('active');
         tg.BackButton.show(); tg.BackButton.onClick(() => closeModal('detail-modal'));
     }
