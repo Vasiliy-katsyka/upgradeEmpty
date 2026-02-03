@@ -7,7 +7,6 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
-    <!-- Added Confetti Library -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
@@ -166,6 +165,8 @@
             border-top-left-radius: 14px; border-top-right-radius: 14px;
             width: 100%; max-width: 600px; display: flex; flex-direction: column; overflow: hidden;
             max-height: 90vh;
+            /* To make click outside work better */
+            pointer-events: auto; 
         }
         #customize-modal .modal-content { height: 90vh; }
 
@@ -209,17 +210,19 @@
         }
 
         /* Roulette Animations */
-        /* Horizontal Model Spin */
+        /* Updated: Full Width */
         .roulette-image-wrapper {
-            width: 160px; height: 160px; position: relative; overflow: hidden; display: flex;
+            width: 100%; height: 160px; position: relative; overflow: hidden; display: flex;
             align-items: center; justify-content: center;
         }
         .roulette-strip {
             display: flex; height: 100%; position: absolute; left: 0; top: 0;
+            /* Will be animated via JS/Keyframes */
         }
         .roulette-strip img {
             width: 160px; height: 160px; object-fit: contain; flex-shrink: 0;
         }
+        
         /* Vertical Text Slot */
         .slot-mask {
             height: 1.2em; overflow: hidden; position: relative; display: inline-block; vertical-align: bottom;
@@ -403,7 +406,7 @@
         </div>
         <div class="modal-buttons-footer">
             <button class="modal-button" onclick="handleBuyMultiple()">Buy</button>
-            <button class="modal-button secondary" onclick="closeModal('qty-modal')">Cancel</button>
+            <!-- Removed Cancel Button -->
         </div>
     </div>
 </div>
@@ -413,7 +416,7 @@
         <div class="modal-header-bar"><span id="detail-title">Gift</span></div>
         <div class="modal-scrollable-content" style="padding: 20px; text-align: center;">
             <div class="image-container" style="width: 160px; height: 160px; margin: 0 auto;">
-                <img id="detail-image" src="" style="display:none;">
+                <img id="detail-image" src="" style="display:none; width: 100%; height: 100%; object-fit: contain;">
                 <div id="detail-lottie" class="lottie-wrapper"></div>
             </div>
             <p style="color: var(--tg-theme-hint-color); margin-top: 15px; line-height: 1.5;" id="detail-desc">
@@ -422,7 +425,7 @@
         </div>
         <div class="modal-buttons-footer">
             <button class="modal-button" id="btn-upgrade" onclick="handleUpgrade()">✨ Upgrade (Free)</button>
-            <button class="modal-button secondary" onclick="closeModal('detail-modal')">Close</button>
+            <!-- Removed Close Button -->
         </div>
     </div>
 </div>
@@ -436,8 +439,8 @@
             <div style="position: relative; z-index: 2; width: 100%; display: flex; flex-direction: column; align-items: center;">
                 <div class="roulette-image-wrapper">
                     <div id="roulette-strip" class="roulette-strip" style="display:none;"></div>
-                    <img id="collectible-image" src="" style="width:100%; height:100%; object-fit:contain; display:none;">
-                    <div id="collectible-lottie" class="lottie-wrapper" style="display:none;"></div>
+                    <img id="collectible-image" src="" style="width:160px; height:160px; object-fit:contain; display:none;">
+                    <div id="collectible-lottie" class="lottie-wrapper" style="width:160px; height:160px; display:none;"></div>
                 </div>
                 <h3 id="collectible-title">Gift Name #000</h3>
                 <div class="sub-header" id="collectible-model-name">Model Name</div>
@@ -519,7 +522,7 @@
         </div>
         <div class="modal-buttons-footer">
             <button class="modal-button" id="btn-create-custom" disabled onclick="handleCreateQueue()">Create All</button>
-            <button class="modal-button secondary" onclick="closeModal('customize-modal')">Cancel</button>
+            <!-- Removed Cancel Button -->
         </div>
     </div>
 </div>
@@ -545,7 +548,7 @@
     const CDN_BASE = "https://cdn.changes.tg/gifts/";
     const LS_KEY = "telegram_gift_simulator_data_v2"; 
     
-    // CUSTOM CONFIGS (Shortened for brevity - same as before)
+    // CUSTOM CONFIGS (Shortened for brevity)
     const MY_CUSTOM_ADDITIONS = {
         "Heart Locket": [{name: "Midnight Club", rarityPermille: 10, isCustom: true, imageUrl: "https://raw.githubusercontent.com/Vasiliy-katsyka/upgradeEmpty/main/MidnightClubEmoji_AgADoJIAAkOhuEs.png", lottieUrl: "https://raw.githubusercontent.com/Vasiliy-katsyka/upgradeEmpty/main/MidnightClubEmoji_AgADoJIAAkOhuEs.json"}],
         "Jolly Chimp": [{name: "Midnight Club", rarityPermille: 10, isCustom: true, imageUrl: "https://raw.githubusercontent.com/Vasiliy-katsyka/upgradeEmpty/main/MidnightClubEmoji_AgADNpwAArR-oUs.png", lottieUrl: "https://raw.githubusercontent.com/Vasiliy-katsyka/upgradeEmpty/main/MidnightClubEmoji_AgADNpwAArR-oUs.json"}],
@@ -561,7 +564,7 @@
 
     let state = { inventory: [], giftDefinitions: {}, lastCollectibleNumber: 100, userBio: "Hello world", userPhone: "", settings: { animations: true, showHidden: false } };
     let customizationQueue = []; let editingIndex = 0; let cachedParts = {};
-    let appRuntime = { longPressTimer: null, activeGiftId: null, shopGiftData: null, reordering: false, sortable: null, selectionMode: null, selectedIds: new Set(), animationState: null };
+    let appRuntime = { longPressTimer: null, activeGiftId: null, shopGiftData: null, reordering: false, sortable: null, selectionMode: null, selectedIds: new Set(), animationState: null, detailInterval: null };
 
     // --- Init ---
     window.addEventListener('DOMContentLoaded', async () => {
@@ -573,7 +576,16 @@
         loadState();
         if (!state.userPhone) state.userPhone = `+888 ${Math.floor(Math.random()*9000+1000)} ${Math.floor(Math.random()*9000+1000)}`;
         updateUserProfile(); applyWornGiftVisuals(); await fetchGiftDefinitions(); renderShop(); renderInventory();
-        document.addEventListener('click', (e) => { const menu = document.getElementById('long-press-menu'); if (!menu.classList.contains('hidden') && !menu.contains(e.target)) menu.classList.add('hidden'); });
+        document.addEventListener('click', (e) => { 
+            const menu = document.getElementById('long-press-menu'); 
+            if (!menu.classList.contains('hidden') && !menu.contains(e.target)) menu.classList.add('hidden');
+            
+            // Close modals on outside click
+            const modals = document.querySelectorAll('.modal-overlay.active');
+            modals.forEach(m => {
+                if(e.target === m) closeModal(m.id);
+            });
+        });
     });
 
     // --- Core Functions ---
@@ -774,7 +786,7 @@
             imgEl.style.display = 'none'; lottieEl.style.display = 'none';
             rouletteStrip.innerHTML = '';
             
-            // Fill strip with random models + final model at specific spots
+            // Fill strip with random models + FINAL model at end
             const stripLen = 30; 
             for(let i=0; i<stripLen; i++) {
                 const rndModel = partsPool.models[Math.floor(Math.random() * partsPool.models.length)];
@@ -783,6 +795,11 @@
                 img.src = src;
                 rouletteStrip.appendChild(img);
             }
+            // Add Final Item
+            const finalImg = document.createElement('img');
+            const finalSrc = cd.model.isCustom ? cd.model.imageUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/png/${encodeURIComponent(cd.model.name)}.png`;
+            finalImg.src = finalSrc;
+            rouletteStrip.appendChild(finalImg);
             
             // 2. Prepare Slot Machines for Text
             initSlotMachine('slot-model', partsPool.models.map(x=>x.name), cd.model.name);
@@ -797,10 +814,19 @@
                 timeouts: []
             };
 
-            // Horizontal Scroll
+            // Horizontal Scroll Calculation
+            // Target: Center the (stripLen + 1)th image.
+            // Width of 1 image = 160px.
+            // Center of final image from start = (stripLen * 160) + (160 / 2).
+            // Screen Center = window.innerWidth / 2.
+            // translateX = - (Center of final image - Screen Center).
+            const screenCenter = window.innerWidth / 2;
+            const finalImageCenter = (stripLen * 160) + 80;
+            const translateX = -(finalImageCenter - screenCenter);
+
             rouletteStrip.animate([
                 { transform: 'translateX(0)' },
-                { transform: `translateX(-${(stripLen-1)*160}px)` }
+                { transform: `translateX(${translateX}px)` }
             ], { duration: 6000, easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)', fill: 'forwards' });
 
             // Backdrop Strobe
@@ -887,12 +913,11 @@
         scroll.innerHTML = html;
         wrapper.appendChild(scroll);
 
-        // Start scrolling (infinite loop simulation by CSS translate)
-        // We actually just animate it downwards fast
+        // Start scrolling
         scroll.animate([
             { transform: 'translateY(0)' },
             { transform: 'translateY(-90%)' } // Scroll most of the way
-        ], { duration: 6000, iterations: 1 }); // Matches total time, logic to stop will snap it
+        ], { duration: 6000, iterations: 1 });
     }
 
     function stopSlotMachine(elementId, finalValue) {
@@ -945,8 +970,8 @@
             imgEl.src = imgPath;
         }
 
-        // Confetti
-        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+        // Confetti - zIndex fixed
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, zIndex: 2001 });
         hapticNotify('success');
 
         // Reset Button
@@ -958,16 +983,50 @@
     }
 
 
-    // --- Generic UI (Same as previous) ---
-    function openDetailModal(gift) {
-        appRuntime.activeGiftId = gift.uniqueId; document.getElementById('detail-title').innerText = gift.name; document.getElementById('detail-image').style.display = 'none'; document.getElementById('detail-lottie').style.display = 'block'; playLottie('detail-lottie', `${CDN_BASE}originals/${gift.originalId}/Original.json`); document.getElementById('detail-modal').classList.add('active'); tg.BackButton.show(); tg.BackButton.onClick(() => closeModal('detail-modal'));
+    // --- Generic UI (Updated) ---
+    async function openDetailModal(gift) {
+        appRuntime.activeGiftId = gift.uniqueId;
+        document.getElementById('detail-title').innerText = gift.name;
+        document.getElementById('detail-image').style.display = 'block';
+        document.getElementById('detail-lottie').style.display = 'none';
+        
+        // Fetch models for slideshow
+        const imgEl = document.getElementById('detail-image');
+        const parts = await fetchGiftParts(gift.name);
+        
+        if (parts.models.length > 0) {
+            let partIndex = 0;
+            // Set initial
+            imgEl.src = parts.models[0].isCustom ? parts.models[0].imageUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/png/${encodeURIComponent(parts.models[0].name)}.png`;
+            
+            // Start Slideshow
+            if(parts.models.length > 1) {
+                appRuntime.detailInterval = setInterval(() => {
+                    partIndex = (partIndex + 1) % parts.models.length;
+                    const model = parts.models[partIndex];
+                    imgEl.src = model.isCustom ? model.imageUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/png/${encodeURIComponent(model.name)}.png`;
+                }, 3000);
+            }
+        } else {
+            imgEl.src = `${CDN_BASE}originals/${gift.originalId}/Original.png`;
+        }
+
+        document.getElementById('detail-modal').classList.add('active');
+        tg.BackButton.show(); tg.BackButton.onClick(() => closeModal('detail-modal'));
     }
+
     function closeModal(id) {
-        document.getElementById(id).classList.remove('active'); tg.BackButton.hide();
-        if(id==='detail-modal') document.getElementById('detail-lottie').innerHTML='';
+        document.getElementById(id).classList.remove('active');
+        tg.BackButton.hide();
+        if(id==='detail-modal') {
+            document.getElementById('detail-lottie').innerHTML='';
+            if(appRuntime.detailInterval) { clearInterval(appRuntime.detailInterval); appRuntime.detailInterval = null; }
+        }
         if(id==='collectible-modal') { document.getElementById('collectible-lottie').innerHTML=''; document.getElementById('roulette-strip').innerHTML=''; if(appRuntime.animationState) skipAnimation(); }
         if (document.getElementById('shop-page').classList.contains('active')) { tg.BackButton.show(); tg.BackButton.onClick(() => switchTab('inventory')); }
     }
+    
+    // ... (Rest of existing functions like switchTab, playLottie, generatePattern, settings, etc. remain unchanged) ...
     function switchTab(tab) {
         haptic('light'); document.getElementById('profile-page').classList.remove('active'); document.getElementById('shop-page').classList.remove('active'); document.querySelectorAll('.profile-tabs button').forEach(b => b.classList.remove('active'));
         if (tab === 'inventory') { document.getElementById('profile-page').classList.add('active'); document.querySelectorAll('.profile-tabs button')[0].classList.add('active'); tg.BackButton.hide(); } 
@@ -985,7 +1044,7 @@
     function loadState() { const saved = localStorage.getItem(LS_KEY); if (saved) { const parsed = JSON.parse(saved); state.inventory = parsed.inventory || []; state.lastCollectibleNumber = parsed.lastCollectibleNumber || 100; state.userBio = parsed.userBio || "Hello world"; state.userPhone = parsed.userPhone || ""; if(parsed.settings) state.settings = parsed.settings; } }
     function resetAppData() { tg.showConfirm("Reset App?", (confirmed) => { if(confirmed) { localStorage.removeItem(LS_KEY); location.reload(); }}); }
     
-    // --- Context Menu & Queue Logic (Same as before) ---
+    // --- Context Menu & Queue Logic ---
     function openMenu(e, gift) { appRuntime.activeGiftId = gift.uniqueId; const menu = document.getElementById('long-press-menu'); document.getElementById('menu-pin').style.display = gift.isCollectible?'block':'none'; document.getElementById('menu-pin').innerText = gift.pinned?"Unpin":"Pin"; document.getElementById('menu-wear').style.display = gift.isCollectible?'block':'none'; document.getElementById('menu-wear').innerText = gift.worn?"Take Off":"Wear"; document.getElementById('menu-reorder').style.display = (gift.isCollectible&&gift.pinned&&state.inventory.filter(g=>g.pinned).length>1)?'block':'none'; document.getElementById('menu-hide').innerText = gift.hidden?"Unhide":"Hide"; let x = e.clientX, y = e.clientY; if(x+180>window.innerWidth) x=window.innerWidth-190; if(y+160>window.innerHeight) y=window.innerHeight-170; menu.style.left=x+'px'; menu.style.top=y+'px'; menu.classList.remove('hidden'); }
     function togglePin() { const g = state.inventory.find(x=>x.uniqueId===appRuntime.activeGiftId); if(g.pinned) {g.pinned=false;g.pinOrder=null;} else {if(state.inventory.filter(x=>x.pinned).length>=6) return alert("Max 6"); g.pinned=true;g.pinOrder=999;} document.getElementById('long-press-menu').classList.add('hidden'); haptic('light'); saveState(); renderInventory(); }
     function toggleWear() { const g = state.inventory.find(x=>x.uniqueId===appRuntime.activeGiftId); if(g.worn) g.worn=false; else {state.inventory.forEach(x=>x.worn=false); g.worn=true;} document.getElementById('long-press-menu').classList.add('hidden'); hapticNotify('success'); saveState(); renderInventory(); applyWornGiftVisuals(); }
