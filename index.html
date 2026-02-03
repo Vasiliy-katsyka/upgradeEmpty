@@ -52,6 +52,13 @@
             display: flex; justify-content: center; position: relative;
             transition: background 0.5s ease;
         }
+
+        /* Fix for text visibility when wearing a gift in light mode */
+        .profile-top-section.has-worn-gift .profile-name-status h1,
+        .profile-top-section.has-worn-gift .profile-name-status p {
+            color: #ffffff !important;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
         
         #profile-pattern-overlay {
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
@@ -92,7 +99,9 @@
 
         .gifts-grid {
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px;
-            flex-grow: 1; overflow-y: auto; align-content: start; background: #000;
+            flex-grow: 1; overflow-y: auto; align-content: start; 
+            /* Changed from black to theme bg color */
+            background: var(--tg-theme-bg-color);
         }
         
         .gift-card {
@@ -217,6 +226,8 @@
             border-radius: 12px;
             overflow: hidden;
             margin-top: 0;
+            /* Added spacing below the table */
+            margin-bottom: 24px;
         }
         
         .stat-row {
@@ -267,7 +278,8 @@
             color: var(--tg-theme-button-text-color);
             border: none;
             padding: 14px;
-            border-radius: 12px; /* Circle borders roughly */
+            /* Increased radius for circular ends */
+            border-radius: 30px;
             font-size: 1.1em;
             font-weight: 600;
             cursor: pointer;
@@ -1094,8 +1106,13 @@
         if (worn) {
             const cd = worn.collectibleData;
             bg.style.background = `radial-gradient(circle at 50% 0%, ${cd.backdrop.hex.centerColor}, ${cd.backdrop.hex.edgeColor})`;
+            // Add class for text contrast in light mode
+            bg.classList.add('has-worn-gift');
             generatePattern('profile-pattern-overlay', cd.pattern, worn.name, false, cd.backdrop.hex.patternColor, true);
-        } else { bg.style.background = 'var(--app-profile-gradient-fallback)'; }
+        } else { 
+            bg.style.background = 'var(--app-profile-gradient-fallback)';
+            bg.classList.remove('has-worn-gift');
+        }
     }
 
     function toggleHide() {
