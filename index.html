@@ -681,21 +681,90 @@
 <div id="customize-modal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header-bar">Customize</div>
+        
+        <!-- Queue Bar -->
         <div class="queue-bar" id="cust-queue-bar"></div>
+        
         <div class="modal-scrollable-content" style="padding: 0; background: var(--tg-theme-secondary-bg-color);">
+            
+            <!-- Base Gift Selection -->
             <div class="filter-section">
                 <h4>Select Base Gift</h4>
                 <div class="filter-options-grid" id="cust-base-grid"></div>
             </div>
+
+            <!-- Parts Selection Container -->
             <div id="cust-parts-container" class="hidden">
-                <div class="filter-section"><h4>Select Model</h4><div class="filter-options-grid" id="cust-model-grid"></div></div>
-                <div class="filter-section"><h4>Select Backdrop</h4><div class="filter-options-grid" id="cust-backdrop-grid"></div></div>
-                <div class="filter-section"><h4>Select Symbol (Optional)</h4><div class="filter-options-grid" id="cust-pattern-grid"></div></div>
+                
+                <!-- Model Grid -->
+                <div class="filter-section">
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding-right: 4px;">
+                        <h4>Select Model</h4>
+                        <span id="lbl-rnd-model" class="hidden" style="font-size:0.75em; color:var(--tg-theme-link-color); font-weight:600; letter-spacing:0.5px; text-transform:uppercase;">Randomized</span>
+                    </div>
+                    <div class="filter-options-grid" id="cust-model-grid"></div>
+                </div>
+
+                <!-- Backdrop Grid -->
+                <div class="filter-section">
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding-right: 4px;">
+                        <h4>Select Backdrop</h4>
+                        <span id="lbl-rnd-backdrop" class="hidden" style="font-size:0.75em; color:var(--tg-theme-link-color); font-weight:600; letter-spacing:0.5px; text-transform:uppercase;">Randomized</span>
+                    </div>
+                    <div class="filter-options-grid" id="cust-backdrop-grid"></div>
+                </div>
+
+                <!-- Pattern Grid -->
+                <div class="filter-section">
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding-right: 4px;">
+                        <h4>Select Symbol (Optional)</h4>
+                        <span id="lbl-rnd-pattern" class="hidden" style="font-size:0.75em; color:var(--tg-theme-link-color); font-weight:600; letter-spacing:0.5px; text-transform:uppercase;">Randomized</span>
+                    </div>
+                    <div class="filter-options-grid" id="cust-pattern-grid"></div>
+                </div>
+
+                <!-- NEW: Bulk / Random Controls -->
+                <div id="cust-bulk-controls" style="margin: 20px 15px 30px 15px; background: var(--tg-theme-bg-color); border-radius: 12px; overflow: hidden;">
+                    
+                    <!-- Quantity Row -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 16px; border-bottom:1px solid rgba(0,0,0,0.05);">
+                        <span style="font-weight:500; font-size: 0.95em;">Quantity</span>
+                        <input type="number" id="cust-qty" value="1" min="1" max="1000" oninput="updateCreateButton()" style="width:80px; padding:8px; border-radius:8px; border:none; background:var(--tg-theme-secondary-bg-color); color:var(--tg-theme-text-color); text-align:center; font-weight:bold; font-size:1.1em; outline:none;">
+                    </div>
+                    
+                    <!-- Random Model Switch -->
+                    <div class="switch-row" style="border-bottom:1px solid rgba(0,0,0,0.05); padding: 12px 16px;">
+                        <span style="font-size: 0.95em;">Random Model</span>
+                        <label class="switch">
+                            <input type="checkbox" id="cb-rnd-model" onchange="toggleRandomPart('model'); updateCreateButton()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <!-- Random Backdrop Switch -->
+                    <div class="switch-row" style="border-bottom:1px solid rgba(0,0,0,0.05); padding: 12px 16px;">
+                        <span style="font-size: 0.95em;">Random Backdrop</span>
+                        <label class="switch">
+                            <input type="checkbox" id="cb-rnd-backdrop" onchange="toggleRandomPart('backdrop'); updateCreateButton()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <!-- Random Pattern Switch (Default Checked) -->
+                    <div class="switch-row" style="border:none; padding: 12px 16px;">
+                        <span style="font-size: 0.95em;">Random Symbol</span>
+                        <label class="switch">
+                            <input type="checkbox" id="cb-rnd-pattern" checked onchange="toggleRandomPart('pattern'); updateCreateButton()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
             </div>
         </div>
+        
         <div class="modal-buttons-footer">
-            <button class="modal-button" id="btn-create-custom" disabled onclick="handleCreateQueue()">Create All</button>
-            <!-- Removed Cancel Button -->
+            <button class="modal-button" id="btn-create-custom" disabled onclick="handleCreateQueue()">Create</button>
         </div>
     </div>
 </div>
@@ -1276,6 +1345,83 @@
         if(gift.isCollectible && !isUpgrading) {
             setTimeout(initCraftingButton, 50);
         }
+    }
+
+// Call this when opening the modal or loading a gift to reset UI state
+    function resetBulkControls() {
+        document.getElementById('cust-qty').value = 1;
+        document.getElementById('cb-rnd-model').checked = false;
+        document.getElementById('cb-rnd-backdrop').checked = false;
+        document.getElementById('cb-rnd-pattern').checked = true; // Default true per request
+        
+        toggleRandomPart('model');
+        toggleRandomPart('backdrop');
+        toggleRandomPart('pattern');
+    }
+
+    function toggleRandomPart(type) {
+        const isChecked = document.getElementById(`cb-rnd-${type}`).checked;
+        const grid = document.getElementById(`cust-${type}-grid`);
+        const label = document.getElementById(`lbl-rnd-${type}`);
+        
+        if (isChecked) {
+            grid.style.opacity = '0.3';
+            grid.style.pointerEvents = 'none';
+            if(label) label.classList.remove('hidden');
+        } else {
+            grid.style.opacity = '1';
+            grid.style.pointerEvents = 'auto';
+            if(label) label.classList.add('hidden');
+        }
+        updateCreateButton();
+    }
+
+    // UPDATE: Modify loadBaseConfig to show/hide bulk controls and reset state
+    // We replace the existing loadBaseConfig with this updated version
+    async function loadBaseConfig(id, name, resetParts) { 
+        haptic('light'); 
+        const curr = customizationQueue[editingIndex]; 
+        
+        if(curr.id !== id || resetParts) { 
+            curr.id = id; 
+            curr.name = name; 
+            curr.parts = { model:null, backdrop:null, pattern:null }; 
+        } 
+        
+        renderQueueBar(); 
+        
+        const baseGrid = document.getElementById('cust-base-grid'); 
+        Array.from(baseGrid.children).forEach(c => { 
+            c.classList.remove('selected'); 
+            if(c.innerText === name) c.classList.add('selected'); 
+        }); 
+        
+        if(!cachedParts[id]) cachedParts[id] = await fetchGiftParts(name); 
+        const parts = cachedParts[id]; 
+        
+        renderPartGrid('cust-model-grid', parts.models, 'model', name); 
+        renderPartGrid('cust-backdrop-grid', parts.backdrops, 'backdrop', name); 
+        renderPartGrid('cust-pattern-grid', parts.patterns, 'pattern', name); 
+        
+        document.getElementById('cust-parts-container').classList.remove('hidden'); 
+        
+        // --- NEW LOGIC: Bulk Controls Visibility ---
+        const bulkDiv = document.getElementById('cust-bulk-controls');
+        // Only show bulk controls if we are editing a single item queue
+        if (customizationQueue.length === 1) {
+            bulkDiv.classList.remove('hidden');
+            if(resetParts) resetBulkControls(); // Reset checkboxes only on fresh load
+            else {
+                // Ensure UI matches current checkbox state if reopening
+                toggleRandomPart('model');
+                toggleRandomPart('backdrop');
+                toggleRandomPart('pattern');
+            }
+        } else {
+            bulkDiv.classList.add('hidden');
+        }
+
+        updateCreateButton(); 
     }
 
     /* --- CRAFTING LOGIC --- */
@@ -1866,8 +2012,113 @@
     async function openCustomizeModal() { document.getElementById('customize-modal').classList.add('active'); tg.BackButton.show(); tg.BackButton.onClick(() => closeModal('customize-modal')); initCustomizationQueue(); const grid = document.getElementById('cust-base-grid'); grid.innerHTML = ''; Object.entries(state.giftDefinitions).forEach(([id, name]) => { if (['custom_skebob', 'custom_baggin_cat'].includes(id)) return; const el = document.createElement('div'); el.className = 'filter-option'; el.innerHTML = `<img src="${CDN_BASE}originals/${id}/Original.png"><div class="label">${name}</div>`; el.onclick = () => loadBaseConfig(id, name, true); grid.appendChild(el); }); }
     async function loadBaseConfig(id, name, resetParts) { haptic('light'); const curr = customizationQueue[editingIndex]; if(curr.id !== id || resetParts) { curr.id = id; curr.name = name; curr.parts = { model:null, backdrop:null, pattern:null }; } renderQueueBar(); const baseGrid = document.getElementById('cust-base-grid'); Array.from(baseGrid.children).forEach(c => { c.classList.remove('selected'); if(c.innerText === name) c.classList.add('selected'); }); if(!cachedParts[id]) cachedParts[id] = await fetchGiftParts(name); const parts = cachedParts[id]; renderPartGrid('cust-model-grid', parts.models, 'model', name); renderPartGrid('cust-backdrop-grid', parts.backdrops, 'backdrop', name); renderPartGrid('cust-pattern-grid', parts.patterns, 'pattern', name); document.getElementById('cust-parts-container').classList.remove('hidden'); updateCreateButton(); }
     function renderPartGrid(elemId, items, type, giftName) { const grid = document.getElementById(elemId); grid.innerHTML = ''; const curr = customizationQueue[editingIndex]; items.forEach(item => { const el = document.createElement('div'); el.className = 'filter-option'; let content = ''; if (type === 'model') content = `<img src="${item.isCustom?item.imageUrl:`${CDN_BASE}models/${encodeURIComponent(giftName)}/png/${encodeURIComponent(item.name)}.png`}">`; else if (type === 'backdrop') content = `<div class="gradient-square" style="background: radial-gradient(circle, ${item.hex.centerColor}, ${item.hex.edgeColor})"></div>`; else content = `<img src="${CDN_BASE}patterns/${encodeURIComponent(giftName)}/png/${encodeURIComponent(item.name)}.png">`; el.innerHTML = `${content}<div class="label">${item.name}</div>`; if (curr.parts[type] && curr.parts[type].name === item.name) el.classList.add('selected'); el.onclick = () => { haptic('light'); Array.from(grid.children).forEach(c => c.classList.remove('selected')); el.classList.add('selected'); curr.parts[type] = item; updateCreateButton(); }; grid.appendChild(el); }); }
-    function updateCreateButton() { const btn = document.getElementById('btn-create-custom'); const allReady = customizationQueue.every(q => q.id && q.parts.model && q.parts.backdrop); btn.disabled = !allReady; btn.innerText = customizationQueue.length > 1 ? `Create All (${customizationQueue.length})` : 'Create'; }
-    function handleCreateQueue() { customizationQueue.forEach(q => { if(!q.id) return; if(!q.parts.pattern) { const parts = cachedParts[q.id]; if(parts && parts.patterns.length) q.parts.pattern = parts.patterns[Math.floor(Math.random() * parts.patterns.length)]; } if(!q.parts.model || !q.parts.backdrop || !q.parts.pattern) return; state.lastCollectibleNumber++; state.inventory.unshift({ uniqueId: Date.now() + Math.random(), originalId: q.id, name: q.name, isCollectible: true, timestamp: Date.now(), pinned: false, collectibleNumber: state.lastCollectibleNumber, collectibleData: { model: q.parts.model, backdrop: q.parts.backdrop, pattern: q.parts.pattern } }); }); hapticNotify('success'); saveState(); renderInventory(); closeModal('customize-modal'); switchTab('inventory'); }
+    function updateCreateButton() { 
+        const btn = document.getElementById('btn-create-custom'); 
+        
+        // Check if all items in queue are valid
+        const allReady = customizationQueue.every(q => {
+            // If ID is missing, not ready
+            if (!q.id) return false;
+
+            // Check Model: Ready if specific selected OR random checked
+            const rndModel = document.getElementById('cb-rnd-model').checked && customizationQueue.length === 1;
+            const hasModel = q.parts.model || rndModel;
+
+            // Check Backdrop
+            const rndBackdrop = document.getElementById('cb-rnd-backdrop').checked && customizationQueue.length === 1;
+            const hasBackdrop = q.parts.backdrop || rndBackdrop;
+
+            // Check Pattern
+            const rndPattern = document.getElementById('cb-rnd-pattern').checked && customizationQueue.length === 1;
+            const hasPattern = q.parts.pattern || rndPattern;
+
+            return hasModel && hasBackdrop && hasPattern;
+        });
+
+        const qty = parseInt(document.getElementById('cust-qty').value) || 1;
+        const isBulk = customizationQueue.length === 1 && qty > 1;
+
+        btn.disabled = !allReady; 
+        
+        if (isBulk) {
+            btn.innerText = `Create (${qty})`;
+        } else {
+            btn.innerText = customizationQueue.length > 1 ? `Create All (${customizationQueue.length})` : 'Create'; 
+        }
+    }
+    async function handleCreateQueue() { 
+        const btn = document.getElementById('btn-create-custom');
+        btn.disabled = true;
+        btn.innerText = "Creating...";
+
+        // Get Bulk Settings
+        const qtyInput = parseInt(document.getElementById('cust-qty').value) || 1;
+        const isRandomModel = document.getElementById('cb-rnd-model').checked;
+        const isRandomBackdrop = document.getElementById('cb-rnd-backdrop').checked;
+        const isRandomPattern = document.getElementById('cb-rnd-pattern').checked;
+
+        // If queue has multiple items, we ignore bulk settings (qty=1)
+        // If queue has 1 item, we use the bulk settings
+        const loopCount = customizationQueue.length === 1 ? qtyInput : 1;
+
+        // Iterate through the queue items (usually just 1 if doing bulk)
+        for (const q of customizationQueue) {
+            if(!q.id) continue;
+
+            const partsPool = cachedParts[q.id]; // Should be cached by now
+            
+            // Loop for Quantity
+            for (let i = 0; i < loopCount; i++) {
+                
+                // 1. Determine Model
+                let finalModel = q.parts.model;
+                if (isRandomModel && customizationQueue.length === 1) {
+                    // Filter out crafted items for random generation (optional, keeps it "fair")
+                    const validModels = partsPool.models.filter(m => !m.crafted);
+                    const pool = validModels.length > 0 ? validModels : partsPool.models;
+                    finalModel = pool[Math.floor(Math.random() * pool.length)];
+                }
+
+                // 2. Determine Backdrop
+                let finalBackdrop = q.parts.backdrop;
+                if (isRandomBackdrop && customizationQueue.length === 1) {
+                    finalBackdrop = partsPool.backdrops[Math.floor(Math.random() * partsPool.backdrops.length)];
+                }
+
+                // 3. Determine Pattern
+                let finalPattern = q.parts.pattern;
+                // If specific pattern not set, or random checked, pick random
+                if ((!finalPattern || isRandomPattern) && customizationQueue.length === 1) {
+                    finalPattern = partsPool.patterns[Math.floor(Math.random() * partsPool.patterns.length)];
+                }
+
+                // Safety check
+                if(!finalModel || !finalBackdrop || !finalPattern) continue;
+
+                state.lastCollectibleNumber++; 
+                state.inventory.unshift({ 
+                    uniqueId: Date.now() + Math.random(), 
+                    originalId: q.id, 
+                    name: q.name, 
+                    isCollectible: true, 
+                    timestamp: Date.now(), 
+                    pinned: false, 
+                    collectibleNumber: state.lastCollectibleNumber, 
+                    collectibleData: { 
+                        model: finalModel, 
+                        backdrop: finalBackdrop, 
+                        pattern: finalPattern 
+                    } 
+                }); 
+            }
+        }
+
+        hapticNotify('success'); 
+        saveState(); 
+        renderInventory(); 
+        closeModal('customize-modal'); 
+        switchTab('inventory'); 
+    }
 </script>
 </body>
 </html>
