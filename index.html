@@ -982,47 +982,80 @@
 
     // --- UPGRADE SYSTEM ---
     async function handleUpgrade() {
-        const btn = document.getElementById('btn-upgrade'); btn.innerText = "Preparing...";
+        const btn = document.getElementById('btn-upgrade'); 
+        btn.innerText = "Preparing...";
         const gift = state.inventory.find(g => g.uniqueId === appRuntime.activeGiftId);
         
         // 1. Fetch parts
         const parts = await fetchGiftParts(gift.name);
-        if (!parts.models.length) { alert("No parts!"); return; }
+        
+        // FILTER: Exclude crafted models for standard upgrades
+        const validModels = parts.models.filter(m => !m.crafted);
+        // Fallback to all models if for some reason validModels is empty
+        const modelPool = validModels.length > 0 ? validModels : parts.models;
+
+        if (!modelPool.length) { alert("No parts!"); return; }
 
         // 2. Generate Result
         gift.isCollectible = true;
         state.lastCollectibleNumber++;
         gift.collectibleNumber = state.lastCollectibleNumber;
+        
         gift.collectibleData = {
-            model: parts.models[Math.floor(Math.random()*parts.models.length)],
-            backdrop: parts.backdrops[Math.floor(Math.random()*parts.backdrops.length)],
-            pattern: parts.patterns[Math.floor(Math.random()*parts.patterns.length)]
+            model: modelPool[Math.floor(Math.random() * modelPool.length)],
+            backdrop: parts.backdrops[Math.floor(Math.random() * parts.backdrops.length)],
+            pattern: parts.patterns[Math.floor(Math.random() * parts.patterns.length)]
         };
 
         // 3. Save State
-        saveState(); renderInventory(); closeModal('detail-modal');
+        saveState(); 
+        renderInventory(); 
+        closeModal('detail-modal');
 
         // 4. Start Roulette Animation
-        openCollectibleModal(gift, true, parts);
+        // Pass the filtered pool to the roulette so it doesn't show crafted items in the strip
+        openCollectibleModal(gift, true, { ...parts, models: modelPool });
         btn.innerText = "Upgrade";
     }
 
     async function handleUpgradeAll() {
         const toUpgrade = state.inventory.filter(g => !g.isCollectible);
         if(!toUpgrade.length) return;
-        const btn = document.querySelector('#action-toolbar button'); btn.innerText = `Upgrading ${toUpgrade.length}...`; btn.disabled = true;
+        
+        const btn = document.querySelector('#action-toolbar button'); 
+        btn.innerText = `Upgrading ${toUpgrade.length}...`; 
+        btn.disabled = true;
+        
         for (let g of toUpgrade) {
             const parts = await fetchGiftParts(g.name);
-            if(parts.models.length) {
-                g.isCollectible = true; state.lastCollectibleNumber++; g.collectibleNumber = state.lastCollectibleNumber;
-                g.collectibleData = { model: parts.models[Math.floor(Math.random()*parts.models.length)], backdrop: parts.backdrops[Math.floor(Math.random()*parts.backdrops.length)], pattern: parts.patterns[Math.floor(Math.random()*parts.patterns.length)] };
+            
+            // FILTER: Exclude crafted models
+            const validModels = parts.models.filter(m => !m.crafted);
+            const modelPool = validModels.length > 0 ? validModels : parts.models;
+
+            if(modelPool.length) {
+                g.isCollectible = true; 
+                state.lastCollectibleNumber++; 
+                g.collectibleNumber = state.lastCollectibleNumber;
+                g.collectibleData = { 
+                    model: modelPool[Math.floor(Math.random() * modelPool.length)], 
+                    backdrop: parts.backdrops[Math.floor(Math.random() * parts.backdrops.length)], 
+                    pattern: parts.patterns[Math.floor(Math.random() * parts.patterns.length)] 
+                };
             }
         }
-        hapticNotify('success'); saveState(); renderInventory();
+        hapticNotify('success'); 
+        saveState(); 
+        renderInventory();
     }
 
     // --- ROULETTE / COLLECTIBLE MODAL LOGIC ---
     function openCollectibleModal(gift, isUpgrading = false, partsPool = null) {
+        // FIX: Update the global active ID so the button finds the correct gift
+        appRuntime.activeGiftId = gift.uniqueId;
+
+        // Note: The rest of the original function logic follows here
+        
         haptic('light');
         const cd = gift.collectibleData;
         
@@ -1056,9 +1089,21 @@
                 slotEl.innerHTML = `<div class="slot-item">${val}</div>`;
             }
             const pctEl = document.getElementById(idPct);
-            if(pctEl) pctEl.innerText = `${(permille/10).toFixed(1)}%`;
+            if(pctEl) {
+                // LOGIC CHANGE: "Epic" for 0 permille
+                if (permille === 0) {
+                    pctEl.innerText = "Epic";
+                    // Optional: Style adjustments for Epic
+                    pctEl.style.backgroundColor = "rgba(255, 215, 0, 0.15)";
+                    pctEl.style.color = "#ffd700";
+                } else {
+                    pctEl.innerText = `${(permille/10).toFixed(1)}%`;
+                    pctEl.style.backgroundColor = ""; // Reset style
+                    pctEl.style.color = ""; // Reset style
+                }
+            }
         };
-        // Changed 'col-model-val' to 'slot-model', etc.
+
         setTextAndPct('slot-model', 'col-model-pct', cd.model.name, cd.model.rarityPermille);
         setTextAndPct('slot-symbol', 'col-symbol-pct', cd.pattern.name, cd.pattern.rarityPermille);
         setTextAndPct('slot-backdrop', 'col-backdrop-pct', cd.backdrop.name, cd.backdrop.rarityPermille);
@@ -1111,11 +1156,6 @@
             };
 
             // Horizontal Scroll Calculation
-            // Target: Center the (stripLen + 1)th image.
-            // Width of 1 image = 160px.
-            // Center of final image from start = (stripLen * 160) + (160 / 2).
-            // Screen Center = window.innerWidth / 2.
-            // translateX = - (Center of final image - Screen Center).
             const screenCenter = window.innerWidth / 2;
             const finalImageCenter = (stripLen * 160) + 80;
             const translateX = -(finalImageCenter - screenCenter);
@@ -1189,6 +1229,11 @@
 
         modal.classList.add('active');
         tg.BackButton.show(); tg.BackButton.onClick(() => closeModal('collectible-modal'));
+        
+        // Show craft button for owned collectibles (only for Jingle Bells/Desk Calendar as per initCraftingButton check)
+        if(gift.isCollectible && !isUpgrading) {
+            setTimeout(initCraftingButton, 50);
+        }
     }
 
     /* --- CRAFTING LOGIC --- */
@@ -1206,14 +1251,20 @@
         const existingBtn = document.getElementById('craft-btn-overlay');
         if (existingBtn) existingBtn.remove();
 
+        // 1. Get the current gift
+        const gift = state.inventory.find(g => g.uniqueId === appRuntime.activeGiftId);
+        if (!gift) return;
+
+        // 2. Whitelist Check: Only allow specific gifts
+        const ALLOWED_CRAFT_GIFTS = ["Jingle Bells", "Desk Calendar"];
+        if (!ALLOWED_CRAFT_GIFTS.includes(gift.name)) return;
+
         const btn = document.createElement('div');
         btn.id = 'craft-btn-overlay';
         btn.className = 'craft-header-btn';
         btn.innerHTML = `<div class="craft-icon"></div>`;
         btn.onclick = (e) => {
             e.stopPropagation();
-            // Now valid because we set activeGiftId in the wrapper below
-            const gift = state.inventory.find(g => g.uniqueId === appRuntime.activeGiftId);
             if(gift) openCraftModal(gift);
         };
         container.appendChild(btn);
@@ -1444,12 +1495,17 @@
                 // Generate NEW Gift
                 const parts = await fetchGiftParts(craftingState.baseName);
                 
-                // Rarest Model Logic (<1% priority)
-                let rareModels = parts.models.filter(m => (m.rarityPermille || 0) < 10);
-                if(rareModels.length === 0) rareModels = parts.models.filter(m => (m.rarityPermille || 0) < 100); // fallback <10%
-                if(rareModels.length === 0) rareModels = parts.models; // fallback all
+                // LOGIC CHANGE: Select ONLY crafted models
+                let craftedModels = parts.models.filter(m => m.crafted === true);
+                
+                // Fallback in case JSON isn't updated or no crafted models exist
+                if (craftedModels.length === 0) {
+                    // Fallback to old "rare" logic if necessary
+                    craftedModels = parts.models.filter(m => (m.rarityPermille || 0) < 10);
+                }
 
-                const newModel = rareModels[Math.floor(Math.random() * rareModels.length)];
+                // Pick random result from crafted pool
+                const newModel = craftedModels[Math.floor(Math.random() * craftedModels.length)];
                 
                 // Backdrop from Inputs
                 const backdrops = gifts.map(g => g.collectibleData.backdrop);
@@ -1464,7 +1520,7 @@
                     name: craftingState.baseName,
                     isCollectible: true,
                     timestamp: Date.now(),
-                    pinned: false, // DISABLED AUTO-PIN
+                    pinned: false,
                     worn: false,
                     collectibleNumber: craftingState.targetNumber,
                     collectibleData: {
