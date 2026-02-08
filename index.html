@@ -787,6 +787,48 @@
     </div>
 </div>
 
+<!-- FAILURE MODAL -->
+<div id="failure-modal" class="modal-overlay">
+    <div class="modal-content" style="background-color: #1c1c1e; color: white; height: auto; min-height: 60vh; border-radius: 16px;">
+        
+        <!-- Header -->
+        <div class="modal-header-bar" style="background: transparent; border: none; display: flex; justify-content: space-between; align-items: center; padding: 16px;">
+            <div onclick="closeModal('failure-modal')" style="cursor: pointer; background: rgba(255,255,255,0.1); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">✕</div>
+            <span style="font-weight: 600; font-size: 1.1em;">Crafting Gift</span>
+            <div style="width: 32px;"></div> <!-- Spacer -->
+        </div>
+
+        <div class="modal-scrollable-content" style="display: flex; flex-direction: column; align-items: center; padding: 20px 20px 40px;">
+            
+            <!-- Central Icon -->
+            <div style="width: 100px; height: 100px; background: #3a2525; border-radius: 24px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; position: relative;">
+                <div class="craft-anvil-icon" style="background-color: #ff595a; transform: scale(1.5);"></div>
+                <div style="position: absolute; bottom: -10px; background: #3a2525; padding: 2px 8px; border-radius: 10px; font-weight: bold; font-size: 0.9em; border: 2px solid #1c1c1e;">
+                    4
+                </div>
+            </div>
+
+            <!-- Text -->
+            <h2 style="color: #ff595a; margin: 0 0 10px 0; font-weight: 700; font-size: 1.5em;">Unsuccessful attempt</h2>
+            <p style="text-align: center; color: #8e8e93; font-size: 0.95em; line-height: 1.4; margin: 0 0 30px 0;">
+                The crafting attempt failed.<br>
+                <span id="fail-count-text">4</span> gifts were lost.
+            </p>
+
+            <!-- Lost Items Grid -->
+            <div id="failed-items-grid" style="display: flex; justify-content: center; gap: 12px; margin-bottom: 40px; width: 100%;">
+                <!-- Items injected here -->
+            </div>
+
+            <!-- Button -->
+            <button onclick="retryCrafting()" style="width: 100%; background: #ffffff; color: #000000; font-weight: 600; font-size: 1.1em; padding: 16px; border-radius: 12px; border: none; cursor: pointer;">
+                Craft Again
+            </button>
+
+        </div>
+    </div>
+</div>
+
 <!-- Menus -->
 <div id="long-press-menu" class="hidden">
     <ul>
@@ -1321,14 +1363,15 @@
             if (gifts[i]) {
                 const cd = gifts[i].collectibleData;
                 const bgStyle = `radial-gradient(circle, ${cd.backdrop.hex.centerColor}, ${cd.backdrop.hex.edgeColor})`;
-                // Image
+                
                 const img = document.createElement('img');
                 img.src = cd.model.isCustom ? cd.model.imageUrl : `${CDN_BASE}models/${encodeURIComponent(gifts[i].name)}/png/${encodeURIComponent(cd.model.name)}.png`;
-                // Remove button
+                
                 const rm = document.createElement('div');
                 rm.className = 'remove-btn';
                 rm.innerText = '✕';
                 rm.onclick = (e) => { e.stopPropagation(); removeCraftItem(gifts[i].uniqueId); };
+                
                 el.style.background = bgStyle;
                 el.appendChild(img);
                 el.appendChild(rm);
@@ -1338,19 +1381,22 @@
             }
         });
 
-        // Calculate Stats - UPDATED PROBABILITY LOGIC
+        // --- NEW PROBABILITY MATH ---
         let chance = 0;
         gifts.forEach(g => {
             if(!g) return;
-            let base = 22; // Increased slightly so 4 * 22 = 88% base
-            // Rarity bonuses
-            if(g.collectibleData.model.rarityPermille < 100) base += 2; 
-            if(g.collectibleData.model.rarityPermille < 10) base += 3;
-            chance += base;
+            // 1. Base Volume: 20% per gift
+            let itemVal = 20; 
+            
+            // 2. Rarity Bonus
+            const p = g.collectibleData.model.rarityPermille || 1000;
+            if(p < 10) itemVal += 2;      // Rare (<1%): +2%
+            else if(p < 100) itemVal += 1; // Uncommon (<10%): +1%
+            // Common (>10%): +0%
+
+            chance += itemVal;
         });
 
-        // CAP PROBABILITY AT 95%
-        if(chance > 95) chance = 95;
         // Cap at 0 if empty
         if(gifts.length === 0) chance = 0;
         
@@ -1362,24 +1408,23 @@
         if(ring) {
             ring.style.strokeDasharray = `${circumference} ${circumference}`;
             ring.style.strokeDashoffset = offset;
-            ring.style.stroke = chance < 50 ? '#ff595a' : '#ffffff'; // White stroke on dark bg looks cleaner for progress
+            ring.style.stroke = chance < 50 ? '#ff595a' : '#ffffff'; 
         }
         
-        const txt = document.getElementById('craft-chance-text');
-        if(txt) txt.innerText = `${chance}%`;
+        document.getElementById('craft-chance-text').innerText = `${chance}%`;
         
-        // Update Button Text (Chance inside button)
         const btn = document.getElementById('btn-craft-action');
         if(btn) {
-            btn.innerHTML = `Craft Gift <br><span style="font-size:0.75em; font-weight:400; opacity:0.9; margin-top:2px; display:block;">${chance}% Success Chance</span>`;
+            btn.innerHTML = `Craft Gift <br><span class="craft-btn-subtext">${chance}% Success Chance</span>`;
             btn.disabled = gifts.length === 0;
         }
 
-        // Render Backdrops Stats
+        // Render Backdrop Probs (Simple visualization of inputs)
         const probContainer = document.getElementById('craft-probs');
         if(probContainer) {
             probContainer.innerHTML = '';
             let backdropsMap = {};
+            // Count filled slots
             gifts.forEach(g => {
                 if(!g) return;
                 const bgName = g.collectibleData.backdrop.name;
@@ -1387,6 +1432,10 @@
                 if(!backdropsMap[bgName]) backdropsMap[bgName] = { count: 0, hex: bgHex };
                 backdropsMap[bgName].count++;
             });
+            
+            // Add "Random" for empty slots logic visualization?
+            // User asked for logic logic, but visual can remain simple or show "Random"
+            // Let's stick to showing input percentages for now to avoid UI clutter
             const totalInputs = gifts.length || 1;
             Object.keys(backdropsMap).forEach(key => {
                 const data = backdropsMap[key];
@@ -1450,15 +1499,17 @@
         // 1. Calculate Success (Same logic as UI)
         let chance = 0;
         const gifts = craftingState.selectedIds.map(id => state.inventory.find(g => g.uniqueId === id));
+        
         gifts.forEach(g => {
             if(!g) return;
-            let base = 22; 
-            if(g.collectibleData.model.rarityPermille < 100) base += 2; 
-            if(g.collectibleData.model.rarityPermille < 10) base += 3;
-            chance += base;
+            let itemVal = 20; 
+            const p = g.collectibleData.model.rarityPermille || 1000;
+            if(p < 10) itemVal += 2;
+            else if(p < 100) itemVal += 1;
+            chance += itemVal;
         });
-        if(chance > 95) chance = 95; // Cap calculation for logic too
         
+        // Roll for success
         const isSuccess = (Math.random() * 100) < chance;
 
         // 2. Animation Setup
@@ -1467,6 +1518,7 @@
         const statusText = document.getElementById('craft-anim-status');
         const faces = cube.querySelectorAll('.cube-face img');
         
+        // Setup visuals for the cube
         for(let i=0; i<4; i++) {
             const g = gifts[i % gifts.length];
             if(g) {
@@ -1476,7 +1528,7 @@
         }
 
         animModal.classList.add('active');
-        cube.classList.remove('spinning', 'burning'); // Reset classes
+        cube.classList.remove('spinning', 'burning'); 
         void cube.offsetWidth; 
         cube.classList.add('spinning');
         
@@ -1490,38 +1542,45 @@
 
         // 3. Resolution
         setTimeout(async () => {
-            // Burn items logic
+            // Keep copy of consumed gifts for the failure screen before deleting
+            const consumedGifts = [...gifts];
+
+            // Remove items from inventory
             state.inventory = state.inventory.filter(g => !craftingState.selectedIds.includes(g.uniqueId));
             
             if (isSuccess) {
                 statusText.innerText = "Constructing form...";
                 haptic('medium');
                 
-                // Generate NEW Gift
                 const parts = await fetchGiftParts(craftingState.baseName);
                 
-                // LOGIC CHANGE: Select ONLY crafted models
+                // --- A. EXCLUSIVE POOL SELECTION ---
                 let craftedModels = parts.models.filter(m => m.crafted === true);
-                
-                // Fallback in case JSON isn't updated or no crafted models exist
-                if (craftedModels.length === 0) {
-                    // Fallback to old "rare" logic if necessary
-                    craftedModels = parts.models.filter(m => (m.rarityPermille || 0) < 10);
-                }
-
-                // Pick random result from crafted pool
+                if (craftedModels.length === 0) craftedModels = parts.models.filter(m => (m.rarityPermille || 0) < 10);
                 const newModel = craftedModels[Math.floor(Math.random() * craftedModels.length)];
                 
-                // Backdrop from Inputs
-                const backdrops = gifts.map(g => g.collectibleData.backdrop);
-                const newBackdrop = backdrops[Math.floor(Math.random() * backdrops.length)];
+                // --- B. BACKDROP VOTING LOGIC ---
+                // We have 4 "votes". Filled slots vote for their color. Empty slots vote for Random.
+                // gifts array has the filled items. Length is 1-4.
                 
-                // Random Pattern
+                let winningBackdrop;
+                const slotRoll = Math.floor(Math.random() * 4); // 0, 1, 2, 3
+                
+                // Check if the rolled slot corresponds to a filled gift
+                if (slotRoll < gifts.length) {
+                    // It hit a filled slot -> Inherit that backdrop
+                    winningBackdrop = gifts[slotRoll].collectibleData.backdrop;
+                } else {
+                    // It hit an empty slot -> Pick random new backdrop
+                    winningBackdrop = parts.backdrops[Math.floor(Math.random() * parts.backdrops.length)];
+                }
+
+                // --- C. Pattern Logic (Random) ---
                 const newPattern = parts.patterns[Math.floor(Math.random() * parts.patterns.length)];
 
                 const newGift = {
                     uniqueId: Date.now(),
-                    originalId: gifts[0].originalId,
+                    originalId: consumedGifts[0].originalId,
                     name: craftingState.baseName,
                     isCollectible: true,
                     timestamp: Date.now(),
@@ -1530,7 +1589,7 @@
                     collectibleNumber: craftingState.targetNumber,
                     collectibleData: {
                         model: newModel,
-                        backdrop: newBackdrop,
+                        backdrop: winningBackdrop,
                         pattern: newPattern
                     }
                 };
@@ -1539,32 +1598,99 @@
                 saveState();
                 renderInventory();
                 
-                // Close anim modal and show result
                 animModal.classList.remove('active');
                 closeModal('craft-modal');
-                
                 setTimeout(() => openCollectibleModal(newGift, false), 300);
                 confetti({ particleCount: 200, spread: 100, zIndex: 3000 });
                 hapticNotify('success');
 
             } else {
-                // FAILURE ANIMATION
-                statusText.innerText = "Instability detected... Crumbled to ash.";
+                // --- FAILURE LOGIC ---
+                statusText.innerText = "Instability detected...";
                 cube.classList.remove('spinning');
-                cube.classList.add('burning'); // Trigger CSS burn animation
+                cube.classList.add('burning');
                 hapticNotify('error');
                 
                 saveState();
                 renderInventory();
                 
-                // Wait for burn animation to finish before closing
                 setTimeout(() => {
                     animModal.classList.remove('active');
                     closeModal('craft-modal');
-                    tg.showAlert(`Crafting failed! The items were lost.`);
+                    // Show custom Failure Screen
+                    showFailureScreen(consumedGifts);
                 }, 1600);
             }
         }, 2500);
+    }
+
+    function showFailureScreen(lostGifts) {
+        const modal = document.getElementById('failure-modal');
+        const grid = document.getElementById('failed-items-grid');
+        const countText = document.getElementById('fail-count-text');
+        
+        countText.innerText = lostGifts.length;
+        grid.innerHTML = '';
+        
+        lostGifts.forEach(g => {
+            const cd = g.collectibleData;
+            const el = document.createElement('div');
+            // Mini gift card style
+            el.style.cssText = `
+                width: 70px; height: 70px; 
+                background: radial-gradient(circle, ${cd.backdrop.hex.centerColor}, ${cd.backdrop.hex.edgeColor});
+                border-radius: 12px; position: relative; overflow: hidden;
+                display: flex; align-items: center; justify-content: center;
+            `;
+            
+            // Image
+            const img = document.createElement('img');
+            img.src = cd.model.isCustom ? cd.model.imageUrl : `${CDN_BASE}models/${encodeURIComponent(g.name)}/png/${encodeURIComponent(cd.model.name)}.png`;
+            img.style.cssText = "width: 80%; height: 80%; object-fit: contain; filter: grayscale(100%) brightness(0.7);";
+            
+            // "Number" Tag (Red/Burnt look)
+            const tag = document.createElement('div');
+            tag.innerText = `#${g.collectibleNumber}`;
+            tag.style.cssText = `
+                position: absolute; top: 0px; right: 0px; 
+                background: #ff595a; color: white; 
+                font-size: 0.6em; padding: 2px 6px; 
+                border-bottom-left-radius: 6px; font-weight: bold;
+            `;
+            
+            // Burnt overlay/icon
+            const burntIcon = document.createElement('div');
+            burntIcon.innerText = "✕";
+            burntIcon.style.cssText = "position: absolute; color: rgba(255,255,255,0.5); font-size: 24px;";
+
+            el.appendChild(img);
+            el.appendChild(tag);
+            // el.appendChild(burntIcon); // Optional: add X over item
+            grid.appendChild(el);
+        });
+        
+        modal.classList.add('active');
+    }
+
+    function retryCrafting() {
+        closeModal('failure-modal');
+        // We assume the user stays on the same gift type context.
+        // We can't automatically re-select items because they were burned.
+        // So we just reopen the empty craft modal for the same gift type if possible.
+        
+        // Find a gift of the same type in inventory to restart the process
+        const sameTypeGift = state.inventory.find(g => 
+            g.name === craftingState.baseName && 
+            g.isCollectible && 
+            !g.collectibleData.model.crafted
+        );
+        
+        if(sameTypeGift) {
+            openCraftModal(sameTypeGift);
+        } else {
+            // No more gifts of this type
+            tg.showAlert("No more gifts of this type available to craft!");
+        }
     }
 
     // --- Animation Helpers ---
