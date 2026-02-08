@@ -1259,6 +1259,9 @@
         const ALLOWED_CRAFT_GIFTS = ["Jingle Bells", "Desk Calendar"];
         if (!ALLOWED_CRAFT_GIFTS.includes(gift.name)) return;
 
+        // 3. Crafted Check: If this gift is already a result of crafting, it cannot be used again.
+        if (gift.collectibleData && gift.collectibleData.model.crafted) return;
+
         const btn = document.createElement('div');
         btn.id = 'craft-btn-overlay';
         btn.className = 'craft-header-btn';
@@ -1408,15 +1411,17 @@
         const grid = document.getElementById('craft-select-grid');
         grid.innerHTML = '';
         
+        // FILTER UPDATED: Exclude gifts that are already 'crafted'
         const candidates = state.inventory.filter(g => 
             g.name === craftingState.baseName && 
             g.isCollectible && 
             !g.hidden &&
-            !craftingState.selectedIds.includes(g.uniqueId)
+            !craftingState.selectedIds.includes(g.uniqueId) &&
+            !g.collectibleData.model.crafted // <--- New Check: Cannot be a crafted item
         );
 
         if(candidates.length === 0) {
-            grid.innerHTML = '<div style="grid-column:span 3; text-align:center; padding:20px; color:gray;">No other matching gifts.</div>';
+            grid.innerHTML = '<div style="grid-column:span 3; text-align:center; padding:20px; color:gray;">No other matching gifts available.</div>';
         }
 
         candidates.forEach(g => {
