@@ -817,7 +817,14 @@
                 <!-- Backdrop Probabilities -->
                 <div class="craft-probability-row" id="craft-probs"></div>
             </div>
-
+            <!-- Add this before the "Craft Gift" button -->
+            <div id="craft-mix-container" class="switch-row" style="background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 15px; width: 90%; opacity: 0.5; pointer-events: none; padding: 12px 16px; border: none;">
+                <span style="font-size: 0.95em;">Backdrop Mixing</span>
+                <label class="switch">
+                    <input type="checkbox" id="cb-mix-backdrop">
+                    <span class="slider"></span>
+                </label>
+            </div>
             <button id="btn-craft-action" class="big-rounded-btn" onclick="startCrafting()">
                 Craft Gift
             </button>
@@ -1477,7 +1484,9 @@
 
     function openCraftModal(initialGift) {
         if(!initialGift) return; // Safety check
-        
+        // Add this inside openCraftModal()
+        const mixCheckbox = document.getElementById('cb-mix-backdrop');
+        if (mixCheckbox) mixCheckbox.checked = false;
         craftingState.baseName = initialGift.name;
         craftingState.selectedIds = [initialGift.uniqueId];
         craftingState.active = true;
@@ -1502,6 +1511,7 @@
             document.getElementById('craft-target-name').innerText = `${craftingState.baseName} #${targetGift.collectibleNumber}`;
         }
 
+        
         // Render Slots
         slots.forEach(i => {
             const el = document.getElementById(`slot-${i}`);
@@ -1543,6 +1553,23 @@
             chance += itemVal;
         });
 
+        // --- ADDED: Backdrop Mixing Checkbox Logic ---
+        const mixContainer = document.getElementById('craft-mix-container');
+        const mixCheckbox = document.getElementById('cb-mix-backdrop');
+        if(mixContainer && mixCheckbox) {
+            // Check how many unique backdrops are currently in the slots
+            const uniqueBackdrops =[...new Set(gifts.filter(g => g).map(g => g.collectibleData.backdrop.name))];
+            
+            if(uniqueBackdrops.length >= 2) {
+                mixContainer.style.opacity = '1';
+                mixContainer.style.pointerEvents = 'auto';
+            } else {
+                mixContainer.style.opacity = '0.5';
+                mixContainer.style.pointerEvents = 'none';
+                mixCheckbox.checked = false;
+            }
+        }
+        
         // Cap at 0 if empty
         if(gifts.length === 0) chance = 0;
         
@@ -1705,20 +1732,49 @@
                 if (craftedModels.length === 0) craftedModels = parts.models.filter(m => (m.rarityPermille || 0) < 10);
                 const newModel = craftedModels[Math.floor(Math.random() * craftedModels.length)];
                 
-                // --- B. BACKDROP VOTING LOGIC ---
-                // We have 4 "votes". Filled slots vote for their color. Empty slots vote for Random.
-                // gifts array has the filled items. Length is 1-4.
-                
+                // --- B. BACKDROP VOTING LOGIC & MIXING ---
                 let winningBackdrop;
-                const slotRoll = Math.floor(Math.random() * 4); // 0, 1, 2, 3
-                
-                // Check if the rolled slot corresponds to a filled gift
-                if (slotRoll < gifts.length) {
-                    // It hit a filled slot -> Inherit that backdrop
-                    winningBackdrop = gifts[slotRoll].collectibleData.backdrop;
+                const isMixChecked = document.getElementById('cb-mix-backdrop')?.checked;
+
+                if (isMixChecked) {
+                    // Extract and sort unique backdrops by rarity (lowest permille = best)
+                    const distinctBGs =[];
+                    const seenNames = new Set();
+                    
+                    const sortedGifts = [...consumedGifts].sort((a, b) => 
+                        (a.collectibleData.backdrop.rarityPermille || 1000) - (b.collectibleData.backdrop.rarityPermille || 1000)
+                    );
+
+                    for (const g of sortedGifts) {
+                        const bg = g.collectibleData.backdrop;
+                        if (!seenNames.has(bg.name)) {
+                            seenNames.add(bg.name);
+                            distinctBGs.push(bg);
+                        }
+                    }
+                    
+                    // Take the 2 best unique backdrops
+                    const bg1 = distinctBGs[0];
+                    const bg2 = distinctBGs[1];
+
+                    // Create the mixed backdrop
+                    winningBackdrop = {
+                        name: `${bg1.name} + ${bg2.name}`, // Sets the text to "Name1 + Name2"
+                        hex: {
+                            centerColor: bg1.hex.centerColor, // Center from the best backdrop
+                            edgeColor: bg2.hex.edgeColor,     // Edge from the second best
+                            patternColor: bg1.hex.patternColor
+                        },
+                        rarityPermille: Math.min(bg1.rarityPermille || 1000, bg2.rarityPermille || 1000)
+                    };
                 } else {
-                    // It hit an empty slot -> Pick random new backdrop
-                    winningBackdrop = parts.backdrops[Math.floor(Math.random() * parts.backdrops.length)];
+                    // Standard voting logic
+                    const slotRoll = Math.floor(Math.random() * 4); 
+                    if (slotRoll < gifts.length) {
+                        winningBackdrop = gifts[slotRoll].collectibleData.backdrop;
+                    } else {
+                        winningBackdrop = parts.backdrops[Math.floor(Math.random() * parts.backdrops.length)];
+                    }
                 }
 
                 // --- C. Pattern Logic (Random) ---
