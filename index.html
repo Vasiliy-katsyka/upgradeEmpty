@@ -1067,7 +1067,7 @@
 
             if (gift.isCollectible) {
                 const cd = gift.collectibleData;
-                const bgStyle = `radial-gradient(circle, ${cd.backdrop.hex.centerColor}, ${cd.backdrop.hex.edgeColor})`;
+                const bgStyle = getBackdropStyle(cd.backdrop);
                 const imgUrl = cd.model.isCustom ? cd.model.imageUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/png/${encodeURIComponent(cd.model.name)}.png`;
                 if (state.settings.animations) { visualHtml = `<div class="lottie-wrapper" id="lot-${gift.uniqueId}"></div>`; setTimeout(() => playLottie(`lot-${gift.uniqueId}`, cd.model.isCustom ? cd.model.lottieUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/lottie/${encodeURIComponent(cd.model.name)}.json`), 0); } 
                 else visualHtml = `<img src="${imgUrl}" loading="lazy">`;
@@ -1185,7 +1185,7 @@
         const btn = document.getElementById('btn-collectible-action');
 
         // Reset Visuals
-        header.style.background = `radial-gradient(circle at 50% 0%, ${cd.backdrop.hex.centerColor}, ${cd.backdrop.hex.edgeColor})`;
+        header.style.background = getBackdropStyle(cd.backdrop);
         document.getElementById('collectible-pattern-container').innerHTML = '';
         generatePattern('collectible-pattern-container', cd.pattern, gift.name, false, cd.backdrop.hex.patternColor);
 
@@ -1302,7 +1302,7 @@
             // Stop Backdrop (~2s)
             appRuntime.animationState.timeouts.push(setTimeout(() => {
                 clearInterval(bgInterval);
-                header.style.background = `radial-gradient(circle at 50% 0%, ${cd.backdrop.hex.centerColor}, ${cd.backdrop.hex.edgeColor})`;
+                header.style.background = getBackdropStyle(cd.backdrop);
                 stopSlotMachine('slot-backdrop', cd.backdrop.name);
                 haptic('medium');
             }, 4000));
@@ -1468,6 +1468,19 @@
         container.appendChild(btn);
     }
 
+    // NEW HELPER: Centralizes background rendering
+    function getBackdropStyle(backdrop) {
+        // 1. If we have a custom mixed gradient (Linear/Conic), use it
+        if (backdrop.customGradient) {
+            return backdrop.customGradient;
+        }
+        // 2. Fallback to standard Radial (Current behavior)
+        // Safety check for legacy data
+        const center = backdrop.hex ? backdrop.hex.centerColor : '#333';
+        const edge = backdrop.hex ? backdrop.hex.edgeColor : '#000';
+        return `radial-gradient(circle, ${center}, ${edge})`;
+    }
+    
     // Hook into openCollectibleModal
     const originalOpenCol = openCollectibleModal;
     openCollectibleModal = function(gift, isUpgrading, parts) {
@@ -1518,7 +1531,7 @@
             el.innerHTML = '';
             if (gifts[i]) {
                 const cd = gifts[i].collectibleData;
-                const bgStyle = `radial-gradient(circle, ${cd.backdrop.hex.centerColor}, ${cd.backdrop.hex.edgeColor})`;
+                const bgStyle = getBackdropStyle(cd.backdrop);
                 
                 const img = document.createElement('img');
                 img.src = cd.model.isCustom ? cd.model.imageUrl : `${CDN_BASE}models/${encodeURIComponent(gifts[i].name)}/png/${encodeURIComponent(cd.model.name)}.png`;
@@ -1650,7 +1663,7 @@
             const el = document.createElement('div');
             el.className = 'craft-select-item';
             const cd = g.collectibleData;
-            const bgStyle = `radial-gradient(circle, ${cd.backdrop.hex.centerColor}, ${cd.backdrop.hex.edgeColor})`;
+            const bgStyle = getBackdropStyle(cd.backdrop);
             
             el.style.background = bgStyle;
             el.innerHTML = `
@@ -1669,7 +1682,7 @@
     }
 
     async function startCrafting() {
-        // 1. Calculate Success (Same logic as UI)
+        // 1. Calculate Success
         let chance = 0;
         const gifts = craftingState.selectedIds.map(id => state.inventory.find(g => g.uniqueId === id));
         
@@ -1682,7 +1695,6 @@
             chance += itemVal;
         });
         
-        // Roll for success
         const isSuccess = (Math.random() * 100) < chance;
 
         // 2. Animation Setup
@@ -1691,7 +1703,6 @@
         const statusText = document.getElementById('craft-anim-status');
         const faces = cube.querySelectorAll('.cube-face img');
         
-        // Setup visuals for the cube
         for(let i=0; i<4; i++) {
             const g = gifts[i % gifts.length];
             if(g) {
@@ -1715,10 +1726,9 @@
 
         // 3. Resolution
         setTimeout(async () => {
-            // Keep copy of consumed gifts for the failure screen before deleting
             const consumedGifts = [...gifts];
 
-            // Remove items from inventory
+            // Remove items
             state.inventory = state.inventory.filter(g => !craftingState.selectedIds.includes(g.uniqueId));
             
             if (isSuccess) {
@@ -1727,48 +1737,77 @@
                 
                 const parts = await fetchGiftParts(craftingState.baseName);
                 
-                // --- A. EXCLUSIVE POOL SELECTION ---
+                // A. EXCLUSIVE POOL
                 let craftedModels = parts.models.filter(m => m.crafted === true);
                 if (craftedModels.length === 0) craftedModels = parts.models.filter(m => (m.rarityPermille || 0) < 10);
                 const newModel = craftedModels[Math.floor(Math.random() * craftedModels.length)];
                 
-                // --- B. BACKDROP VOTING LOGIC & MIXING ---
+                // --- B. NEW COLOR MIXING LOGIC ---
                 let winningBackdrop;
                 const isMixChecked = document.getElementById('cb-mix-backdrop')?.checked;
 
+                // Gather all colors involved in the craft
+                const inputColors = consumedGifts.map(g => g.collectibleData.backdrop.hex.centerColor);
+                // Count distinct slots filled (consumedGifts.length)
+                const slotCount = consumedGifts.length;
+
                 if (isMixChecked) {
-                    // Extract and sort unique backdrops by rarity (lowest permille = best)
-                    const distinctBGs =[];
-                    const seenNames = new Set();
-                    
-                    const sortedGifts = [...consumedGifts].sort((a, b) => 
-                        (a.collectibleData.backdrop.rarityPermille || 1000) - (b.collectibleData.backdrop.rarityPermille || 1000)
-                    );
+                    // Logic based on Slot Count
+                    let gradientStyle = "";
+                    let bgName = "";
 
-                    for (const g of sortedGifts) {
-                        const bg = g.collectibleData.backdrop;
-                        if (!seenNames.has(bg.name)) {
-                            seenNames.add(bg.name);
-                            distinctBGs.push(bg);
-                        }
+                    if (slotCount === 3) {
+                        // 3 Slots = LINEAR GRADIENT (Diagonal)
+                        bgName = "Tri-Fusion";
+                        // We take the 3 colors. If less than 3 unique, we cycle them.
+                        const c1 = inputColors[0];
+                        const c2 = inputColors[1] || c1;
+                        const c3 = inputColors[2] || c1;
+                        gradientStyle = `linear-gradient(135deg, ${c1}, ${c2}, ${c3})`;
+
+                    } else if (slotCount >= 4) {
+                        // 4 Slots = CONIC GRADIENT (Holographic/Rainbow effect)
+                        bgName = "Prismatic Core";
+                        const c1 = inputColors[0];
+                        const c2 = inputColors[1] || c1;
+                        const c3 = inputColors[2] || c1;
+                        const c4 = inputColors[3] || c1;
+                        // Repeat c1 at the end to make the conic smooth (360 connect to 0)
+                        gradientStyle = `conic-gradient(from 0deg, ${c1}, ${c2}, ${c3}, ${c4}, ${c1})`;
+
+                    } else {
+                        // 2 Slots (or 1) = Standard Logic (Radial mix)
+                        // This handles the existing "Mix" logic you had
+                        const sortedGifts = [...consumedGifts].sort((a, b) => 
+                            (a.collectibleData.backdrop.rarityPermille || 1000) - (b.collectibleData.backdrop.rarityPermille || 1000)
+                        );
+                        // Get best 2 unique backdrops
+                        const uniqueBgs = [];
+                        const seen = new Set();
+                        sortedGifts.forEach(g => {
+                            if(!seen.has(g.collectibleData.backdrop.name)){
+                                seen.add(g.collectibleData.backdrop.name);
+                                uniqueBgs.push(g.collectibleData.backdrop);
+                            }
+                        });
+
+                        const bg1 = uniqueBgs[0];
+                        const bg2 = uniqueBgs[1] || bg1; // Fallback if only 1 unique
+                        
+                        bgName = `${bg1.name} + ${bg2.name}`;
+                        // Radial
+                        gradientStyle = `radial-gradient(circle, ${bg1.hex.centerColor}, ${bg2.hex.edgeColor})`;
                     }
-                    
-                    // Take the 2 best unique backdrops
-                    const bg1 = distinctBGs[0];
-                    const bg2 = distinctBGs[1];
 
-                    // Create the mixed backdrop
                     winningBackdrop = {
-                        name: `${bg1.name} + ${bg2.name}`, // Sets the text to "Name1 + Name2"
-                        hex: {
-                            centerColor: bg1.hex.centerColor, // Center from the best backdrop
-                            edgeColor: bg2.hex.edgeColor,     // Edge from the second best
-                            patternColor: bg1.hex.patternColor
-                        },
-                        rarityPermille: Math.min(bg1.rarityPermille || 1000, bg2.rarityPermille || 1000)
+                        name: bgName,
+                        customGradient: gradientStyle, // Save the CSS string directly
+                        hex: consumedGifts[0].collectibleData.backdrop.hex, // Keep metadata for safety
+                        rarityPermille: 1 // Crafted is always rare
                     };
+
                 } else {
-                    // Standard voting logic
+                    // Standard Random Voting if "Mix" is OFF
                     const slotRoll = Math.floor(Math.random() * 4); 
                     if (slotRoll < gifts.length) {
                         winningBackdrop = gifts[slotRoll].collectibleData.backdrop;
@@ -1777,7 +1816,7 @@
                     }
                 }
 
-                // --- C. Pattern Logic (Random) ---
+                // C. Pattern
                 const newPattern = parts.patterns[Math.floor(Math.random() * parts.patterns.length)];
 
                 const newGift = {
@@ -1807,7 +1846,6 @@
                 hapticNotify('success');
 
             } else {
-                // --- FAILURE LOGIC ---
                 statusText.innerText = "Instability detected...";
                 cube.classList.remove('spinning');
                 cube.classList.add('burning');
@@ -1819,7 +1857,6 @@
                 setTimeout(() => {
                     animModal.classList.remove('active');
                     closeModal('craft-modal');
-                    // Show custom Failure Screen
                     showFailureScreen(consumedGifts);
                 }, 1600);
             }
@@ -1840,7 +1877,7 @@
             // Mini gift card style
             el.style.cssText = `
                 width: 70px; height: 70px; 
-                background: radial-gradient(circle, ${cd.backdrop.hex.centerColor}, ${cd.backdrop.hex.edgeColor});
+                background: ${getBackdropStyle(cd.backdrop)};
                 border-radius: 12px; position: relative; overflow: hidden;
                 display: flex; align-items: center; justify-content: center;
             `;
@@ -1952,7 +1989,7 @@
 
         // Finalize Visuals
         const header = document.getElementById('collectible-header');
-        header.style.background = `radial-gradient(circle at 50% 0%, ${cd.backdrop.hex.centerColor}, ${cd.backdrop.hex.edgeColor})`;
+        header.style.background = getBackdropStyle(cd.backdrop);
         document.getElementById('collectible-pattern-container').innerHTML = '';
         generatePattern('collectible-pattern-container', cd.pattern, giftName, false, cd.backdrop.hex.patternColor);
 
@@ -2052,7 +2089,7 @@
     function openMenu(e, gift) { appRuntime.activeGiftId = gift.uniqueId; const menu = document.getElementById('long-press-menu'); document.getElementById('menu-pin').style.display = gift.isCollectible?'block':'none'; document.getElementById('menu-pin').innerText = gift.pinned?"Unpin":"Pin"; document.getElementById('menu-wear').style.display = gift.isCollectible?'block':'none'; document.getElementById('menu-wear').innerText = gift.worn?"Take Off":"Wear"; document.getElementById('menu-reorder').style.display = (gift.isCollectible&&gift.pinned&&state.inventory.filter(g=>g.pinned).length>1)?'block':'none'; document.getElementById('menu-hide').innerText = gift.hidden?"Unhide":"Hide"; let x = e.clientX, y = e.clientY; if(x+180>window.innerWidth) x=window.innerWidth-190; if(y+160>window.innerHeight) y=window.innerHeight-170; menu.style.left=x+'px'; menu.style.top=y+'px'; menu.classList.remove('hidden'); }
     function togglePin() { const g = state.inventory.find(x=>x.uniqueId===appRuntime.activeGiftId); if(g.pinned) {g.pinned=false;g.pinOrder=null;} else {if(state.inventory.filter(x=>x.pinned).length>=6) return alert("Max 6"); g.pinned=true;g.pinOrder=999;} document.getElementById('long-press-menu').classList.add('hidden'); haptic('light'); saveState(); renderInventory(); }
     function toggleWear() { const g = state.inventory.find(x=>x.uniqueId===appRuntime.activeGiftId); if(g.worn) g.worn=false; else {state.inventory.forEach(x=>x.worn=false); g.worn=true;} document.getElementById('long-press-menu').classList.add('hidden'); hapticNotify('success'); saveState(); renderInventory(); applyWornGiftVisuals(); }
-    function applyWornGiftVisuals() { const worn = state.inventory.find(g => g.worn); const bg = document.getElementById('profile-bg'); document.getElementById('profile-pattern-overlay').innerHTML = ''; if (worn) { const cd = worn.collectibleData; bg.style.background = `radial-gradient(circle at 50% 0%, ${cd.backdrop.hex.centerColor}, ${cd.backdrop.hex.edgeColor})`; bg.classList.add('has-worn-gift'); generatePattern('profile-pattern-overlay', cd.pattern, worn.name, false, cd.backdrop.hex.patternColor, true); } else { bg.style.background = 'var(--app-profile-gradient-fallback)'; bg.classList.remove('has-worn-gift'); } }
+    function applyWornGiftVisuals() { const worn = state.inventory.find(g => g.worn); const bg = document.getElementById('profile-bg'); document.getElementById('profile-pattern-overlay').innerHTML = ''; if (worn) { const cd = worn.collectibleData; bg.style.background = getBackdropStyle(cd.backdrop); bg.classList.add('has-worn-gift'); generatePattern('profile-pattern-overlay', cd.pattern, worn.name, false, cd.backdrop.hex.patternColor, true); } else { bg.style.background = 'var(--app-profile-gradient-fallback)'; bg.classList.remove('has-worn-gift'); } }
     function toggleHide() { const g = state.inventory.find(x=>x.uniqueId===appRuntime.activeGiftId); g.hidden=!g.hidden; if(g.hidden){g.pinned=false;g.worn=false;} document.getElementById('long-press-menu').classList.add('hidden'); haptic('light'); saveState(); renderInventory(); applyWornGiftVisuals(); }
     function deleteGift() { tg.showConfirm("Delete?",(y)=>{if(y){state.inventory=state.inventory.filter(x=>x.uniqueId!==appRuntime.activeGiftId); haptic('heavy'); saveState(); renderInventory(); applyWornGiftVisuals();}}); document.getElementById('long-press-menu').classList.add('hidden'); }
     function startReorderMode() { document.getElementById('long-press-menu').classList.add('hidden'); appRuntime.reordering = true; document.getElementById('reorder-controls').classList.remove('hidden'); document.getElementById('inventory-grid').classList.add('reordering'); haptic('medium'); appRuntime.sortable = new Sortable(document.getElementById('inventory-grid'), { animation: 150, filter: ':not([data-pinned="true"])', draggable: '[data-pinned="true"]', onMove: (evt) => evt.related.hasAttribute('data-pinned') }); }
@@ -2106,51 +2143,54 @@
         const btn = document.getElementById('btn-create-custom');
         btn.disabled = true;
         btn.innerText = "Creating...";
-
-        // Get Bulk Settings
+    
         const qtyInput = parseInt(document.getElementById('cust-qty').value) || 1;
+        // Check checkboxes
         const isRandomModel = document.getElementById('cb-rnd-model').checked;
         const isRandomBackdrop = document.getElementById('cb-rnd-backdrop').checked;
         const isRandomPattern = document.getElementById('cb-rnd-pattern').checked;
-
-        // If queue has multiple items, we ignore bulk settings (qty=1)
-        // If queue has 1 item, we use the bulk settings
-        const loopCount = customizationQueue.length === 1 ? qtyInput : 1;
-
-        // Iterate through the queue items (usually just 1 if doing bulk)
+    
+        // Loop through every item in the customization queue
         for (const q of customizationQueue) {
             if(!q.id) continue;
-
-            const partsPool = cachedParts[q.id]; // Should be cached by now
-            
-            // Loop for Quantity
+    
+            // BUG FIX: Ensure parts are loaded even if user didn't click the tab
+            let partsPool = cachedParts[q.id];
+            if (!partsPool) {
+                partsPool = await fetchGiftParts(q.name);
+                cachedParts[q.id] = partsPool;
+            }
+    
+            // Logic: If queue has 1 item, use the input box quantity. 
+            // If queue has multiple items, create 1 of each.
+            const loopCount = customizationQueue.length === 1 ? qtyInput : 1;
+    
             for (let i = 0; i < loopCount; i++) {
                 
                 // 1. Determine Model
                 let finalModel = q.parts.model;
-                if (isRandomModel && customizationQueue.length === 1) {
-                    // Filter out crafted items for random generation (optional, keeps it "fair")
+                // Apply random if: Checkbox is checked OR model wasn't manually selected
+                if (!finalModel || (customizationQueue.length === 1 && isRandomModel)) {
                     const validModels = partsPool.models.filter(m => !m.crafted);
                     const pool = validModels.length > 0 ? validModels : partsPool.models;
                     finalModel = pool[Math.floor(Math.random() * pool.length)];
                 }
-
+    
                 // 2. Determine Backdrop
                 let finalBackdrop = q.parts.backdrop;
-                if (isRandomBackdrop && customizationQueue.length === 1) {
+                if (!finalBackdrop || (customizationQueue.length === 1 && isRandomBackdrop)) {
                     finalBackdrop = partsPool.backdrops[Math.floor(Math.random() * partsPool.backdrops.length)];
                 }
-
+    
                 // 3. Determine Pattern
                 let finalPattern = q.parts.pattern;
-                // If specific pattern not set, or random checked, pick random
-                if ((!finalPattern || isRandomPattern) && customizationQueue.length === 1) {
+                if (!finalPattern || (customizationQueue.length === 1 && isRandomPattern)) {
                     finalPattern = partsPool.patterns[Math.floor(Math.random() * partsPool.patterns.length)];
                 }
-
-                // Safety check
+    
+                // If we still fail to find a part (rare error), skip
                 if(!finalModel || !finalBackdrop || !finalPattern) continue;
-
+    
                 state.lastCollectibleNumber++; 
                 state.inventory.unshift({ 
                     uniqueId: Date.now() + Math.random(), 
@@ -2168,7 +2208,7 @@
                 }); 
             }
         }
-
+    
         hapticNotify('success'); 
         saveState(); 
         renderInventory(); 
