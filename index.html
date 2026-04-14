@@ -696,10 +696,19 @@
                 const cd = gift.collectibleData;
                 const bgStyle = getBackdropStyle(cd.backdrop);
                 const imgUrl = cd.model.isCustom ? cd.model.imageUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/png/${encodeURIComponent(cd.model.name)}.png`;
-                if (state.settings.animations) { visualHtml = `<div class="lottie-wrapper" id="lot-${gift.uniqueId}"></div>`; setTimeout(() => playLottie(`lot-${gift.uniqueId}`, cd.model.isCustom ? cd.model.lottieUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/lottie/${encodeURIComponent(cd.model.name)}.json`), 0); } 
-                else visualHtml = `<img src="${imgUrl}" loading="lazy">`;
-                el.innerHTML = `${topIcon<div class="top-right-label" style="background: linear-gradient(to bottom, ${cd.backdrop.hex.edgeColor}, ${cd.backdrop.hex.centerColor});">#${gift.collectibleNumber}</div><div class="gift-card-bg-pattern" style="background:${bgStyle}"></div><div class="dynamic-pattern-container" id="pat-${gift.uniqueId}"></div><div class="image-container">${visualHtml}</div>`; 
+                
+                if (state.settings.animations) { 
+                    visualHtml = `<div class="lottie-wrapper" id="lot-${gift.uniqueId}"></div>`; 
+                    setTimeout(() => playLottie(`lot-${gift.uniqueId}`, cd.model.isCustom ? cd.model.lottieUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/lottie/${encodeURIComponent(cd.model.name)}.json`), 0); 
+                } else {
+                    visualHtml = `<img src="${imgUrl}" loading="lazy">`;
+                }
+                
+                // THE FIX IS HERE: Added the missing "}" after topIcon
+                el.innerHTML = `${topIcon}<div class="top-right-label" style="background: linear-gradient(to bottom, ${cd.backdrop.hex.edgeColor}, ${cd.backdrop.hex.centerColor});">#${gift.collectibleNumber}</div><div class="gift-card-bg-pattern" style="background:${bgStyle}"></div><div class="dynamic-pattern-container" id="pat-${gift.uniqueId}"></div><div class="image-container">${visualHtml}</div>`; 
+                
                 setTimeout(() => generatePattern(`pat-${gift.uniqueId}`, cd.pattern, gift.name, true, cd.backdrop.hex.patternColor), 0);
+                
                 if (!appRuntime.selectionMode) el.onclick = () => openCollectibleModal(gift, false);
             } else {
                 const imgUrl = `${CDN_BASE}originals/${gift.originalId}/Original.png`;
