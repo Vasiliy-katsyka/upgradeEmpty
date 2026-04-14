@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gift Simulator</title>
+    <title>Gift Upgrade</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
@@ -18,10 +18,7 @@
             --tg-theme-button-text-color: #ffffff;
             --tg-theme-secondary-bg-color: #17212b;
             --app-accent-blue: #5288c1;
-            
             --app-modal-backdrop-color: rgba(0,0,0,0.8);
-            --app-rarity-chip-bg: rgba(62, 188, 249, 0.15);
-            --app-rarity-text: #62bcf9;
             --app-profile-gradient-fallback: var(--tg-theme-secondary-bg-color);
         }
 
@@ -36,71 +33,6 @@
             user-select: none;
         }
 
-        /* --- LIQUID GLASS EFFECT (Applied globally to UI elements & buttons) --- */
-        .liquid-glass {
-            background: rgba(255, 255, 255, 0.08) !important;
-            backdrop-filter: blur(16px) !important;
-            -webkit-backdrop-filter: blur(16px) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            border-top-color: rgba(255, 255, 255, 0.45) !important;
-            border-left-color: rgba(255, 255, 255, 0.45) !important;
-            border-bottom-color: rgba(0, 0, 0, 0.3) !important;
-            border-right-color: rgba(0, 0, 0, 0.3) !important;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
-        }
-
-        button, .action-button, .modal-button, .queue-chip, .buy-gift-item, .gift-card {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-top-color: rgba(255, 255, 255, 0.45);
-            border-left-color: rgba(255, 255, 255, 0.45);
-            border-bottom-color: rgba(0, 0, 0, 0.3);
-            border-right-color: rgba(0, 0, 0, 0.3);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            color: white;
-            transition: all 0.2s ease;
-        }
-        
-        button:active, .action-button:active, .modal-button:active, .queue-chip:active, .buy-gift-item:active, .gift-card:active {
-            transform: scale(0.97);
-        }
-
-        /* Primary Glass Blue Button */
-        .glass-primary-btn {
-            background: linear-gradient(135deg, rgba(0, 122, 255, 0.8) 0%, rgba(0, 80, 200, 0.8) 100%) !important;
-            backdrop-filter: blur(16px) !important;
-            -webkit-backdrop-filter: blur(16px) !important;
-            border: 1px solid rgba(255, 255, 255, 0.2) !important;
-            border-top-color: rgba(255, 255, 255, 0.6) !important;
-            border-left-color: rgba(255, 255, 255, 0.6) !important;
-            border-bottom-color: rgba(0, 0, 0, 0.4) !important;
-            border-right-color: rgba(0, 0, 0, 0.4) !important;
-            box-shadow: 0 6px 20px rgba(0, 122, 255, 0.4) !important;
-            color: white !important;
-            border-radius: 20px !important;
-            padding: 16px !important;
-            font-size: 1.1em !important;
-            font-weight: 600 !important;
-            width: 100%;
-            cursor: pointer;
-        }
-
-        /* Gradient Labels (Midnight Blue gradient edge to center) */
-        .gradient-label {
-            background: linear-gradient(to bottom, #0f1627, #2a3f68) !important;
-            color: white !important;
-        }
-
-        .top-right-label {
-            position: absolute; top: 12px; right: -32px; transform: rotate(45deg);
-            background: linear-gradient(to bottom, #0f1627, #2a3f68) !important;
-            color: white; font-size: 0.6em; padding: 3px 35px; z-index: 4; font-weight: 600; letter-spacing: 0.5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.4);
-        }
-
-        /* General Layout */
         .app-container { max-width: 600px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; position: relative; }
         .page { display: none; flex-direction: column; flex-grow: 1; background-color: var(--tg-theme-bg-color); }
         .page.active { display: flex; }
@@ -118,398 +50,500 @@
             display: flex; justify-content: center; position: relative;
             transition: background 0.5s ease;
         }
+
+        .profile-top-section.has-worn-gift .profile-name-status h1,
+        .profile-top-section.has-worn-gift .profile-name-status p { color: #ffffff !important; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
         
-        #profile-pattern-overlay {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            overflow: hidden; pointer-events: none; opacity: 0.15;
-        }
-        
+        #profile-pattern-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; pointer-events: none; opacity: 0.15; }
+        .profile-pattern-item { position: absolute; width: 30px; height: 30px; left: 50%; top: 50%; background-color: currentColor; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
+
         .profile-main-info { display: flex; flex-direction: column; align-items: center; z-index: 2; position: relative; }
-        .profile-avatar {
-            width: 100px; height: 100px; border-radius: 50%;
-            background-color: var(--tg-theme-hint-color); margin-bottom: 12px;
-            object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
+        .profile-avatar { width: 100px; height: 100px; border-radius: 50%; background-color: var(--tg-theme-hint-color); margin-bottom: 12px; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
         .profile-name-status h1 { font-size: 1.4em; font-weight: 700; text-align: center; margin: 0 0 4px 0; }
         .profile-name-status p { font-size: 0.9em; opacity: 0.7; text-align: center; margin: 0; color: var(--tg-theme-text-color); }
 
         .profile-info-block { padding: 20px 20px; background-color: var(--tg-theme-bg-color); }
-        .info-item { margin-bottom: 18px; }
+        .profile-info-header { color: var(--tg-theme-link-color); font-weight: 500; font-size: 0.95em; margin-bottom: 15px; }
+        .info-item { margin-bottom: 18px; cursor: default; }
         .info-item .value { color: var(--tg-theme-text-color); font-size: 1.1em; display: block; margin-bottom: 2px; }
         .info-item .label { color: var(--tg-theme-hint-color); font-size: 0.85em; }
 
-        .profile-tabs { display: flex; justify-content: space-around; background-color: var(--tg-theme-bg-color); }
-        .profile-tabs button {
-            background: none !important; border: none !important; box-shadow: none !important;
-            color: var(--tg-theme-hint-color) !important; padding: 14px 10px; font-size: 0.95em; cursor: pointer; flex-grow: 1;
-            font-weight: 500; border-bottom: 2px solid transparent !important; text-transform: uppercase;
-        }
-        .profile-tabs button.active { color: var(--tg-theme-link-color) !important; border-bottom-color: var(--tg-theme-link-color) !important; }
+        .profile-tabs { display: flex; justify-content: space-around; background-color: var(--tg-theme-bg-color); border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .profile-tabs button { background: none; border: none; color: var(--tg-theme-hint-color); padding: 14px 10px; font-size: 0.95em; cursor: pointer; flex-grow: 1; font-weight: 500; border-bottom: 2px solid transparent; text-transform: uppercase; }
+        .profile-tabs button.active { color: var(--tg-theme-link-color); border-bottom-color: var(--tg-theme-link-color); }
 
-        .gifts-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px;
-            flex-grow: 1; overflow-y: auto; align-content: start; 
-        }
+        .gifts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px; flex-grow: 1; overflow-y: auto; align-content: start; background: var(--tg-theme-bg-color); }
         
         .gift-card, .buy-gift-item {
-            border-radius: 16px; padding: 6px;
+            background-color: var(--tg-theme-secondary-bg-color); border-radius: 12px; padding: 6px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; position: relative; overflow: hidden;
+            cursor: pointer; position: relative; overflow: hidden; transition: transform 0.1s ease-out; border: none; 
         }
         .gift-card { aspect-ratio: 1 / 1; }
         .buy-gift-item { aspect-ratio: 1 / 1.35; padding: 8px; }
-        .gift-card.selected { box-shadow: inset 0 0 0 3px var(--tg-theme-link-color); }
-
-        .image-container {
-            width: 75%; height: 75%; display: flex; align-items: center; justify-content: center;
-            position: relative; z-index: 2; margin-bottom: 0px; 
+        .gift-card.selected { box-shadow: inset 0 0 0 3px var(--tg-theme-link-color); background-color: rgba(98, 188, 249, 0.15); }
+        .gift-card:active, .buy-gift-item:active { transform: scale(0.97); }
+        
+        /* Ribbon & Tags Logic (Matches Screenshots) */
+        .buy-gift-item::before {
+            content: "Limited"; position: absolute; top: 12px; right: -32px; transform: rotate(45deg);
+            background: linear-gradient(to bottom, #0f1c35, #1c3666); color: white; padding: 4px 35px;
+            font-size: 0.65em; font-weight: bold; z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.3); text-align: center;
         }
+        .top-right-label {
+            position: absolute; top: 12px; right: -32px; transform: rotate(45deg);
+            background: linear-gradient(to bottom, #0f1c35, #1c3666); /* Default fallback */
+            color: white; padding: 4px 35px; font-size: 0.65em; font-weight: bold; z-index: 5; box-shadow: 0 2px 4px rgba(0,0,0,0.3); text-align: center;
+        }
+        .gift-price { background: rgba(255, 255, 255, 0.08); padding: 4px 12px; border-radius: 12px; font-weight: bold; color: #fff; font-size: 0.8em; margin-top: 5px; display: flex; align-items: center; gap: 4px; }
+        .gift-price::before { content: "✨"; font-size: 1.1em; color: #e5b94c; }
+
+        .status-icon { position: absolute; top: 6px; left: 6px; z-index: 5; width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; }
+        .status-icon svg { fill: #fff; width: 100%; height: 100%; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8)); }
+        .gift-card.is-hidden { opacity: 0.4; filter: grayscale(1); }
+
+        .image-container { width: 75%; height: 75%; display: flex; align-items: center; justify-content: center; position: relative; z-index: 2; margin-bottom: 0px; }
         .buy-gift-item .image-container { height: 55%; margin-bottom: 4px; margin-top: 8px; }
-        .image-container img, .image-container .lottie-wrapper { max-width: 100%; max-height: 100%; object-fit: contain; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); }
+        .image-container img, .image-container .lottie-wrapper { max-width: 100%; max-height: 100%; object-fit: contain; }
         .lottie-wrapper { width: 100%; height: 100%; }
         
-        .gift-name { font-size: 0.85em; font-weight: 500; text-align: center; margin-top: 4px; z-index: 2; line-height: 1.2; }
-        .gift-price { font-size: 0.8em; color: #ffca28; margin: 4px 0 8px; font-weight: bold; z-index: 2; display: flex; align-items: center; gap: 4px;}
-        
-        /* Modals & Overlays */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: var(--app-modal-backdrop-color);
-            display: flex; align-items: flex-end; justify-content: center; z-index: 1000;
-            opacity: 0; visibility: hidden; transition: 0.2s;
+        .gift-name { font-size: 0.85em; font-weight: 500; text-align: center; margin-top: 4px; z-index: 2; width: 100%; line-height: 1.2; padding: 0 2px; }
+        .gift-card-bg-pattern { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0; }
+        .dynamic-pattern-container { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1; overflow: hidden; pointer-events: none; }
+        .card-pattern-symbol { position: absolute; width: 30px; height: 30px; left: 50%; top: 50%; background-color: currentColor; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; opacity: 0.15; }
+
+        /* Liquid Glass Buttons & Elements */
+        .glass-btn, .modal-button, .big-rounded-btn, .action-button, #btn-craft-action {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid transparent;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.02)), 
+                linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0) 70%, rgba(255, 255, 255, 0.4) 100%);
+            background-origin: border-box; background-clip: padding-box, border-box;
+            border-radius: 30px; color: #fff; font-weight: 600; font-size: 1.1em;
+            padding: 14px; width: 100%; text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            cursor: pointer; transition: transform 0.1s ease-in-out;
         }
+        .action-button { width: auto; padding: 8px 16px; font-size: 0.9em; border-radius: 20px; }
+        .glass-btn:active, .action-button:active, .modal-button:active { transform: scale(0.97); }
+        .glass-btn.blue, .action-button.blue {
+            background-color: rgba(62, 151, 240, 0.2);
+            background-image: 
+                linear-gradient(rgba(62, 151, 240, 0.1), rgba(62, 151, 240, 0.1)), 
+                linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0) 70%, rgba(255, 255, 255, 0.4) 100%);
+        }
+
+        /* Modals & Glassmorphism overall */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--app-modal-backdrop-color); display: flex; align-items: flex-end; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: 0.2s; }
         .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { background-color: var(--tg-theme-secondary-bg-color); border-top-left-radius: 24px; border-top-right-radius: 24px; width: 100%; max-width: 600px; display: flex; flex-direction: column; overflow: hidden; max-height: 90vh; pointer-events: auto; }
         
-        .modal-content {
-            background-color: var(--tg-theme-secondary-bg-color);
-            border-top-left-radius: 20px; border-top-right-radius: 20px;
-            width: 100%; max-width: 600px; display: flex; flex-direction: column; overflow: hidden;
-            max-height: 90vh; pointer-events: auto;
-            position: relative;
+        .glass-modal {
+            background: rgba(28, 28, 30, 0.65) !important;
+            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            border-top: 1px solid rgba(255,255,255,0.1); border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05);
         }
-        
-        .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .stat-row:last-child { border-bottom: none; }
-        .stat-label { font-weight: 500; color: var(--tg-theme-hint-color); font-size: 0.95em; }
-        .stat-value { font-size: 0.95em; color: var(--tg-theme-text-color); font-weight: 500; display: flex; align-items: center; }
 
+        .modal-header-bar { padding: 16px; text-align: center; font-weight: 600; font-size: 1.1em; background: var(--tg-theme-secondary-bg-color); position: relative; z-index: 10; }
+        .modal-scrollable-content { overflow-y: auto; padding: 0; flex-grow: 1; }
+        .modal-buttons-footer { padding: 15px; display: flex; gap: 10px; background: var(--tg-theme-secondary-bg-color); }
+        .close-btn { position: absolute; left: 16px; top: 16px; width: 30px; height: 30px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; color: #fff; backdrop-filter: blur(10px); }
+        .round-btn { width: 36px; height: 36px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff; backdrop-filter: blur(10px); font-weight: bold; }
+
+        /* Screenshot 3 & 5 Stats Tables */
+        .stat-table { background: rgba(255,255,255,0.05); border-radius: 16px; padding: 0 16px; margin: 15px 0; border: 1px solid rgba(255,255,255,0.03); }
+        .stat-table-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.95em; }
+        .stat-table-row:last-child { border-bottom: none; }
+        .stat-label { color: rgba(255,255,255,0.6); }
+        .stat-value { font-weight: 500; color: #fff; display: flex; align-items: center; gap: 8px; }
+        .sell-pill { background: rgba(62, 151, 240, 0.15); color: #62bcf9; padding: 2px 8px; border-radius: 8px; font-size: 0.8em; }
+        .percentage-pill { background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 8px; font-size: 0.8em; }
+        .owner-chip img { width: 20px; height: 20px; border-radius: 50%; }
+        .star-badge { color: #fff; background: #62bcf9; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; display: flex; align-items: center; justify-content: center; margin-left: 4px; }
+
+        /* Upgraded Profile Collectible Action Row */
+        .action-buttons-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 20px; }
+        .action-btn-item {
+            background: rgba(255,255,255,0.08); backdrop-filter: blur(15px); border-radius: 16px;
+            display: flex; flex-direction: column; align-items: center; padding: 12px; cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .action-btn-item svg { width: 24px; height: 24px; margin-bottom: 6px; }
+        .action-btn-item span { font-size: 0.85em; font-weight: 500; color: #fff; }
+
+        /* Upgrade Features List */
+        .feature-row { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; text-align: left; }
+        .feature-row svg { flex-shrink: 0; width: 24px; height: 24px; stroke: #62bcf9; }
+        .feature-row h4 { margin:0 0 6px 0; font-size:1.05em; color:#fff; font-weight: 600; }
+        .feature-row p { margin:0; font-size:0.9em; color:rgba(255,255,255,0.6); line-height:1.4; }
+
+        /* Glow Elements */
+        .glowing-bg .glow-circle { position: absolute; width: 100px; height: 100px; background: rgba(85, 255, 120, 0.4); filter: blur(40px); border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; }
+
+        /* Roulette Core */
+        .roulette-image-wrapper { width: 100%; height: 160px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .roulette-strip { display: flex; height: 100%; position: absolute; left: 0; top: 0; }
+        .roulette-strip img { width: 160px; height: 160px; object-fit: contain; flex-shrink: 0; }
+        .slot-mask { height: 1.2em; overflow: hidden; position: relative; display: inline-block; vertical-align: bottom; width: 120px; text-align: right; }
+        .slot-scroll { display: flex; flex-direction: column; position: absolute; top: 0; right: 0; width: 100%; transition: transform 0.1s linear; }
+        .slot-item { height: 1.2em; display: flex; align-items: center; justify-content: flex-end; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Remaining UI elements (Filter options, Queue, Switches) */
+        #action-toolbar { padding: 10px 15px; display: flex; justify-content: flex-end; gap: 10px; background-color: var(--tg-theme-bg-color); }
         .hidden { display: none !important; }
-        
-        /* Loading */
-        .glass-panel-loading { display: flex; flex-direction: column; align-items: center; z-index: 2; position: relative; }
-        .liquid-blob { position: absolute; border-radius: 50%; filter: blur(50px); opacity: 0.5; z-index: 1; animation: blobFloat 10s infinite alternate; }
-        .blob-1 { width: 200px; height: 200px; background: #007AFF; top: 20%; left: 15%; }
-        .blob-2 { width: 250px; height: 250px; background: #5ac8fa; bottom: 20%; right: 10%; }
-        @keyframes blobFloat { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(20px, -20px) scale(1.1); } 100% { transform: translate(-20px, 20px) scale(0.9); } }
-        
-        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid rgba(0,0,0,0.1); font-weight: 500; }
+        .switch { position: relative; display: inline-block; width: 50px; height: 30px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.2); transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        input:checked + .slider { background-color: #34c759; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--tg-theme-hint-color); transition: .4s; border-radius: 34px; opacity: 0.3; }
+        .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        input:checked + .slider { background-color: var(--tg-theme-button-color); opacity: 1; }
         input:checked + .slider:before { transform: translateX(20px); }
+        
+        .queue-bar { display: flex; overflow-x: auto; padding: 12px 15px; gap: 8px; background: var(--tg-theme-bg-color); white-space: nowrap; scrollbar-width: none; }
+        .queue-chip { padding: 8px 14px; background: var(--tg-theme-secondary-bg-color); border-radius: 20px; font-size: 0.9em; cursor: pointer; border: 1px solid transparent; display: flex; align-items: center; gap: 8px; font-weight: 500; }
+        .queue-chip.active { border-color: var(--tg-theme-link-color); background: rgba(98, 188, 249, 0.1); color: var(--tg-theme-link-color); }
+        .filter-options-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; overflow-y: auto; padding: 4px; max-height: 220px; }
+        .filter-option { background: var(--tg-theme-secondary-bg-color); border-radius: 12px; padding: 10px; cursor: pointer; border: 2px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100px; }
+        .filter-option.selected { border-color: var(--tg-theme-link-color); background: rgba(98, 188, 249, 0.05); }
+        .filter-option img { width: 55px; height: 55px; object-fit: contain; margin-bottom: 5px; }
 
+        /* Crafting Visuals */
+        .craft-container { background: transparent; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 100%; position: relative; }
+        .craft-slots-area { position: relative; width: 300px; height: 300px; margin-top: 20px; }
+        .craft-center-progress { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .craft-svg-circle { transform: rotate(-90deg); width: 100%; height: 100%; }
+        .craft-svg-circle circle { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
+        .craft-bg-circle { stroke: rgba(255,255,255,0.1); }
+        .craft-fg-circle { stroke: #ffffff; }
+        .craft-slot { position: absolute; width: 70px; height: 70px; background: rgba(255,255,255,0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; border: 2px solid transparent; }
+        .craft-slot.top-left { top: 0; left: 0; } .craft-slot.top-right { top: 0; right: 0; } .craft-slot.bottom-left { bottom: 0; left: 0; } .craft-slot.bottom-right { bottom: 0; right: 0; }
+        .craft-slot img { width: 100%; height: 100%; object-fit: contain; }
     </style>
 </head>
 <body>
 
 <div id="loading-overlay" class="modal-overlay active" style="align-items: center; justify-content: center; background: var(--tg-theme-bg-color); z-index: 9999;">
-    <div class="liquid-blob blob-1"></div>
-    <div class="liquid-blob blob-2"></div>
-    <div class="glass-panel-loading liquid-glass" style="padding: 40px; border-radius: 24px;">
-        <div id="loading-anim" style="width: 100px; height: 100px;"></div>
-        <h2 style="font-weight:700; margin-top:15px; color:var(--tg-theme-text-color);">Gift Simulator</h2>
+    <div class="glass-btn blue" style="width:120px; height:120px; border-radius:30px; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+        <div id="loading-anim" style="width: 80px; height: 80px;"></div>
     </div>
 </div>
 
 <div class="app-container">
-    <!-- Profile Page -->
-    <div id="profile-page" class="page active">
+    <div id="profile-page" class="page">
         <div class="page-header">
             <h2>Profile</h2>
-            <div><button class="action-button" style="padding: 8px 16px; border-radius: 12px; border:none;">Settings</button></div>
+            <div><button class="action-button glass-btn" onclick="openSettingsModal()">Settings</button></div>
         </div>
         <div class="profile-top-section" id="profile-bg">
             <div id="profile-pattern-overlay"></div>
             <div class="profile-main-info">
-                <img src="https://i.pravatar.cc/150" class="profile-avatar" id="user-avatar">
+                <img src="" class="profile-avatar" id="user-avatar">
                 <div class="profile-name-status">
-                    <h1 id="user-name">Web User</h1>
+                    <h1 id="user-name">Loading...</h1>
                     <p id="gift-count-display">0 gifts</p>
                 </div>
             </div>
         </div>
-        
         <div class="profile-info-block">
-            <div class="info-item">
-                <span class="value" id="profile-phone">+888 0000 0000</span>
-                <span class="label">Mobile</span>
-            </div>
-            <div class="info-item">
-                <span class="value" id="profile-bio">Hello world</span>
-                <span class="label">Bio</span>
-            </div>
-            <div class="info-item">
-                <span class="value" id="profile-username">@webuser</span>
-                <span class="label">Username</span>
-            </div>
+            <div class="profile-info-header">Info</div>
+            <div class="info-item"><span class="value" id="profile-phone">+888 0000 0000</span><span class="label">Mobile</span></div>
+            <div class="info-item clickable" onclick="editBio()"><span class="value" id="profile-bio">Hello world</span><span class="label">Bio</span></div>
+            <div class="info-item"><span class="value" id="profile-username">@username</span><span class="label">Username</span></div>
         </div>
-
         <div class="profile-tabs">
-            <button class="active">Inventory</button>
-            <button>Gift Shop</button>
+            <button class="active" onclick="switchTab('inventory')">Inventory</button>
+            <button onclick="switchTab('shop')">Gift Shop</button>
         </div>
-        
         <div id="action-toolbar" class="hidden"></div>
-        <div class="gifts-grid" id="inventory-grid">
-            <!-- Items injected by JS -->
-        </div>
+        <div class="gifts-grid" id="inventory-grid"></div>
     </div>
 
-    <!-- Shop Page -->
     <div id="shop-page" class="page">
         <div class="page-header">
             <h2>Gift Shop</h2>
-            <button class="action-button" style="padding: 8px 16px; border-radius: 12px; border:none;">Customize</button>
+            <button class="action-button glass-btn blue" onclick="openCustomizeModal()">Customize</button>
         </div>
-        <div class="gifts-grid" id="shop-grid">
-            <!-- Shop Items injected by JS (ensure to use .top-right-label with 'Limited' text) -->
-        </div>
+        <div class="gifts-grid" id="shop-grid"></div>
     </div>
 </div>
 
+<!-- ================= ALL MODALS ================= -->
 
-<!-- ============================== -->
-<!-- 1. BUY / SEND GIFT MODAL -->
-<!-- ============================== -->
-<div id="qty-modal" class="modal-overlay">
-    <div class="modal-content" style="background-color: var(--tg-theme-bg-color); position: relative;">
-        
-        <div style="text-align: center; padding: 16px; font-weight: 600; font-size: 1.1em; color: var(--tg-theme-text-color);">
-            You got a gift for Free
-        </div>
-        
-        <div class="modal-scrollable-content" style="padding-bottom: 20px;">
-            <!-- Gift Card Display -->
-            <div class="liquid-glass" style="margin: 0 20px 20px; border-radius: 20px; padding: 25px 20px; position: relative; display: flex; flex-direction: column; align-items: center; overflow: hidden;">
-                <div class="top-right-label gradient-label" style="right: -40px; padding: 4px 45px; font-size: 0.65em;">
-                    1 of 3,000
-                </div>
-                <img id="buy-image" src="" style="width: 110px; height: 110px; object-fit: contain; margin-bottom: 12px; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.4));" />
-                <h3 style="margin-bottom: 6px; font-weight: 700; font-size: 1.2em;">Saved Gift</h3>
-                <p style="text-align: center; font-size: 0.9em; color: var(--tg-theme-hint-color); margin-bottom: 20px; line-height: 1.4;">
-                    Add this gift to your profile or convert it to Free Stars.
-                </p>
-                <button class="liquid-glass" style="padding: 10px 30px; border-radius: 20px; font-weight: 600;">View</button>
-            </div>
-            
-            <!-- Message Input -->
-            <div style="margin: 0 20px 20px;">
-                <input type="text" class="liquid-glass" placeholder="Enter Message (Optional)" style="width: 100%; padding: 16px; border-radius: 16px; color: white; outline: none; box-sizing: border-box; font-size: 1em;" />
-            </div>
-            
-            <!-- Hide Name Toggle -->
-            <div class="liquid-glass" style="margin: 0 20px 20px; border-radius: 16px; padding: 16px; display: flex; justify-content: space-between; align-items: center;">
-                <div style="padding-right: 15px;">
-                    <div style="font-weight: 600; font-size: 1em; margin-bottom: 4px;">Hide My Name</div>
-                    <div style="font-size: 0.8em; color: var(--tg-theme-hint-color); line-height: 1.3;">Hide my name and message from visitors to my profile.</div>
-                </div>
-                <label class="switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            
-            <!-- Availability Bar -->
-            <div class="liquid-glass" style="margin: 0 20px 16px; border-radius: 16px; display: flex; overflow: hidden; background: rgba(0,0,0,0.3) !important; justify-content: space-between; align-items: center; padding: 12px 16px; position: relative;">
-                <div style="color: #00c6ff; font-weight: 600; font-size: 0.95em; position: relative; z-index: 2;">2,872 left</div>
-                <div style="color: rgba(255,255,255,0.6); font-size: 0.9em; position: relative; z-index: 2;">127 sold</div>
-                <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 85%; background: rgba(0, 198, 255, 0.2); z-index: 1; border-right: 2px solid #00c6ff;"></div>
-            </div>
-            
-            <p style="text-align: center; color: var(--tg-theme-hint-color); font-size: 0.85em; margin: 0 40px 20px; line-height: 1.4;">
-                Once all the gifts are sold, you will no longer be able to purchase them.
-            </p>
-            
-            <div style="padding: 0 20px;">
-                <button class="glass-primary-btn">Buy gift for Free</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<!-- ============================== -->
-<!-- 2. BEFORE UPGRADE MODAL -->
-<!-- ============================== -->
-<div id="detail-modal" class="modal-overlay">
-    <div class="modal-content" style="background-color: var(--tg-theme-secondary-bg-color);">
-        <div style="padding: 30px; display: flex; flex-direction: column; align-items: center; position: relative;">
-            <div class="liquid-glass" style="background: radial-gradient(circle, rgba(144, 238, 144, 0.4) 0%, transparent 70%) !important; width: 220px; height: 220px; position: absolute; top: 10px; z-index: 1; border: none !important; box-shadow: none !important;"></div>
-            <img id="detail-image" src="" style="width: 130px; height: 130px; object-fit: contain; z-index: 2; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));" />
-        </div>
-        
-        <h2 style="text-align: center; margin: 0; font-weight: 700; font-size: 1.5em; z-index: 2;">Saved Gift</h2>
-        <p style="text-align: center; color: var(--tg-theme-hint-color); margin: 10px 40px 25px; font-size: 0.95em; line-height: 1.4; z-index: 2;">
-            You can add this gift to your Profile or convert it to Free Stars.
-        </p>
-        
-        <div class="liquid-glass" style="margin: 0 20px; border-radius: 16px; overflow: hidden; background: rgba(0,0,0,0.2) !important;">
-            <div class="stat-row">
-                <div class="stat-label">Date</div>
-                <div class="stat-value">14.04.26 in 23:30</div>
-            </div>
-            <div class="stat-row">
-                <div class="stat-label">Value</div>
-                <div class="stat-value">Free <span class="liquid-glass" style="color:var(--tg-theme-link-color); padding: 4px 10px; border-radius: 10px; font-size: 0.85em; margin-left: 10px; font-weight: 600;">Sell for Free</span></div>
-            </div>
-            <div class="stat-row">
-                <div class="stat-label">Availability</div>
-                <div class="stat-value">3 671 of 4 908 left</div>
-            </div>
-            <div class="stat-row">
-                <div class="stat-label">Status</div>
-                <div class="stat-value">Non-unique</div>
-            </div>
-        </div>
-        
-        <p style="text-align: center; margin: 25px 0; color: var(--tg-theme-hint-color); font-size: 0.9em;">
-            This gift is visible on your profile. <span style="color: var(--tg-theme-link-color); cursor:pointer; font-weight: 500;">Hide ></span>
-        </p>
-        
-        <div style="padding: 0 20px 30px;">
-            <button class="glass-primary-btn" id="btn-upgrade">Upgrade</button>
-        </div>
-    </div>
-</div>
-
-
-<!-- ============================== -->
-<!-- 3. UPGRADE INFO MODAL -->
-<!-- ============================== -->
-<div id="upgrade-info-modal" class="modal-overlay">
-    <div class="modal-content" style="background-color: var(--tg-theme-bg-color);">
-        <!-- Top Visual Header -->
-        <div style="background: linear-gradient(180deg, rgba(82,188,188,0.8) 0%, var(--tg-theme-bg-color) 100%); padding: 30px 20px 20px; text-align: center; border-top-left-radius: 20px; border-top-right-radius: 20px; position: relative;">
-            <div class="liquid-glass" style="width: 40px; height: 5px; border-radius: 3px; margin: 0 auto 25px; border:none !important; box-shadow:none !important; background:rgba(255,255,255,0.4) !important;"></div>
-            <img id="upgrade-hero-img" src="" style="width: 140px; height: 140px; object-fit: contain; margin-bottom: 15px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4));" />
-            <h2 style="margin: 0 0 10px; font-weight: 700; font-size: 1.6em;">Upgrade Gifts</h2>
-            <p style="color: rgba(255,255,255,0.8); font-size: 0.95em; line-height: 1.4; margin: 0 25px;">Turn your gift into a unique collectible that you can sell or keep for yourself.</p>
-        </div>
-        
-        <!-- Features List -->
-        <div style="padding: 20px 25px; display: flex; flex-direction: column; gap: 24px;">
-            <!-- Unique -->
-            <div style="display: flex; gap: 16px; align-items: flex-start;">
-                <svg viewBox="0 0 24 24" width="28" height="28" fill="var(--tg-theme-link-color)" style="flex-shrink: 0; margin-top: 2px;"><path d="M12 2L2 9l10 13L22 9l-10-7zm0 2.5l7 5.5-7 9.5-7-9.5 7-5.5zm-5 6h10l-5 6.5L7 10.5z"/></svg>
-                <div>
-                    <div style="font-weight: 600; font-size: 1.1em; margin-bottom: 6px;">Unique</div>
-                    <div style="color: var(--tg-theme-hint-color); font-size: 0.9em; line-height: 1.4;">Get a unique number, model, backdrop and a symbol for your gift.</div>
-                </div>
-            </div>
-            
-            <!-- Transferable -->
-            <div style="display: flex; gap: 16px; align-items: flex-start;">
-                <svg viewBox="0 0 24 24" width="28" height="28" fill="var(--tg-theme-link-color)" style="flex-shrink: 0; margin-top: 2px;"><path d="M16 1l-4 4h3v6h2V5h3l-4-4zm-8 23l4-4h-3v-6H7v6H4l4 4z"/></svg>
-                <div>
-                    <div style="font-weight: 600; font-size: 1.1em; margin-bottom: 6px;">Transferable</div>
-                    <div style="color: var(--tg-theme-hint-color); font-size: 0.9em; line-height: 1.4;">You can share a collector's gift with any friend at the library.</div>
-                </div>
-            </div>
-            
-            <!-- Tradable -->
-            <div style="display: flex; gap: 16px; align-items: flex-start;">
-                <svg viewBox="0 0 24 24" width="28" height="28" fill="var(--tg-theme-link-color)" style="flex-shrink: 0; margin-top: 2px;"><path d="M21 3L3 21l-2-2 18-18 2 2z" /><path d="M10.5 10.5L3 18l3 3 7.5-7.5zM15 4l-4 4 5 5 4-4z" fill="var(--tg-theme-link-color)" /></svg>
-                <div>
-                    <div style="font-weight: 600; font-size: 1.1em; margin-bottom: 6px;">Tradable</div>
-                    <div style="color: var(--tg-theme-hint-color); font-size: 0.9em; line-height: 1.4;">A gift can be sold, saved in the profile, or hidden.</div>
-                </div>
-            </div>
-        </div>
-        
-        <div style="padding: 10px 20px 30px;">
-            <button class="glass-primary-btn">Processing...</button>
-        </div>
-    </div>
-</div>
-
-
-<!-- ============================== -->
-<!-- 4. COLLECTIBLE MODAL -->
-<!-- ============================== -->
-<div id="collectible-modal" class="modal-overlay">
-    <div class="modal-content" style="background: linear-gradient(180deg, #6ba68d 0%, #1c1c1e 45%); padding-top: 15px;">
-        
-        <!-- Header Controls -->
-        <div style="display: flex; justify-content: space-between; padding: 0 20px; z-index: 10;">
-            <div class="liquid-glass" style="width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-            </div>
-            <div class="liquid-glass" style="width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
-            </div>
-        </div>
-        
+<!-- Settings Modal -->
+<div id="settings-modal" class="modal-overlay">
+    <div class="modal-content glass-modal">
+        <div class="modal-header-bar" style="background:transparent; border-bottom:1px solid rgba(255,255,255,0.05);">Settings</div>
         <div class="modal-scrollable-content">
-            <!-- Center Display -->
-            <div style="text-align: center; margin-top: 5px; position: relative; z-index: 5;">
-                <img id="collectible-image" src="" style="width: 150px; height: 150px; object-fit: contain; filter: drop-shadow(0 12px 24px rgba(0,0,0,0.4)); margin-bottom: 10px;" />
-                <h2 id="collectible-title" style="font-weight: 700; font-size: 1.7em; margin: 10px 0 6px;">Kissed Frog <span style="opacity: 0.7; font-weight: 400; font-size: 0.9em;">#1902</span></h2>
-                <div id="collectible-model-name" style="color: rgba(255,255,255,0.7); font-size: 0.95em; margin-bottom: 25px;">Cranberry</div>
-                
-                <!-- Action Buttons Row -->
-                <div style="display: flex; gap: 12px; padding: 0 20px; margin-bottom: 30px;">
-                    <button class="liquid-glass" style="flex: 1; border-radius: 16px; padding: 14px 0; display: flex; flex-direction: column; align-items: center; justify-content: center; border:none;">
-                        <svg viewBox="0 0 24 24" width="26" height="26" fill="white" style="margin-bottom: 6px;"><path d="M3 16l-3-10 6 3 6-7 6 7 6-3-3 10H3zm0 2h18v4H3v-4z"/></svg>
-                        <div style="font-size: 0.85em; font-weight: 600;">wear</div>
-                    </button>
-                    <button class="liquid-glass" style="flex: 1; border-radius: 16px; padding: 14px 0; display: flex; flex-direction: column; align-items: center; justify-content: center; border:none;">
-                        <svg viewBox="0 0 24 24" width="26" height="26" fill="white" style="margin-bottom: 6px;"><path d="M21.41 11.58l-9-9C12.04 2.21 11.54 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg>
-                        <div style="font-size: 0.85em; font-weight: 600;">sell</div>
-                    </button>
-                    <button class="liquid-glass" style="flex: 1; border-radius: 16px; padding: 14px 0; display: flex; flex-direction: column; align-items: center; justify-content: center; border:none;">
-                        <svg viewBox="0 0 24 24" width="26" height="26" fill="white" style="margin-bottom: 6px;"><path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z"/></svg>
-                        <div style="font-size: 0.85em; font-weight: 600;">delete</div>
-                    </button>
-                </div>
+            <div class="switch-row"><span>Animations (Lottie)</span><label class="switch"><input type="checkbox" id="setting-animations" onchange="toggleSetting('animations', this.checked)"><span class="slider"></span></label></div>
+            <div class="switch-row"><span>Show Hidden Gifts</span><label class="switch"><input type="checkbox" id="setting-hidden" onchange="toggleSetting('showHidden', this.checked)"><span class="slider"></span></label></div>
+            <div style="padding: 20px; display: flex; flex-direction: column; gap: 15px;">
+                <button class="glass-btn blue" onclick="startSelectionMode('hide')">Select & Hide Multiple</button>
+                <button class="glass-btn" style="color: #ff595a;" onclick="resetAppData()">Reset All Data</button>
             </div>
-            
-            <!-- Stats Table -->
-            <div class="liquid-glass" style="margin: 0 20px; border-radius: 16px; overflow: hidden; background: rgba(0,0,0,0.3) !important;">
-                <div class="stat-row">
-                    <div class="stat-label">Owner</div>
-                    <div class="stat-value" style="color: var(--tg-theme-link-color);">
-                        <img src="https://i.pravatar.cc/150" style="width:22px; height:22px; border-radius:50%; margin-right:8px;" />
-                        Compact VPN Su... <svg viewBox="0 0 24 24" width="16" height="16" fill="var(--tg-theme-link-color)" style="margin-left:6px;"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                    </div>
-                </div>
-                <div class="stat-row">
-                    <div class="stat-label">Model</div>
-                    <div class="stat-value">Cranberry <span class="liquid-glass" style="margin-left: 10px; padding: 2px 10px; border-radius: 12px; font-size: 0.85em; color: var(--tg-theme-link-color); font-weight: 600;">4%</span></div>
-                </div>
-                <div class="stat-row">
-                    <div class="stat-label">Pattern</div>
-                    <div class="stat-value">Bull of Heaven <span class="liquid-glass" style="margin-left: 10px; padding: 2px 10px; border-radius: 12px; font-size: 0.85em; color: var(--tg-theme-link-color); font-weight: 600;">0.2%</span></div>
-                </div>
-                <div class="stat-row">
-                    <div class="stat-label">Backdrop</div>
-                    <div class="stat-value">Pine Green <span class="liquid-glass" style="margin-left: 10px; padding: 2px 10px; border-radius: 12px; font-size: 0.85em; color: var(--tg-theme-link-color); font-weight: 600;">2%</span></div>
-                </div>
-                <div class="stat-row">
-                    <div class="stat-label">Availability</div>
-                    <div class="stat-value">1 895/4 933 issued</div>
-                </div>
-            </div>
-            
-            <p style="text-align: center; margin: 25px 0 20px; color: var(--tg-theme-hint-color); font-size: 0.9em;">
-                This gift is visible on your profile. <span style="color: var(--tg-theme-link-color); cursor:pointer; font-weight: 500;">Hide ></span>
-            </p>
         </div>
-        
-        <div style="padding: 10px 20px 30px;">
-            <button class="glass-primary-btn" id="btn-collectible-action">OK</button>
+        <div class="modal-buttons-footer" style="background:transparent;"><button class="glass-btn" onclick="closeModal('settings-modal')">Close</button></div>
+    </div>
+</div>
+
+<!-- Shop Buy Modal (replaces old qty-modal with rich UI) -->
+<div id="qty-modal" class="modal-overlay">
+    <div class="modal-content glass-modal" style="background:#0e1621; border-radius:24px;">
+        <div style="text-align:center; margin-top:-20px; margin-bottom:10px; position:relative; z-index:20;">
+            <span style="background:rgba(255,255,255,0.1); padding:6px 16px; border-radius:20px; font-size:0.9em; backdrop-filter:blur(10px); color:#fff; border:1px solid rgba(255,255,255,0.1);">You got a gift for Free</span>
+        </div>
+        <div class="modal-scrollable-content" style="padding: 20px;">
+            <div style="background: rgba(255,255,255,0.08); border-radius: 20px; padding: 24px; position: relative; overflow: hidden; margin-bottom: 20px; border:1px solid rgba(255,255,255,0.05);">
+                <div class="top-right-label" style="background: linear-gradient(to bottom, #0f1c35, #1c3666);">1 of 3,000</div>
+                <div style="text-align:center;"><img id="buy-inner-img" src="https://cdn.changes.tg/gifts/originals/Kissed%20Frog/Original.png" style="width:110px; height:110px; filter:drop-shadow(0 10px 15px rgba(0,0,0,0.5));"></div>
+                <h3 style="text-align:center; margin:15px 0 5px; font-size:1.3em;">Saved Gift</h3>
+                <p style="text-align:center; font-size:0.9em; color:rgba(255,255,255,0.7); margin-bottom:15px; line-height:1.4;">Add this gift to your profile or convert it to Free</p>
+                <div style="text-align:center;"><button class="glass-btn" style="width:auto; padding:8px 30px; font-size:0.95em;">View</button></div>
+            </div>
+
+            <input type="text" placeholder="Enter Message (Optional)" style="width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:16px; color:#fff; font-size:1em; outline:none; margin-bottom:15px;">
+            <input type="number" id="qty-input" value="1" style="display:none;">
+
+            <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.05); padding:16px; border-radius:16px; margin-bottom:15px;">
+                <div><h4 style="margin:0 0 5px 0; font-weight:600;">Hide My Name</h4><p style="margin:0; font-size:0.85em; color:rgba(255,255,255,0.5);">Hide my name and message from visitors.</p></div>
+                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+            </div>
+
+            <div style="background:rgba(62,151,240,0.15); border-radius:12px; display:flex; justify-content:space-between; padding:12px 16px; margin-bottom:10px; border:1px solid rgba(62,151,240,0.3);">
+                <span style="color:#62bcf9; font-weight:600; font-size:0.95em;">2,872 left</span>
+                <span style="color:rgba(255,255,255,0.7); font-size:0.95em;">127 sold</span>
+            </div>
+            <p style="text-align:center; font-size:0.85em; color:rgba(255,255,255,0.5); margin-bottom:10px;">Once all the gifts are sold, you will no longer be able to purchase them.</p>
+        </div>
+        <div class="modal-buttons-footer" style="background:transparent; padding:0 20px 20px;">
+            <button class="glass-btn blue" onclick="handleBuyMultiple()">Receive gift for Free</button>
         </div>
     </div>
+</div>
+
+<!-- Detail Modal (Before Upgrade / Non Unique) -->
+<div id="detail-modal" class="modal-overlay">
+    <div class="modal-content glass-modal" style="background:#1c1c1e;">
+        <div class="modal-header-bar" style="background:transparent; border:none;">
+            <div class="close-btn" onclick="closeModal('detail-modal')">✕</div>
+        </div>
+        <div class="modal-scrollable-content" style="padding: 0 20px 20px;">
+            <div class="image-container glowing-bg" style="width: 160px; height: 160px; margin: 0 auto; position:relative;">
+                <div class="glow-circle"></div>
+                <img id="detail-image" src="" style="display:none; width: 100%; height: 100%; object-fit: contain; position:relative; z-index:2; filter:drop-shadow(0 10px 20px rgba(0,0,0,0.6));">
+                <div id="detail-lottie" class="lottie-wrapper" style="position:relative; z-index:2;"></div>
+            </div>
+            <h2 id="detail-title" style="text-align:center; margin:15px 0 5px; font-size:1.5em; font-weight:700;">Saved Gift</h2>
+            <p style="text-align:center; color: var(--tg-theme-hint-color); font-size:0.95em; margin-bottom:20px; padding:0 20px; line-height:1.4;">
+                You can add this gift to your Profile or convert it to Free.
+            </p>
+
+            <div class="stat-table">
+                <div class="stat-table-row"><span class="stat-label">Date</span><span class="stat-value">14.04.26 in 23:30</span></div>
+                <div class="stat-table-row"><span class="stat-label">Value</span><span class="stat-value">Free <span class="sell-pill">Sell for Free</span></span></div>
+                <div class="stat-table-row"><span class="stat-label">Availability</span><span class="stat-value">3 671 of 4 908 left</span></div>
+                <div class="stat-table-row"><span class="stat-label">Status</span><span class="stat-value">Non-unique</span></div>
+            </div>
+
+            <div style="text-align:center; margin: 20px 0 10px;">
+                <span style="color:var(--tg-theme-hint-color); font-size:0.9em;">This gift is visible on your profile. <a href="#" style="color:#62bcf9; text-decoration:none;">Hide ></a></span>
+            </div>
+        </div>
+        <div class="modal-buttons-footer" style="background:transparent; padding:0 20px 20px;">
+            <!-- Opens the Pre-Upgrade Info Modal -->
+            <button class="glass-btn blue" onclick="closeModal('detail-modal'); document.getElementById('upgrade-info-modal').classList.add('active');">Upgrade</button>
+        </div>
+    </div>
+</div>
+
+<!-- Pre-Upgrade Info Modal (Screenshot 1) -->
+<div id="upgrade-info-modal" class="modal-overlay">
+    <div class="modal-content glass-modal" style="background: linear-gradient(180deg, #5bb5a2 0%, #1c1c1e 50%);">
+        <div class="modal-header-bar" style="background:transparent; border:none;"><div class="close-btn" onclick="closeModal('upgrade-info-modal')">✕</div></div>
+        <div class="modal-scrollable-content" style="padding: 0 20px 20px;">
+            <div style="text-align:center; margin-bottom: 20px;">
+                 <img src="https://cdn.changes.tg/gifts/originals/Kissed%20Frog/Original.png" style="width:140px; height:140px; object-fit:contain; filter:drop-shadow(0 15px 20px rgba(0,0,0,0.3));">
+            </div>
+            <h2 style="text-align:center; margin-bottom:12px; font-size:1.7em; font-weight:700;">Upgrade Gifts</h2>
+            <p style="text-align:center; color: rgba(255,255,255,0.85); font-size:1em; margin-bottom:35px; line-height:1.5; padding:0 15px;">
+                Turn your gift into a unique collectible that you can sell or keep for yourself.
+            </p>
+
+            <div class="feature-row">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#62bcf9" stroke-width="2"><path d="M6 3h12l4 6-10 12L2 9l4-6z"/><path d="M2 9h20M12 21V9M6 3l6 6M18 3l-6 6"/></svg>
+                <div><h4>Unique</h4><p>Get a unique number, model, backdrop and a symbol for your gift.</p></div>
+            </div>
+            <div class="feature-row">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#62bcf9" stroke-width="2"><path d="M8 7h12m0 0l-4-4m4 4l-4 4m4 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                <div><h4>Transferable</h4><p>You can share a collector's gift with any friend at the library.</p></div>
+            </div>
+            <div class="feature-row">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#62bcf9" stroke-width="2"><path d="M12 2l10 10-10 10L2 12 12 2z"/></svg> 
+                <div><h4>Tradable</h4><p>A gift can be sold, saved in the profile, or hidden.</p></div>
+            </div>
+        </div>
+        <div class="modal-buttons-footer" style="background:transparent; padding:0 20px 20px;">
+            <!-- Start actual upgrade logic -->
+            <button id="btn-upgrade" class="glass-btn blue" onclick="closeModal('upgrade-info-modal'); handleUpgrade();">Processing...</button>
+        </div>
+    </div>
+</div>
+
+<!-- Collectible Modal (Upgraded Profile - Screenshot 5) -->
+<div id="collectible-modal" class="modal-overlay">
+    <div class="modal-content glass-modal" style="background:#1c1c1e;">
+        <div id="collectible-header" style="position:relative; border-bottom-left-radius:24px; border-bottom-right-radius:24px; padding:20px; overflow:hidden;">
+            <div style="display:flex; justify-content:space-between; position:relative; z-index:10;">
+                <div class="round-btn" style="width:32px; height:32px;" onclick="closeModal('collectible-modal')">✕</div>
+                <div class="round-btn" style="width:32px; height:32px; font-size:20px; line-height:10px;">...</div>
+            </div>
+            <div id="collectible-pattern-container" class="dynamic-pattern-container"></div>
+            <div style="position: relative; z-index: 2; width: 100%; display: flex; flex-direction: column; align-items: center; margin-top:5px;">
+                <div class="roulette-image-wrapper">
+                    <div id="roulette-strip" class="roulette-strip" style="display:none;"></div>
+                    <img id="collectible-image" src="" style="width:150px; height:150px; object-fit:contain; display:none; filter:drop-shadow(0 10px 20px rgba(0,0,0,0.5));">
+                    <div id="collectible-lottie" class="lottie-wrapper" style="width:150px; height:150px; display:none;"></div>
+                </div>
+                <h3 id="collectible-title" style="font-size:1.5em; font-weight:700; margin-top:10px; text-shadow:0 2px 4px rgba(0,0,0,0.5);">Gift #000</h3>
+                <div class="sub-header" id="collectible-model-name" style="color:rgba(255,255,255,0.8); font-size:1em; margin-bottom:10px; text-shadow:0 1px 2px rgba(0,0,0,0.5);">Model Name</div>
+            </div>
+            <div class="action-buttons-row">
+                <div class="action-btn-item">
+                    <svg viewBox="0 0 24 24" fill="#fff"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5z"/></svg><span>wear</span>
+                </div>
+                <div class="action-btn-item">
+                    <svg viewBox="0 0 24 24" fill="#fff"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.41l9 9c.36.36.86.58 1.41.58s1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.41zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg><span>sell</span>
+                </div>
+                <div class="action-btn-item">
+                    <svg viewBox="0 0 24 24" fill="#fff"><path d="M15 4V3H9v1H4v2h1v13c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V6h1V4h-5zm2 15H7V6h10v13z"/></svg><span>delete</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-scrollable-content" style="padding: 16px;">
+            <div class="stat-table">
+                <div class="stat-table-row">
+                    <div class="stat-label">Owner</div>
+                    <div class="stat-value owner-chip"><img id="col-owner-img" src=""><span id="col-owner-name" style="color:#62bcf9;">User</span><span class="star-badge">★</span></div>
+                </div>
+                <div class="stat-table-row">
+                    <div class="stat-label">Model</div>
+                    <div class="stat-value"><div class="slot-mask" id="slot-model"><div class="slot-scroll"></div></div><span class="percentage-pill" id="col-model-pct">4%</span></div>
+                </div>
+                <div class="stat-table-row">
+                    <div class="stat-label">Pattern</div>
+                    <div class="stat-value"><div class="slot-mask" id="slot-symbol"><div class="slot-scroll"></div></div><span class="percentage-pill" id="col-symbol-pct" style="color:#62bcf9; background:rgba(98,188,249,0.15);">0.2%</span></div>
+                </div>
+                <div class="stat-table-row">
+                    <div class="stat-label">Backdrop</div>
+                    <div class="stat-value"><div class="slot-mask" id="slot-backdrop"><div class="slot-scroll"></div></div><span class="percentage-pill" id="col-backdrop-pct">2%</span></div>
+                </div>
+                <div class="stat-table-row">
+                    <div class="stat-label">Availability</div>
+                    <div class="stat-value" id="col-quantity">1 895/4 933 issued</div>
+                </div>
+            </div>
+            <div style="text-align:center; margin: 15px 0 10px;">
+                <span style="color:var(--tg-theme-hint-color); font-size:0.85em;">This gift is visible on your profile. <a href="#" style="color:#62bcf9; text-decoration:none;">Hide ></a></span>
+            </div>
+        </div>
+        <div class="modal-buttons-footer" style="padding-top: 0; background: transparent;">
+            <button id="btn-collectible-action" class="glass-btn blue" onclick="closeModal('collectible-modal')">OK</button>
+        </div>
+    </div>
+</div>
+
+<!-- Customize Modal -->
+<div id="customize-modal" class="modal-overlay">
+    <div class="modal-content glass-modal">
+        <div class="modal-header-bar" style="background:transparent;">Customize</div>
+        <div class="queue-bar" id="cust-queue-bar" style="background:rgba(0,0,0,0.1);"></div>
+        <div class="modal-scrollable-content" style="padding: 0; background: transparent;">
+            <div class="filter-section" style="padding: 15px;">
+                <h4 style="margin: 0 0 12px; color: #fff;">Select Base Gift</h4>
+                <div class="filter-options-grid" id="cust-base-grid"></div>
+            </div>
+            <div id="cust-parts-container" class="hidden">
+                <div class="filter-section" style="padding: 15px;"><h4 style="color:#fff;">Select Model</h4><div class="filter-options-grid" id="cust-model-grid"></div></div>
+                <div class="filter-section" style="padding: 15px;"><h4 style="color:#fff;">Select Backdrop</h4><div class="filter-options-grid" id="cust-backdrop-grid"></div></div>
+                <div class="filter-section" style="padding: 15px;"><h4 style="color:#fff;">Select Symbol</h4><div class="filter-options-grid" id="cust-pattern-grid"></div></div>
+                <div id="cust-bulk-controls" style="margin: 15px; background: rgba(255,255,255,0.05); border-radius: 16px; overflow: hidden; border:1px solid rgba(255,255,255,0.05);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding: 16px; border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <span style="font-weight:600;">Quantity</span>
+                        <input type="number" id="cust-qty" value="1" min="1" max="1000" oninput="updateCreateButton()" style="width:80px; padding:10px; border-radius:12px; border:none; background:rgba(0,0,0,0.3); color:#fff; text-align:center; font-weight:bold; outline:none;">
+                    </div>
+                    <div class="switch-row" style="border-bottom:1px solid rgba(255,255,255,0.05);"><span>Random Model</span><label class="switch"><input type="checkbox" id="cb-rnd-model" onchange="toggleRandomPart('model'); updateCreateButton()"><span class="slider"></span></label></div>
+                    <div class="switch-row" style="border-bottom:1px solid rgba(255,255,255,0.05);"><span>Random Backdrop</span><label class="switch"><input type="checkbox" id="cb-rnd-backdrop" onchange="toggleRandomPart('backdrop'); updateCreateButton()"><span class="slider"></span></label></div>
+                    <div class="switch-row"><span>Random Symbol</span><label class="switch"><input type="checkbox" id="cb-rnd-pattern" checked onchange="toggleRandomPart('pattern'); updateCreateButton()"><span class="slider"></span></label></div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-buttons-footer" style="background:transparent;"><button class="glass-btn blue" id="btn-create-custom" disabled onclick="handleCreateQueue()">Create</button></div>
+    </div>
+</div>
+
+<!-- Craft Main Modal -->
+<div id="craft-modal" class="modal-overlay">
+    <div class="modal-content glass-modal" style="height: 90vh;">
+        <div class="modal-header-bar" style="background:transparent;"><div class="close-btn" onclick="closeModal('craft-modal')">✕</div><span>Craft Gift</span></div>
+        <div class="craft-container">
+            <div class="craft-slots-area">
+                <div class="craft-center-progress"><svg class="craft-svg-circle" viewBox="0 0 100 100"><circle class="craft-bg-circle" cx="50" cy="50" r="45"></circle><circle id="craft-progress-ring" class="craft-fg-circle" cx="50" cy="50" r="45" stroke-dasharray="283" stroke-dashoffset="283"></circle></svg><div class="craft-pct-text" id="craft-chance-text" style="font-size:1.2em;">0%</div></div>
+                <div class="craft-slot top-left" id="slot-0" onclick="openCraftSelect()"><span class="add-icon">+</span></div>
+                <div class="craft-slot top-right" id="slot-1" onclick="openCraftSelect()"><span class="add-icon">+</span></div>
+                <div class="craft-slot bottom-left" id="slot-2" onclick="openCraftSelect()"><span class="add-icon">+</span></div>
+                <div class="craft-slot bottom-right" id="slot-3" onclick="openCraftSelect()"><span class="add-icon">+</span></div>
+            </div>
+            <div style="text-align:center; margin-top:-10px;">
+                <p style="font-size:0.95em; opacity:0.8;">Add up to 4 gifts to craft new <br><b id="craft-target-name">Gift #000</b>.</p>
+                <p style="font-size:0.85em; color:#ff595a; margin-top:8px;">If crafting fails, all selected gifts are consumed.</p>
+                <div class="craft-probability-row" id="craft-probs" style="margin-top:15px;"></div>
+            </div>
+            <button id="btn-craft-action" class="glass-btn blue" onclick="startCrafting()">Craft Gift</button>
+        </div>
+    </div>
+</div>
+
+<!-- Craft Select Modal -->
+<div id="craft-select-modal" class="modal-overlay">
+    <div class="modal-content glass-modal"><div class="modal-header-bar" style="background:transparent;">Select Gifts</div><div class="modal-scrollable-content"><div class="craft-select-grid" id="craft-select-grid" style="padding:15px; display:grid; grid-template-columns:repeat(3,1fr); gap:10px;"></div></div><div class="modal-buttons-footer" style="background:transparent;"><button class="glass-btn" onclick="closeModal('craft-select-modal')">Done</button></div></div>
+</div>
+
+<!-- Craft Anim Modal -->
+<div id="craft-anim-modal" class="modal-overlay" style="z-index:2000;">
+    <div class="modal-content glass-modal" style="background:transparent; align-items:center; justify-content:center; box-shadow:none;">
+        <h2 style="color:#fff; font-size:2em; font-weight:700;">Crafting...</h2>
+        <p id="craft-anim-status" style="color:rgba(255,255,255,0.7); margin-top:10px; font-size:1.1em;">Heating up the anvil</p>
+    </div>
+</div>
+
+<!-- Failure Modal -->
+<div id="failure-modal" class="modal-overlay">
+    <div class="modal-content glass-modal" style="height:auto; min-height:60vh;">
+        <div class="modal-header-bar" style="background:transparent;"><div class="close-btn" onclick="closeModal('failure-modal')">✕</div></div>
+        <div class="modal-scrollable-content" style="display:flex; flex-direction:column; align-items:center; padding:20px;">
+            <div style="width:90px; height:90px; background:rgba(255,89,90,0.2); border-radius:24px; display:flex; align-items:center; justify-content:center; margin-bottom:20px;"><div style="font-size:40px; color:#ff595a; font-weight:bold;">✕</div></div>
+            <h2 style="color:#ff595a; font-size:1.6em; margin-bottom:10px; font-weight:700;">Unsuccessful attempt</h2>
+            <p style="text-align:center; color:rgba(255,255,255,0.6); margin-bottom:30px;">The attempt failed.<br><span id="fail-count-text">4</span> gifts were lost.</p>
+            <div id="failed-items-grid" style="display:flex; justify-content:center; gap:12px; margin-bottom:40px; width:100%;"></div>
+            <button class="glass-btn blue" onclick="retryCrafting()">Craft Again</button>
+        </div>
+    </div>
+</div>
+
+<!-- Menus -->
+<div id="long-press-menu" class="hidden" style="position:fixed; background:rgba(30,40,55,0.9); backdrop-filter:blur(20px); border-radius:16px; border:1px solid rgba(255,255,255,0.1); z-index:2000; min-width:200px; padding:8px 0; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+    <ul style="list-style:none;">
+        <li id="menu-pin" onclick="togglePin()" style="padding:14px 20px; cursor:pointer; font-weight:500;">Pin to Profile</li>
+        <li id="menu-wear" onclick="toggleWear()" style="padding:14px 20px; cursor:pointer; font-weight:500;">Wear Gift</li>
+        <li id="menu-reorder" class="hidden" onclick="startReorderMode()" style="padding:14px 20px; cursor:pointer; font-weight:500;">Reorder Pins</li>
+        <li id="menu-hide" onclick="toggleHide()" style="padding:14px 20px; cursor:pointer; font-weight:500;">Hide Gift</li>
+        <li class="danger" onclick="deleteGift()" style="padding:14px 20px; cursor:pointer; font-weight:500; color:#ff595a;">Delete</li>
+    </ul>
+</div>
+<div id="reorder-controls" class="page-header hidden" style="position:fixed; top:0; left:0; right:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(20px); z-index:100; justify-content:center;">
+    <button class="glass-btn blue" style="width:auto; padding:10px 30px;" onclick="stopReorderMode()">Done Reordering</button>
 </div>
 
 <script>
@@ -664,7 +698,7 @@
                 const imgUrl = cd.model.isCustom ? cd.model.imageUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/png/${encodeURIComponent(cd.model.name)}.png`;
                 if (state.settings.animations) { visualHtml = `<div class="lottie-wrapper" id="lot-${gift.uniqueId}"></div>`; setTimeout(() => playLottie(`lot-${gift.uniqueId}`, cd.model.isCustom ? cd.model.lottieUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/lottie/${encodeURIComponent(cd.model.name)}.json`), 0); } 
                 else visualHtml = `<img src="${imgUrl}" loading="lazy">`;
-                el.innerHTML = `${topIcon}<div class="top-right-label">#${gift.collectibleNumber}</div><div class="gift-card-bg-pattern" style="background:${bgStyle}"></div><div class="dynamic-pattern-container" id="pat-${gift.uniqueId}"></div><div class="image-container">${visualHtml}</div>`; 
+                el.innerHTML = `${topIcon<div class="top-right-label" style="background: linear-gradient(to bottom, ${cd.backdrop.hex.edgeColor}, ${cd.backdrop.hex.centerColor});">#${gift.collectibleNumber}</div><div class="gift-card-bg-pattern" style="background:${bgStyle}"></div><div class="dynamic-pattern-container" id="pat-${gift.uniqueId}"></div><div class="image-container">${visualHtml}</div>`; 
                 setTimeout(() => generatePattern(`pat-${gift.uniqueId}`, cd.pattern, gift.name, true, cd.backdrop.hex.patternColor), 0);
                 if (!appRuntime.selectionMode) el.onclick = () => openCollectibleModal(gift, false);
             } else {
@@ -1732,82 +1766,81 @@
             btn.innerText = customizationQueue.length > 1 ? `Create All (${customizationQueue.length})` : 'Create'; 
         }
     }
-    async function handleCreateQueue() { 
+    async function handleCreateQueue() {
         const btn = document.getElementById('btn-create-custom');
         btn.disabled = true;
         btn.innerText = "Creating...";
     
         const qtyInput = parseInt(document.getElementById('cust-qty').value) || 1;
-        // Check checkboxes
         const isRandomModel = document.getElementById('cb-rnd-model').checked;
         const isRandomBackdrop = document.getElementById('cb-rnd-backdrop').checked;
         const isRandomPattern = document.getElementById('cb-rnd-pattern').checked;
     
-        // Loop through every item in the customization queue
-        for (const q of customizationQueue) {
-            if(!q.id) continue;
+        // Use a slight timeout to prevent UI freeze on large batches
+        setTimeout(async () => {
+            for (const q of customizationQueue) {
+                if(!q.id) continue;
+                let partsPool = cachedParts[q.id];
+                if (!partsPool) {
+                    partsPool = await fetchGiftParts(q.name);
+                    cachedParts[q.id] = partsPool;
+                }
     
-            // BUG FIX: Ensure parts are loaded even if user didn't click the tab
-            let partsPool = cachedParts[q.id];
-            if (!partsPool) {
-                partsPool = await fetchGiftParts(q.name);
-                cachedParts[q.id] = partsPool;
+                const loopCount = customizationQueue.length === 1 ? qtyInput : 1;
+    
+                for (let i = 0; i < loopCount; i++) {
+                    let finalModel = q.parts.model;
+                    if (!finalModel || (customizationQueue.length === 1 && isRandomModel)) {
+                        const validModels = partsPool.models.filter(m => !m.crafted);
+                        const pool = validModels.length > 0 ? validModels : partsPool.models;
+                        finalModel = pool[Math.floor(Math.random() * pool.length)];
+                    }
+    
+                    let finalBackdrop = q.parts.backdrop;
+                    if (!finalBackdrop || (customizationQueue.length === 1 && isRandomBackdrop)) {
+                        finalBackdrop = partsPool.backdrops[Math.floor(Math.random() * partsPool.backdrops.length)];
+                    }
+    
+                    let finalPattern = q.parts.pattern;
+                    if (!finalPattern || (customizationQueue.length === 1 && isRandomPattern)) {
+                        finalPattern = partsPool.patterns[Math.floor(Math.random() * partsPool.patterns.length)];
+                    }
+    
+                    if(!finalModel || !finalBackdrop || !finalPattern) continue;
+    
+                    state.lastCollectibleNumber++;
+                    state.inventory.unshift({
+                        uniqueId: Date.now() + Math.random(),
+                        originalId: q.id,
+                        name: q.name,
+                        isCollectible: true,
+                        timestamp: Date.now(),
+                        pinned: false,
+                        collectibleNumber: state.lastCollectibleNumber,
+                        collectibleData: {
+                            model: JSON.parse(JSON.stringify(finalModel)), // Deep Clone fixes reference bug
+                            backdrop: JSON.parse(JSON.stringify(finalBackdrop)),
+                            pattern: JSON.parse(JSON.stringify(finalPattern))
+                        }
+                    });
+                }
             }
-    
-            // Logic: If queue has 1 item, use the input box quantity. 
-            // If queue has multiple items, create 1 of each.
-            const loopCount = customizationQueue.length === 1 ? qtyInput : 1;
-    
-            for (let i = 0; i < loopCount; i++) {
-                
-                // 1. Determine Model
-                let finalModel = q.parts.model;
-                // Apply random if: Checkbox is checked OR model wasn't manually selected
-                if (!finalModel || (customizationQueue.length === 1 && isRandomModel)) {
-                    const validModels = partsPool.models.filter(m => !m.crafted);
-                    const pool = validModels.length > 0 ? validModels : partsPool.models;
-                    finalModel = pool[Math.floor(Math.random() * pool.length)];
-                }
-    
-                // 2. Determine Backdrop
-                let finalBackdrop = q.parts.backdrop;
-                if (!finalBackdrop || (customizationQueue.length === 1 && isRandomBackdrop)) {
-                    finalBackdrop = partsPool.backdrops[Math.floor(Math.random() * partsPool.backdrops.length)];
-                }
-    
-                // 3. Determine Pattern
-                let finalPattern = q.parts.pattern;
-                if (!finalPattern || (customizationQueue.length === 1 && isRandomPattern)) {
-                    finalPattern = partsPool.patterns[Math.floor(Math.random() * partsPool.patterns.length)];
-                }
-    
-                // If we still fail to find a part (rare error), skip
-                if(!finalModel || !finalBackdrop || !finalPattern) continue;
-    
-                state.lastCollectibleNumber++; 
-                state.inventory.unshift({ 
-                    uniqueId: Date.now() + Math.random(), 
-                    originalId: q.id, 
-                    name: q.name, 
-                    isCollectible: true, 
-                    timestamp: Date.now(), 
-                    pinned: false, 
-                    collectibleNumber: state.lastCollectibleNumber, 
-                    collectibleData: { 
-                        model: finalModel, 
-                        backdrop: finalBackdrop, 
-                        pattern: finalPattern 
-                    } 
-                }); 
-            }
-        }
-    
-        hapticNotify('success'); 
-        saveState(); 
-        renderInventory(); 
-        closeModal('customize-modal'); 
-        switchTab('inventory'); 
+            hapticNotify('success');
+            saveState();
+            renderInventory();
+            closeModal('customize-modal');
+            switchTab('inventory');
+        }, 50);
     }
+
+/* 
+  NOTE FOR DYNAMIC GRID RIBBONS: To make the Grid NFT ribbons perfectly match the 
+  backdrop edge/center colors dynamically, update the line in your JS `renderInventory` where 
+  `<div class="top-right-label">` is generated to include the inline gradient:
+  
+  <div class="top-right-label" style="background: linear-gradient(to bottom, ${cd.backdrop.hex.edgeColor}, ${cd.backdrop.hex.centerColor});">#${gift.collectibleNumber}</div>
+*/
+
 </script>
 </body>
 </html>
