@@ -90,11 +90,12 @@
 
         .profile-tabs { display: flex; justify-content: space-around; background-color: var(--tg-theme-bg-color); border-bottom: 1px solid #000; }
         .profile-tabs button {
-            background: none; border: none; color: var(--tg-theme-hint-color);
+            background: none !important; border: none; color: var(--tg-theme-hint-color) !important;
             padding: 14px 10px; font-size: 0.95em; cursor: pointer; flex-grow: 1;
             font-weight: 500; border-bottom: 2px solid transparent; text-transform: uppercase;
+            backdrop-filter: none; box-shadow: none;
         }
-        .profile-tabs button.active { color: var(--tg-theme-link-color); border-bottom-color: var(--tg-theme-link-color); }
+        .profile-tabs button.active { color: var(--tg-theme-link-color) !important; border-bottom-color: var(--tg-theme-link-color); }
 
         .gifts-grid {
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px;
@@ -112,6 +113,27 @@
         .gift-card { aspect-ratio: 1 / 1; }
         .buy-gift-item { aspect-ratio: 1 / 1.35; padding: 8px; }
         
+        /* 
+         * Pure CSS for "Limited" Label on Shop Items 
+         * Matches "Midnight Blue" gradient requirement.
+         */
+        .buy-gift-item::after {
+            content: "Limited";
+            position: absolute;
+            top: 12px; right: -32px;
+            transform: rotate(45deg);
+            background: linear-gradient(180deg, #2b3a5c 0%, #151d30 100%);
+            color: white;
+            font-size: 0.65em;
+            padding: 3px 35px;
+            z-index: 4;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            text-transform: uppercase;
+            pointer-events: none;
+        }
+
         .gift-card.selected { box-shadow: inset 0 0 0 3px var(--tg-theme-link-color); background-color: rgba(98, 188, 249, 0.15); }
         .gift-card:active, .buy-gift-item:active { transform: scale(0.97); }
         
@@ -140,15 +162,47 @@
             background-color: currentColor; 
             -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; opacity: 0.15;
         }
+        
+        /* Updated Top Right Label (Dynamic Gradients driven by CSS Variables) */
         .top-right-label {
             position: absolute; top: 12px; right: -32px; transform: rotate(45deg);
-            background: rgba(0,0,0,0.6); color: white; font-size: 0.6em; padding: 2px 35px; z-index: 4; font-weight: 600; letter-spacing: 0.5px;
+            background: linear-gradient(180deg, var(--label-edge, #2b3a5c) 0%, var(--label-center, #151d30) 100%) !important;
+            color: white; font-size: 0.6em; padding: 2px 35px; z-index: 4; font-weight: 600; letter-spacing: 0.5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            text-transform: uppercase;
+        }
+
+        /* --- GLASSMORPHISM BUTTONS --- */
+        .action-button, .modal-button, .big-rounded-btn, #btn-craft-action, .queue-chip.add-gift-chip {
+            background: rgba(62, 151, 240, 0.2) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top-color: rgba(255, 255, 255, 0.4);
+            border-left-color: rgba(255, 255, 255, 0.4);
+            border-bottom-color: rgba(0, 0, 0, 0.3);
+            border-right-color: rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 0 10px rgba(255,255,255,0.05);
+            color: #ffffff !important;
+            transition: all 0.2s ease;
         }
 
         .action-button {
-            background-color: var(--tg-theme-button-color); color: var(--tg-theme-button-text-color);
-            border: none; padding: 6px 14px; border-radius: 16px; font-size: 0.9em; cursor: pointer; font-weight: 500;
+            padding: 6px 14px; border-radius: 16px; font-size: 0.9em; cursor: pointer; font-weight: 500;
         }
+        
+        .action-button:active, .modal-button:active, .big-rounded-btn:active, .queue-chip.add-gift-chip:active {
+            transform: scale(0.96);
+            background: rgba(255, 255, 255, 0.25) !important;
+        }
+
+        .modal-button.secondary {
+            background: rgba(255, 255, 255, 0.08) !important;
+            border-top-color: rgba(255, 255, 255, 0.2);
+            border-left-color: rgba(255, 255, 255, 0.2);
+            color: var(--tg-theme-link-color) !important;
+        }
+
         #action-toolbar {
             padding: 10px 15px; display: flex; justify-content: flex-end; gap: 10px; background-color: var(--tg-theme-bg-color);
         }
@@ -165,7 +219,6 @@
             border-top-left-radius: 14px; border-top-right-radius: 14px;
             width: 100%; max-width: 600px; display: flex; flex-direction: column; overflow: hidden;
             max-height: 90vh;
-            /* To make click outside work better */
             pointer-events: auto; 
         }
         #customize-modal .modal-content { height: 90vh; }
@@ -175,12 +228,9 @@
         
         .modal-buttons-footer { padding: 15px; display: flex; gap: 10px; background: var(--tg-theme-secondary-bg-color); }
         .modal-button {
-            flex: 1; padding: 12px; border-radius: 30px; border: none; font-size: 1em; font-weight: 600; cursor: pointer;
-            background-color: var(--tg-theme-button-color); color: var(--tg-theme-button-text-color);
+            flex: 1; padding: 12px; border-radius: 30px; font-size: 1em; font-weight: 600; cursor: pointer;
         }
-        .modal-button.secondary { background-color: var(--tg-theme-bg-color); color: var(--tg-theme-link-color); }
         
-        /* New Collectible Modal Styles */
         .collectible-header {
             position: relative; padding: 40px 0 30px; text-align: center; overflow: hidden;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -205,25 +255,20 @@
         .learn-more { font-size: 0.8em; color: var(--tg-theme-link-color); margin-left: 4px; opacity: 0.8; }
         
         .big-rounded-btn {
-            width: 100%; background-color: var(--tg-theme-button-color); color: var(--tg-theme-button-text-color);
-            border: none; padding: 14px; border-radius: 30px; font-size: 1.1em; font-weight: 600; cursor: pointer;
+            width: 100%; padding: 14px; border-radius: 30px; font-size: 1.1em; font-weight: 600; cursor: pointer;
         }
 
-        /* Roulette Animations */
-        /* Updated: Full Width */
         .roulette-image-wrapper {
             width: 100%; height: 160px; position: relative; overflow: hidden; display: flex;
             align-items: center; justify-content: center;
         }
         .roulette-strip {
             display: flex; height: 100%; position: absolute; left: 0; top: 0;
-            /* Will be animated via JS/Keyframes */
         }
         .roulette-strip img {
             width: 160px; height: 160px; object-fit: contain; flex-shrink: 0;
         }
         
-        /* Vertical Text Slot */
         .slot-mask {
             height: 1.2em; overflow: hidden; position: relative; display: inline-block; vertical-align: bottom;
             width: 120px; text-align: right;
@@ -237,7 +282,6 @@
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
 
-        /* Menu */
         #long-press-menu {
             position: fixed; background: var(--tg-theme-secondary-bg-color);
             border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
@@ -247,7 +291,6 @@
         #long-press-menu li:hover { background: rgba(255,255,255,0.05); }
         #long-press-menu li.danger { color: #ff595a; }
 
-        /* Queue Bar */
         .queue-bar { display: flex; overflow-x: auto; padding: 12px 15px; gap: 8px; background: var(--tg-theme-bg-color); white-space: nowrap; scrollbar-width: none; }
         .queue-bar::-webkit-scrollbar { display: none; }
         .queue-chip { 
@@ -256,8 +299,7 @@
         }
         .queue-chip.active { border-color: var(--tg-theme-link-color); background: rgba(98, 188, 249, 0.1); color: var(--tg-theme-link-color); }
         .queue-chip .close-x { opacity: 0.6; font-size: 1.2em; font-weight: 300; }
-        .add-gift-chip { background: var(--tg-theme-button-color); color: var(--tg-theme-button-text-color); }
-
+        
         .filter-section { padding: 0 15px; margin-bottom: 20px; }
         .filter-section h4 { margin: 15px 0 8px; color: var(--tg-theme-hint-color); font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; padding-left: 4px; }
         
@@ -288,8 +330,6 @@
         .hidden { display: none !important; }
         .reordering .gift-card { opacity: 0.5; }
         .reordering .gift-card[data-pinned="true"] { opacity: 1; cursor: grab; box-shadow: 0 0 0 2px var(--tg-theme-link-color); }
-        
-        #qty-modal input { background: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); border: none; padding: 12px; border-radius: 12px; width: 100%; font-size: 1.4em; text-align: center; margin-bottom: 15px; outline: none; font-weight: bold; }
 
         /* Loading */
         .glass-panel { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; animation: glassFloat 4s ease-in-out infinite; }
@@ -313,34 +353,21 @@
             background-color: #ffffff;
         }
 
-        /* Updated Craft Container Background */
         .craft-container {
             background: transparent; 
             padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 100%;
             position: relative;
         }
 
-        /* Green Gradient Button */
         #btn-craft-action {
             width: 90%; 
             height: auto;
             min-height: 56px;
             margin: 0 auto 10px auto;
-            
-            /* Exact Gradient: Bright Green to Teal/Cyan */
-            background: linear-gradient(90deg, #4cd964 0%, #29b6f6 100%);
-            
-            /* Fully Rounded Pill Shape */
+            background: linear-gradient(90deg, rgba(76, 217, 100, 0.4) 0%, rgba(41, 182, 246, 0.4) 100%) !important;
             border-radius: 30px; 
-            border: none;
-            
-            /* Text Styling */
-            color: #ffffff;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             cursor: pointer;
-            box-shadow: 0 4px 20px rgba(46, 204, 113, 0.4);
-            
-            /* Font adjustments */
             font-size: 1.1em; 
             font-weight: 700;
             line-height: 1.2;
@@ -349,13 +376,14 @@
         }
 
         #btn-craft-action:disabled {
-            background: #2c3e50;
-            color: #7f8c8d;
-            box-shadow: none;
+            background: rgba(255, 255, 255, 0.05) !important;
+            color: rgba(255, 255, 255, 0.3) !important;
+            border-color: transparent !important;
+            box-shadow: none !important;
+            backdrop-filter: none;
             cursor: not-allowed;
         }
 
-        /* Ensure the success text inside button is styled */
         .craft-btn-subtext {
             font-size: 0.75em; 
             font-weight: 500; 
@@ -363,14 +391,12 @@
             margin-top: 2px;
         }
 
-        /* Animation Modal Sizing - Match other modals */
         #craft-modal .modal-content {
             background: #094d4f;
             background: radial-gradient(circle,rgba(9, 77, 79, 1) 0%, rgba(0, 20, 16, 1) 100%);
             height: 90vh;
         }
 
-        /* Rest of Craft Styles (Slots, etc) */
         .craft-slots-area { position: relative; width: 300px; height: 300px; margin-top: 20px; }
         .craft-center-progress {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -413,14 +439,12 @@
         .prob-pill { display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 20px; color: #fff; font-size: 0.85em; }
         .prob-dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); }
 
-        /* Selection Grid */
         .craft-select-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
         .craft-select-item { position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 1/1; background: var(--tg-theme-secondary-bg-color); border: 2px solid transparent; }
         .craft-select-item.selected { border-color: #3e97f0; background: rgba(62, 151, 240, 0.2); }
         .craft-select-item img { width: 100%; height: 100%; object-fit: contain; }
         .rarity-badge { position: absolute; top: 4px; left: 4px; background: rgba(0,0,0,0.6); color: #fff; font-size: 0.7em; padding: 2px 6px; border-radius: 4px; }
 
-        /* CUBE & BURNING ANIMATION */
         .cube-wrapper { width: 150px; height: 150px; perspective: 600px; margin: 0 auto; position: relative; }
         .cube { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transform: translateZ(-75px); }
         .cube.spinning { animation: spinCube 3s cubic-bezier(0.1, 0.7, 0.1, 1) forwards; }
@@ -440,7 +464,7 @@
         }
 
         #craft-anim-modal .cube-wrapper {
-            margin-bottom: 30px; /* Space between cube and text */
+            margin-bottom: 30px; 
             flex-shrink: 0;
         }
 
@@ -470,7 +494,6 @@
             50% { filter: brightness(3) sepia(1) hue-rotate(-30deg) blur(2px); opacity: 0.8; }
             100% { filter: grayscale(1) brightness(0.2) blur(10px); opacity: 0; transform: scale(0.5) translateZ(-75px) translateY(50px); }
         }
-</style>
     </style>
 </head>
 <body>
@@ -485,7 +508,6 @@
 </div>
 
 <div class="app-container">
-    <!-- Profile Page -->
     <div id="profile-page" class="page">
         <div class="page-header">
             <h2>Profile</h2>
@@ -527,7 +549,6 @@
         <div class="gifts-grid" id="inventory-grid"></div>
     </div>
 
-    <!-- Shop Page -->
     <div id="shop-page" class="page">
         <div class="page-header">
             <h2>Gift Shop</h2>
@@ -560,8 +581,8 @@
                 </label>
             </div>
             <div style="padding: 20px; display: flex; flex-direction: column; gap: 10px;">
-                <button class="modal-button" style="width:100%; background: var(--app-accent-blue);" onclick="startSelectionMode('hide')">Select & Hide Multiple</button>
-                <button class="modal-button secondary" style="width:100%; color: #ff595a;" onclick="resetAppData()">Reset All Data</button>
+                <button class="modal-button" style="width:100%;" onclick="startSelectionMode('hide')">Select & Hide Multiple</button>
+                <button class="modal-button secondary" style="width:100%; color: #ff595a !important;" onclick="resetAppData()">Reset All Data</button>
             </div>
         </div>
         <div class="modal-buttons-footer">
@@ -570,43 +591,129 @@
     </div>
 </div>
 
+<!-- Redesigned as "Gift Sending" Layout -->
 <div id="qty-modal" class="modal-overlay">
-    <div class="modal-content" style="max-height: auto;">
-        <div class="modal-header-bar">Buy Multiple</div>
-        <div class="modal-scrollable-content" style="padding: 20px;">
-            <p style="margin-bottom: 10px; color: var(--tg-theme-hint-color);">Enter quantity:</p>
-            <input type="number" id="qty-input" value="1" min="1" max="1000">
-        </div>
-        <div class="modal-buttons-footer">
-            <button class="modal-button" onclick="handleBuyMultiple()">Buy</button>
-            <!-- Removed Cancel Button -->
-        </div>
-    </div>
-</div>
-
-<div id="detail-modal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header-bar"><span id="detail-title">Gift</span></div>
-        <div class="modal-scrollable-content" style="padding: 20px; text-align: center;">
-            <div class="image-container" style="width: 160px; height: 160px; margin: 0 auto;">
-                <img id="detail-image" src="" style="display:none; width: 100%; height: 100%; object-fit: contain;">
-                <div id="detail-lottie" class="lottie-wrapper"></div>
+    <div class="modal-content" style="background-color: var(--tg-theme-bg-color); border-radius: 20px 20px 0 0; padding-bottom: 20px;">
+        <div style="padding: 20px; display: flex; flex-direction: column; align-items: center; position: relative;">
+            
+            <h3 style="font-size: 14px; font-weight: normal; margin-bottom: 15px; color: var(--tg-theme-text-color);">You bought a gift for Free</h3>
+            
+            <div style="background: var(--tg-theme-secondary-bg-color); border-radius: 16px; width: 100%; padding: 25px 20px; text-align: center; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="position: absolute; top: 15px; right: -35px; transform: rotate(45deg); background: linear-gradient(180deg, #2b3a5c 0%, #151d30 100%); color: white; font-size: 10px; padding: 4px 40px; font-weight: bold; text-transform: uppercase;">1 of 3,000</div>
+                <img id="qty-modal-img" src="" style="width: 90px; height: 90px; margin: 0 auto; display: block; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));">
+                <h2 style="margin-top: 15px; font-size: 20px; font-weight: 600;">Saved Gift</h2>
+                <p style="color: var(--tg-theme-hint-color); font-size: 14px; margin-top: 8px; line-height: 1.4;">Add this gift to your profile or<br>convert it to Free</p>
+                <button class="modal-button secondary" style="margin-top: 15px; padding: 8px 24px; border-radius: 20px; width: auto; font-size: 14px;">View</button>
             </div>
-            <p style="color: var(--tg-theme-hint-color); margin-top: 15px; line-height: 1.5;" id="detail-desc">
-                This is a regular gift. Upgrade it to make it a unique collectible!
-            </p>
-        </div>
-        <div class="modal-buttons-footer">
-            <button class="modal-button" id="btn-upgrade" onclick="handleUpgrade()">Upgrade</button>
-            <!-- Removed Close Button -->
+            
+            <input type="number" id="qty-input" placeholder="Enter Quantity" value="1" min="1" max="1000" style="width: 100%; background: var(--tg-theme-secondary-bg-color); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 16px; margin-top: 15px; color: var(--tg-theme-text-color); outline: none; font-size: 15px;">
+            
+            <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; background: var(--tg-theme-secondary-bg-color); padding: 16px; border-radius: 12px; margin-top: 15px; border: 1px solid rgba(255,255,255,0.05);">
+                <span style="font-size: 16px; font-weight: 500;">Hide My Name</span>
+                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+            </div>
+            <p style="color: var(--tg-theme-hint-color); font-size: 13px; margin-top: 8px; text-align: left; width: 100%; padding-left: 5px;">Hide my name and message from visitors to my profile.</p>
+
+            <div style="width: 100%; display: flex; justify-content: space-between; background: rgba(62,151,240,0.2); color: var(--tg-theme-link-color); padding: 12px 16px; border-radius: 12px; margin-top: 20px; font-weight: 600; font-size: 14px; border: 1px solid rgba(62,151,240,0.3);">
+                <span>2,872 left</span>
+                <span>127 sold</span>
+            </div>
+            <p style="color: var(--tg-theme-hint-color); font-size: 13px; margin-top: 8px; text-align: left; width: 100%; padding-left: 5px;">Once all the gifts are sold, you will no longer be able to purchase them.</p>
+
+            <button class="big-rounded-btn" onclick="handleBuyMultiple()" style="width: 100%; margin-top: 20px; font-size: 16px; padding: 16px;">Buy gift for Free</button>
         </div>
     </div>
 </div>
 
-<!-- COLLECTIBLE / ROULETTE MODAL -->
+<!-- Redesigned as "Non-Unique Gift" Modal -->
+<div id="detail-modal" class="modal-overlay">
+    <div class="modal-content" style="background-color: var(--tg-theme-secondary-bg-color); border-radius: 20px 20px 0 0; padding-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; padding: 15px 20px;">
+            <div onclick="closeModal('detail-modal')" style="background: rgba(255,255,255,0.1); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;">✕</div>
+            <div style="background: rgba(255,255,255,0.1); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;">•••</div>
+        </div>
+        
+        <div style="padding: 0 20px 20px; display: flex; flex-direction: column; align-items: center;">
+            <div style="position: relative; width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+                <div style="position: absolute; width: 100px; height: 100px; background: radial-gradient(circle, rgba(139,195,74,0.4) 0%, transparent 70%); filter: blur(20px); border-radius: 50%;"></div>
+                <img id="detail-image" src="" style="display:none; width: 100%; height: 100%; object-fit: contain; position: relative; z-index: 2; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));">
+                <div id="detail-lottie" class="lottie-wrapper" style="position: relative; z-index: 2; width: 100%; height: 100%;"></div>
+            </div>
+            
+            <h2 id="detail-title" style="font-size: 22px; font-weight: 700; color: var(--tg-theme-text-color);">Saved Gift</h2>
+            <p style="color: var(--tg-theme-text-color); font-size: 15px; margin-top: 8px; text-align: center; max-width: 80%;">You can add this gift to your Profile or convert it to Free.</p>
+            
+            <div style="background: var(--tg-theme-bg-color); border-radius: 14px; width: 100%; margin-top: 25px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="display: flex; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <span style="color: var(--tg-theme-hint-color); font-size: 15px;">Date</span>
+                    <span style="color: var(--tg-theme-text-color); font-size: 15px; font-weight: 500;">Just now</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <span style="color: var(--tg-theme-hint-color); font-size: 15px;">Value</span>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="color: var(--tg-theme-text-color); font-size: 15px; font-weight: 500;">Free</span>
+                        <span style="background: rgba(62,151,240,0.15); color: #3e97f0; padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 600;">Sell for Free</span>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <span style="color: var(--tg-theme-hint-color); font-size: 15px;">Availability</span>
+                    <span style="color: var(--tg-theme-text-color); font-size: 15px; font-weight: 500;">3 671 of 4 908 left</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 14px 16px;">
+                    <span style="color: var(--tg-theme-hint-color); font-size: 15px;">Status</span>
+                    <span style="color: var(--tg-theme-text-color); font-size: 15px; font-weight: 500;">Non-unique</span>
+                </div>
+            </div>
+
+            <p style="color: var(--tg-theme-hint-color); font-size: 14px; margin-top: 16px; margin-bottom: 24px;">This gift is visible on your profile. <span style="color: #3e97f0; cursor: pointer;">Hide ></span></p>
+
+            <button class="big-rounded-btn" id="btn-upgrade" onclick="handleUpgrade()" style="width: 100%; font-size: 16px; padding: 16px;">Upgrade</button>
+        </div>
+    </div>
+</div>
+
+<!-- NEW: "Before Upgrade" Modal Layout -->
+<div id="before-upgrade-modal" class="modal-overlay">
+    <div class="modal-content" style="background: var(--tg-theme-secondary-bg-color); height: 90vh; border-radius: 20px 20px 0 0;">
+        <div style="background: linear-gradient(180deg, #4dc9c6 0%, #35989b 100%); padding: 40px 20px 30px; text-align: center; position: relative; overflow: hidden;">
+            <div style="position: absolute; top:0; left:0; width:100%; height:100%; opacity:0.1; background-image: radial-gradient(#fff 10%, transparent 10%); background-size: 20px 20px;"></div>
+            <img src="https://cdn.changes.tg/gifts/originals/kissed_frog/Original.png" id="before-upgrade-img" style="width: 120px; height: 120px; position: relative; z-index: 2; margin: 0 auto; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));">
+            <h2 style="color: white; font-size: 24px; font-weight: 600; margin-top: 15px; position: relative; z-index: 2;">Upgrade Gifts</h2>
+            <p style="color: rgba(255,255,255,0.9); font-size: 15px; margin-top: 10px; position: relative; z-index: 2; line-height: 1.4;">Turn your gift into a unique collectible that you can sell or keep for yourself.</p>
+        </div>
+        
+        <div style="padding: 25px 20px;">
+            <div style="display: flex; gap: 15px; margin-bottom: 25px;">
+                <div style="color: #3e97f0; font-size: 24px;">💎</div>
+                <div>
+                    <h4 style="font-size: 16px; margin-bottom: 4px; color: var(--tg-theme-text-color);">Unique</h4>
+                    <p style="color: var(--tg-theme-hint-color); font-size: 14px; line-height: 1.4;">Get a unique number, model, backdrop and a symbol for your gift.</p>
+                </div>
+            </div>
+            <div style="display: flex; gap: 15px; margin-bottom: 25px;">
+                <div style="color: #3e97f0; font-size: 24px;">🔄</div>
+                <div>
+                    <h4 style="font-size: 16px; margin-bottom: 4px; color: var(--tg-theme-text-color);">Transferable</h4>
+                    <p style="color: var(--tg-theme-hint-color); font-size: 14px; line-height: 1.4;">You can share a collector's gift with any friend at the library.</p>
+                </div>
+            </div>
+            <div style="display: flex; gap: 15px; margin-bottom: 25px;">
+                <div style="color: #3e97f0; font-size: 24px;">⚖️</div>
+                <div>
+                    <h4 style="font-size: 16px; margin-bottom: 4px; color: var(--tg-theme-text-color);">Tradable</h4>
+                    <p style="color: var(--tg-theme-hint-color); font-size: 14px; line-height: 1.4;">A gift can be sold, saved in the profile, or hidden.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div style="padding: 20px; margin-top: auto;">
+            <button class="big-rounded-btn" onclick="closeModal('before-upgrade-modal')" style="width: 100%; font-size: 16px; padding: 16px;">Processing...</button>
+        </div>
+    </div>
+</div>
+
 <div id="collectible-modal" class="modal-overlay">
     <div class="modal-content" style="background-color: var(--tg-theme-bg-color);">
-        <!-- Top Gradient Section -->
         <div id="collectible-header" class="collectible-header">
             <div id="collectible-pattern-container" class="dynamic-pattern-container"></div>
             <div style="position: relative; z-index: 2; width: 100%; display: flex; flex-direction: column; align-items: center;">
@@ -620,10 +727,8 @@
             </div>
         </div>
 
-        <!-- Scrollable Content with Table -->
         <div class="modal-scrollable-content" style="padding: 16px;">
             <div class="stats-table">
-                <!-- Owner -->
                 <div class="stat-row">
                     <div class="stat-label">Owner</div>
                     <div class="stat-value owner-chip">
@@ -631,7 +736,6 @@
                         <span id="col-owner-name">User</span>
                     </div>
                 </div>
-                <!-- Model -->
                 <div class="stat-row">
                     <div class="stat-label">Model</div>
                     <div class="stat-value">
@@ -639,7 +743,6 @@
                         <span class="percentage-pill" id="col-model-pct">0%</span>
                     </div>
                 </div>
-                <!-- Symbol -->
                 <div class="stat-row">
                     <div class="stat-label">Symbol</div>
                     <div class="stat-value">
@@ -647,7 +750,6 @@
                         <span class="percentage-pill" id="col-symbol-pct">0%</span>
                     </div>
                 </div>
-                <!-- Backdrop -->
                 <div class="stat-row">
                     <div class="stat-label">Backdrop</div>
                     <div class="stat-value">
@@ -655,23 +757,20 @@
                         <span class="percentage-pill" id="col-backdrop-pct">0%</span>
                     </div>
                 </div>
-                <!-- Quantity -->
                 <div class="stat-row">
                     <div class="stat-label">Quantity</div>
                     <div class="stat-value" id="col-quantity">100/1000 issued</div>
                 </div>
-                <!-- Value -->
                 <div class="stat-row">
                     <div class="stat-label">Value</div>
                     <div class="stat-value" style="color: var(--tg-theme-link-color);">
-                        <span id="col-value">~10 TON</span> 
+                        <span id="col-value">Free</span> 
                         <span class="learn-more">learn more</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Footer -->
         <div class="modal-buttons-footer" style="padding-top: 0; background: var(--tg-theme-bg-color);">
             <button id="btn-collectible-action" class="big-rounded-btn" onclick="closeModal('collectible-modal')">OK</button>
         </div>
@@ -682,21 +781,16 @@
     <div class="modal-content">
         <div class="modal-header-bar">Customize</div>
         
-        <!-- Queue Bar -->
         <div class="queue-bar" id="cust-queue-bar"></div>
         
         <div class="modal-scrollable-content" style="padding: 0; background: var(--tg-theme-secondary-bg-color);">
             
-            <!-- Base Gift Selection -->
             <div class="filter-section">
                 <h4>Select Base Gift</h4>
                 <div class="filter-options-grid" id="cust-base-grid"></div>
             </div>
 
-            <!-- Parts Selection Container -->
             <div id="cust-parts-container" class="hidden">
-                
-                <!-- Model Grid -->
                 <div class="filter-section">
                     <div style="display:flex; justify-content:space-between; align-items:center; padding-right: 4px;">
                         <h4>Select Model</h4>
@@ -705,7 +799,6 @@
                     <div class="filter-options-grid" id="cust-model-grid"></div>
                 </div>
 
-                <!-- Backdrop Grid -->
                 <div class="filter-section">
                     <div style="display:flex; justify-content:space-between; align-items:center; padding-right: 4px;">
                         <h4>Select Backdrop</h4>
@@ -714,7 +807,6 @@
                     <div class="filter-options-grid" id="cust-backdrop-grid"></div>
                 </div>
 
-                <!-- Pattern Grid -->
                 <div class="filter-section">
                     <div style="display:flex; justify-content:space-between; align-items:center; padding-right: 4px;">
                         <h4>Select Symbol (Optional)</h4>
@@ -723,16 +815,13 @@
                     <div class="filter-options-grid" id="cust-pattern-grid"></div>
                 </div>
 
-                <!-- NEW: Bulk / Random Controls -->
                 <div id="cust-bulk-controls" style="margin: 20px 15px 30px 15px; background: var(--tg-theme-bg-color); border-radius: 12px; overflow: hidden;">
                     
-                    <!-- Quantity Row -->
                     <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 16px; border-bottom:1px solid rgba(0,0,0,0.05);">
                         <span style="font-weight:500; font-size: 0.95em;">Quantity</span>
                         <input type="number" id="cust-qty" value="1" min="1" max="1000" oninput="updateCreateButton()" style="width:80px; padding:8px; border-radius:8px; border:none; background:var(--tg-theme-secondary-bg-color); color:var(--tg-theme-text-color); text-align:center; font-weight:bold; font-size:1.1em; outline:none;">
                     </div>
                     
-                    <!-- Random Model Switch -->
                     <div class="switch-row" style="border-bottom:1px solid rgba(0,0,0,0.05); padding: 12px 16px;">
                         <span style="font-size: 0.95em;">Random Model</span>
                         <label class="switch">
@@ -741,7 +830,6 @@
                         </label>
                     </div>
                     
-                    <!-- Random Backdrop Switch -->
                     <div class="switch-row" style="border-bottom:1px solid rgba(0,0,0,0.05); padding: 12px 16px;">
                         <span style="font-size: 0.95em;">Random Backdrop</span>
                         <label class="switch">
@@ -750,7 +838,6 @@
                         </label>
                     </div>
                     
-                    <!-- Random Pattern Switch (Default Checked) -->
                     <div class="switch-row" style="border:none; padding: 12px 16px;">
                         <span style="font-size: 0.95em;">Random Symbol</span>
                         <label class="switch">
@@ -759,7 +846,6 @@
                         </label>
                     </div>
                 </div>
-
             </div>
         </div>
         
@@ -769,7 +855,6 @@
     </div>
 </div>
 
-<!-- CRAFTING MAIN MODAL -->
 <div id="craft-modal" class="modal-overlay">
     <div class="modal-content" style="height: 90vh; color: white;">
         <div class="modal-header-bar" style="background:transparent; border:none; color:white;">
@@ -778,9 +863,7 @@
         </div>
         
         <div class="craft-container">
-            <!-- Central Crafting Area -->
             <div class="craft-slots-area">
-                <!-- Center Progress -->
                 <div class="craft-center-progress">
                     <svg class="craft-svg-circle" viewBox="0 0 100 100">
                         <circle class="craft-bg-circle" cx="50" cy="50" r="45"></circle>
@@ -790,7 +873,6 @@
                     <div class="craft-pct-text" id="craft-chance-text">0%</div>
                 </div>
 
-                <!-- 4 Slots -->
                 <div class="craft-slot top-left" id="slot-0" onclick="openCraftSelect()">
                     <span class="add-icon">+</span>
                 </div>
@@ -814,10 +896,8 @@
                     If crafting fails, all selected gifts will be consumed.
                 </p>
                 
-                <!-- Backdrop Probabilities -->
                 <div class="craft-probability-row" id="craft-probs"></div>
             </div>
-            <!-- Add this before the "Craft Gift" button -->
             <div id="craft-mix-container" class="switch-row" style="background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 15px; width: 90%; opacity: 0.5; pointer-events: none; padding: 12px 16px; border: none;">
                 <span style="font-size: 0.95em;">Backdrop Mixing</span>
                 <label class="switch">
@@ -832,7 +912,6 @@
     </div>
 </div>
 
-<!-- CRAFT SELECTION MODAL -->
 <div id="craft-select-modal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header-bar">Select Gifts</div>
@@ -845,7 +924,6 @@
     </div>
 </div>
 
-<!-- ANIMATION MODAL -->
 <div id="craft-anim-modal" class="modal-overlay" style="z-index: 2000; background: rgba(14, 22, 33, 0.95);">
     <div class="modal-content" style="background: transparent; align-items: center; justify-content: center; box-shadow:none;">
         <div class="cube-wrapper">
@@ -863,20 +941,15 @@
     </div>
 </div>
 
-<!-- FAILURE MODAL -->
 <div id="failure-modal" class="modal-overlay">
     <div class="modal-content" style="background-color: #1c1c1e; color: white; height: auto; min-height: 60vh; border-radius: 16px;">
-        
-        <!-- Header -->
         <div class="modal-header-bar" style="background: transparent; border: none; display: flex; justify-content: space-between; align-items: center; padding: 16px;">
             <div onclick="closeModal('failure-modal')" style="cursor: pointer; background: rgba(255,255,255,0.1); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">✕</div>
             <span style="font-weight: 600; font-size: 1.1em;">Crafting Gift</span>
-            <div style="width: 32px;"></div> <!-- Spacer -->
+            <div style="width: 32px;"></div>
         </div>
 
         <div class="modal-scrollable-content" style="display: flex; flex-direction: column; align-items: center; padding: 20px 20px 40px;">
-            
-            <!-- Central Icon -->
             <div style="width: 100px; height: 100px; background: #3a2525; border-radius: 24px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; position: relative;">
                 <div class="craft-anvil-icon" style="background-color: #ff595a; transform: scale(1.5);"></div>
                 <div style="position: absolute; bottom: -10px; background: #3a2525; padding: 2px 8px; border-radius: 10px; font-weight: bold; font-size: 0.9em; border: 2px solid #1c1c1e;">
@@ -884,28 +957,21 @@
                 </div>
             </div>
 
-            <!-- Text -->
             <h2 style="color: #ff595a; margin: 0 0 10px 0; font-weight: 700; font-size: 1.5em;">Unsuccessful attempt</h2>
             <p style="text-align: center; color: #8e8e93; font-size: 0.95em; line-height: 1.4; margin: 0 0 30px 0;">
                 The crafting attempt failed.<br>
                 <span id="fail-count-text">4</span> gifts were lost.
             </p>
 
-            <!-- Lost Items Grid -->
-            <div id="failed-items-grid" style="display: flex; justify-content: center; gap: 12px; margin-bottom: 40px; width: 100%;">
-                <!-- Items injected here -->
-            </div>
+            <div id="failed-items-grid" style="display: flex; justify-content: center; gap: 12px; margin-bottom: 40px; width: 100%;"></div>
 
-            <!-- Button -->
-            <button onclick="retryCrafting()" style="width: 100%; background: #ffffff; color: #000000; font-weight: 600; font-size: 1.1em; padding: 16px; border-radius: 12px; border: none; cursor: pointer;">
+            <button onclick="retryCrafting()" class="big-rounded-btn" style="width: 100%; background: #ffffff; color: #000000;">
                 Craft Again
             </button>
-
         </div>
     </div>
 </div>
 
-<!-- Menus -->
 <div id="long-press-menu" class="hidden">
     <ul>
         <li id="menu-pin" onclick="togglePin()">Pin to Profile</li>
@@ -1071,7 +1137,7 @@
                 const imgUrl = cd.model.isCustom ? cd.model.imageUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/png/${encodeURIComponent(cd.model.name)}.png`;
                 if (state.settings.animations) { visualHtml = `<div class="lottie-wrapper" id="lot-${gift.uniqueId}"></div>`; setTimeout(() => playLottie(`lot-${gift.uniqueId}`, cd.model.isCustom ? cd.model.lottieUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/lottie/${encodeURIComponent(cd.model.name)}.json`), 0); } 
                 else visualHtml = `<img src="${imgUrl}" loading="lazy">`;
-                el.innerHTML = `${topIcon}<div class="top-right-label">#${gift.collectibleNumber}</div><div class="gift-card-bg-pattern" style="background:${bgStyle}"></div><div class="dynamic-pattern-container" id="pat-${gift.uniqueId}"></div><div class="image-container">${visualHtml}</div>`; 
+                el.innerHTML = `${topIcon}<div class="top-right-label" style="--label-edge: ${cd.backdrop.hex.edgeColor}; --label-center: ${cd.backdrop.hex.centerColor};">#${gift.collectibleNumber}</div>...`;
                 setTimeout(() => generatePattern(`pat-${gift.uniqueId}`, cd.pattern, gift.name, true, cd.backdrop.hex.patternColor), 0);
                 if (!appRuntime.selectionMode) el.onclick = () => openCollectibleModal(gift, false);
             } else {
@@ -1095,7 +1161,14 @@
     function startShopLongPress(e, id, name) { appRuntime.longPressTimer = setTimeout(() => { haptic('medium'); openQtyModal(id, name); }, 500); }
     function startInventoryLongPress(e, gift) { appRuntime.longPressTimer = setTimeout(() => { haptic('medium'); openMenu(e.touches[0], gift); }, 500); }
     function cancelLongPress() { clearTimeout(appRuntime.longPressTimer); }
-    function openQtyModal(id, name) { appRuntime.shopGiftData = { id, name }; document.getElementById('qty-modal').classList.add('active'); document.getElementById('qty-input').value = 1; tg.BackButton.show(); tg.BackButton.onClick(() => closeModal('qty-modal')); }
+    function openQtyModal(id, name) { 
+        appRuntime.shopGiftData = { id, name }; 
+        document.getElementById('qty-modal-img').src = `${CDN_BASE}originals/${id}/Original.png`; // Added for UI updates
+        document.getElementById('qty-modal').classList.add('active'); 
+        document.getElementById('qty-input').value = 1; 
+        tg.BackButton.show(); 
+        tg.BackButton.onClick(() => closeModal('qty-modal')); 
+    }
     function handleBuyMultiple() { const qty = parseInt(document.getElementById('qty-input').value); if(qty>0) buyGift(appRuntime.shopGiftData.id, appRuntime.shopGiftData.name, qty); closeModal('qty-modal'); }
 
     // --- UPGRADE SYSTEM ---
@@ -2145,55 +2218,49 @@
         btn.innerText = "Creating...";
     
         const qtyInput = parseInt(document.getElementById('cust-qty').value) || 1;
-        // Check checkboxes
         const isRandomModel = document.getElementById('cb-rnd-model').checked;
         const isRandomBackdrop = document.getElementById('cb-rnd-backdrop').checked;
         const isRandomPattern = document.getElementById('cb-rnd-pattern').checked;
     
-        // Loop through every item in the customization queue
         for (const q of customizationQueue) {
             if(!q.id) continue;
     
-            // BUG FIX: Ensure parts are loaded even if user didn't click the tab
             let partsPool = cachedParts[q.id];
             if (!partsPool) {
                 partsPool = await fetchGiftParts(q.name);
                 cachedParts[q.id] = partsPool;
             }
     
-            // Logic: If queue has 1 item, use the input box quantity. 
-            // If queue has multiple items, create 1 of each.
             const loopCount = customizationQueue.length === 1 ? qtyInput : 1;
     
             for (let i = 0; i < loopCount; i++) {
                 
-                // 1. Determine Model
                 let finalModel = q.parts.model;
-                // Apply random if: Checkbox is checked OR model wasn't manually selected
                 if (!finalModel || (customizationQueue.length === 1 && isRandomModel)) {
                     const validModels = partsPool.models.filter(m => !m.crafted);
                     const pool = validModels.length > 0 ? validModels : partsPool.models;
                     finalModel = pool[Math.floor(Math.random() * pool.length)];
                 }
     
-                // 2. Determine Backdrop
                 let finalBackdrop = q.parts.backdrop;
                 if (!finalBackdrop || (customizationQueue.length === 1 && isRandomBackdrop)) {
                     finalBackdrop = partsPool.backdrops[Math.floor(Math.random() * partsPool.backdrops.length)];
                 }
     
-                // 3. Determine Pattern
                 let finalPattern = q.parts.pattern;
+                // Bug Fix: Check if patterns exist before attempting Randomization
                 if (!finalPattern || (customizationQueue.length === 1 && isRandomPattern)) {
-                    finalPattern = partsPool.patterns[Math.floor(Math.random() * partsPool.patterns.length)];
+                    if (partsPool.patterns && partsPool.patterns.length > 0) {
+                        finalPattern = partsPool.patterns[Math.floor(Math.random() * partsPool.patterns.length)];
+                    }
                 }
     
-                // If we still fail to find a part (rare error), skip
-                if(!finalModel || !finalBackdrop || !finalPattern) continue;
+                // Bug Fix: Do not fail creation if pattern is missing (since symbols are optional)
+                if(!finalModel || !finalBackdrop) continue;
     
                 state.lastCollectibleNumber++; 
                 state.inventory.unshift({ 
-                    uniqueId: Date.now() + Math.random(), 
+                    uniqueId: Date.now() + i + Math.random(), // Bug Fix: added loop index `i` for full uniqueness
                     originalId: q.id, 
                     name: q.name, 
                     isCollectible: true, 
@@ -2203,7 +2270,7 @@
                     collectibleData: { 
                         model: finalModel, 
                         backdrop: finalBackdrop, 
-                        pattern: finalPattern 
+                        pattern: finalPattern || { name: 'None', rarityPermille: 1000 } // Safe fallback if no pattern exists
                     } 
                 }); 
             }
