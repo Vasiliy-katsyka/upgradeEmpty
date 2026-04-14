@@ -18,7 +18,10 @@
             --tg-theme-button-text-color: #ffffff;
             --tg-theme-secondary-bg-color: #17212b;
             --app-accent-blue: #5288c1;
+            
             --app-modal-backdrop-color: rgba(0,0,0,0.8);
+            --app-rarity-chip-bg: rgba(62, 188, 249, 0.15);
+            --app-rarity-text: #62bcf9;
             --app-profile-gradient-fallback: var(--tg-theme-secondary-bg-color);
         }
 
@@ -52,147 +55,226 @@
         }
 
         .profile-top-section.has-worn-gift .profile-name-status h1,
-        .profile-top-section.has-worn-gift .profile-name-status p { color: #ffffff !important; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+        .profile-top-section.has-worn-gift .profile-name-status p {
+            color: #ffffff !important;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
         
-        #profile-pattern-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; pointer-events: none; opacity: 0.15; }
-        .profile-pattern-item { position: absolute; width: 30px; height: 30px; left: 50%; top: 50%; background-color: currentColor; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
+        #profile-pattern-overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            overflow: hidden; pointer-events: none; opacity: 0.15;
+        }
+        
+        .profile-pattern-item {
+            position: absolute; width: 30px; height: 30px;
+            left: 50%; top: 50%;
+            background-color: currentColor; 
+            -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+        }
 
         .profile-main-info { display: flex; flex-direction: column; align-items: center; z-index: 2; position: relative; }
-        .profile-avatar { width: 100px; height: 100px; border-radius: 50%; background-color: var(--tg-theme-hint-color); margin-bottom: 12px; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-        .profile-name-status h1 { font-size: 1.4em; font-weight: 700; text-align: center; margin: 0 0 4px 0; }
+        .profile-avatar {
+            width: 100px; height: 100px; border-radius: 50%;
+            background-color: var(--tg-theme-hint-color); margin-bottom: 12px;
+            object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .profile-name-status h1 { font-size: 1.4em; font-weight: 700; text-align: center; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.5px; }
         .profile-name-status p { font-size: 0.9em; opacity: 0.7; text-align: center; margin: 0; color: var(--tg-theme-text-color); }
 
         .profile-info-block { padding: 20px 20px; background-color: var(--tg-theme-bg-color); }
         .profile-info-header { color: var(--tg-theme-link-color); font-weight: 500; font-size: 0.95em; margin-bottom: 15px; }
         .info-item { margin-bottom: 18px; cursor: default; }
-        .info-item .value { color: var(--tg-theme-text-color); font-size: 1.1em; display: block; margin-bottom: 2px; }
+        .info-item .value { color: var(--tg-theme-text-color); font-size: 1.1em; display: block; margin-bottom: 2px; line-height: 1.2;}
         .info-item .label { color: var(--tg-theme-hint-color); font-size: 0.85em; }
+        .info-item .clickable { cursor: pointer; }
 
-        .profile-tabs { display: flex; justify-content: space-around; background-color: var(--tg-theme-bg-color); border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .profile-tabs button { background: none; border: none; color: var(--tg-theme-hint-color); padding: 14px 10px; font-size: 0.95em; cursor: pointer; flex-grow: 1; font-weight: 500; border-bottom: 2px solid transparent; text-transform: uppercase; }
+        .profile-tabs { display: flex; justify-content: space-around; background-color: var(--tg-theme-bg-color); border-bottom: 1px solid #000; }
+        .profile-tabs button {
+            background: none; border: none; color: var(--tg-theme-hint-color);
+            padding: 14px 10px; font-size: 0.95em; cursor: pointer; flex-grow: 1;
+            font-weight: 500; border-bottom: 2px solid transparent; text-transform: uppercase;
+        }
         .profile-tabs button.active { color: var(--tg-theme-link-color); border-bottom-color: var(--tg-theme-link-color); }
 
-        .gifts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px; flex-grow: 1; overflow-y: auto; align-content: start; background: var(--tg-theme-bg-color); }
+        .gifts-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px;
+            flex-grow: 1; overflow-y: auto; align-content: start; 
+            background: var(--tg-theme-bg-color);
+        }
         
         .gift-card, .buy-gift-item {
-            background-color: var(--tg-theme-secondary-bg-color); border-radius: 12px; padding: 6px;
+            background-color: var(--tg-theme-secondary-bg-color);
+            border-radius: 12px; padding: 6px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; position: relative; overflow: hidden; transition: transform 0.1s ease-out; border: none; 
+            cursor: pointer; position: relative; overflow: hidden;
+            transition: transform 0.1s ease-out; border: none; 
         }
         .gift-card { aspect-ratio: 1 / 1; }
         .buy-gift-item { aspect-ratio: 1 / 1.35; padding: 8px; }
+        
         .gift-card.selected { box-shadow: inset 0 0 0 3px var(--tg-theme-link-color); background-color: rgba(98, 188, 249, 0.15); }
         .gift-card:active, .buy-gift-item:active { transform: scale(0.97); }
         
-        /* Ribbon & Tags Logic (Matches Screenshots) */
-        .buy-gift-item::before {
-            content: "Limited"; position: absolute; top: 12px; right: -32px; transform: rotate(45deg);
-            background: linear-gradient(to bottom, #0f1c35, #1c3666); color: white; padding: 4px 35px;
-            font-size: 0.65em; font-weight: bold; z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.3); text-align: center;
+        .status-icon {
+            position: absolute; top: 6px; left: 6px; z-index: 5;
+            width: 14px; height: 14px; display: flex; align-items: center; justify-content: center;
         }
-        .top-right-label {
-            position: absolute; top: 12px; right: -32px; transform: rotate(45deg);
-            background: linear-gradient(to bottom, #0f1c35, #1c3666); /* Default fallback */
-            color: white; padding: 4px 35px; font-size: 0.65em; font-weight: bold; z-index: 5; box-shadow: 0 2px 4px rgba(0,0,0,0.3); text-align: center;
-        }
-        .gift-price { background: rgba(255, 255, 255, 0.08); padding: 4px 12px; border-radius: 12px; font-weight: bold; color: #fff; font-size: 0.8em; margin-top: 5px; display: flex; align-items: center; gap: 4px; }
-        .gift-price::before { content: "✨"; font-size: 1.1em; color: #e5b94c; }
-
-        .status-icon { position: absolute; top: 6px; left: 6px; z-index: 5; width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; }
         .status-icon svg { fill: #fff; width: 100%; height: 100%; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8)); }
+
         .gift-card.is-hidden { opacity: 0.4; filter: grayscale(1); }
 
-        .image-container { width: 75%; height: 75%; display: flex; align-items: center; justify-content: center; position: relative; z-index: 2; margin-bottom: 0px; }
+        .image-container {
+            width: 75%; height: 75%; display: flex; align-items: center; justify-content: center;
+            position: relative; z-index: 2; margin-bottom: 0px; 
+        }
         .buy-gift-item .image-container { height: 55%; margin-bottom: 4px; margin-top: 8px; }
         .image-container img, .image-container .lottie-wrapper { max-width: 100%; max-height: 100%; object-fit: contain; }
         .lottie-wrapper { width: 100%; height: 100%; }
         
-        .gift-name { font-size: 0.85em; font-weight: 500; text-align: center; margin-top: 4px; z-index: 2; width: 100%; line-height: 1.2; padding: 0 2px; }
+        .gift-name { font-size: 0.85em; font-weight: 500; text-align: center; margin-top: 4px; z-index: 2; width: 100%; line-height: 1.2; padding: 0 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .gift-price { font-size: 0.8em; color: var(--tg-theme-hint-color); margin: 4px 0 8px; font-weight: bold; z-index: 2;}
         .gift-card-bg-pattern { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0; }
         .dynamic-pattern-container { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1; overflow: hidden; pointer-events: none; }
-        .card-pattern-symbol { position: absolute; width: 30px; height: 30px; left: 50%; top: 50%; background-color: currentColor; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; opacity: 0.15; }
-
-        /* Liquid Glass Buttons & Elements */
-        .glass-btn, .modal-button, .big-rounded-btn, .action-button, #btn-craft-action {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid transparent;
-            background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.02)), 
-                linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0) 70%, rgba(255, 255, 255, 0.4) 100%);
-            background-origin: border-box; background-clip: padding-box, border-box;
-            border-radius: 30px; color: #fff; font-weight: 600; font-size: 1.1em;
-            padding: 14px; width: 100%; text-align: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-            cursor: pointer; transition: transform 0.1s ease-in-out;
+        .card-pattern-symbol { 
+            position: absolute; width: 30px; height: 30px; left: 50%; top: 50%;
+            background-color: currentColor; 
+            -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; opacity: 0.15;
         }
-        .action-button { width: auto; padding: 8px 16px; font-size: 0.9em; border-radius: 20px; }
-        .glass-btn:active, .action-button:active, .modal-button:active { transform: scale(0.97); }
-        .glass-btn.blue, .action-button.blue {
-            background-color: rgba(62, 151, 240, 0.2);
-            background-image: 
-                linear-gradient(rgba(62, 151, 240, 0.1), rgba(62, 151, 240, 0.1)), 
-                linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0) 70%, rgba(255, 255, 255, 0.4) 100%);
+        .top-right-label {
+            position: absolute; top: 12px; right: -32px; transform: rotate(45deg);
+            background: rgba(0,0,0,0.6); color: white; font-size: 0.6em; padding: 2px 35px; z-index: 4; font-weight: 600; letter-spacing: 0.5px;
         }
 
-        /* Modals & Glassmorphism overall */
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--app-modal-backdrop-color); display: flex; align-items: flex-end; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: 0.2s; }
+        .action-button {
+            background-color: var(--tg-theme-button-color); color: var(--tg-theme-button-text-color);
+            border: none; padding: 6px 14px; border-radius: 16px; font-size: 0.9em; cursor: pointer; font-weight: 500;
+        }
+        #action-toolbar {
+            padding: 10px 15px; display: flex; justify-content: flex-end; gap: 10px; background-color: var(--tg-theme-bg-color);
+        }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--app-modal-backdrop-color);
+            display: flex; align-items: flex-end; justify-content: center; z-index: 1000;
+            opacity: 0; visibility: hidden; transition: 0.2s;
+        }
         .modal-overlay.active { opacity: 1; visibility: visible; }
-        .modal-content { background-color: var(--tg-theme-secondary-bg-color); border-top-left-radius: 24px; border-top-right-radius: 24px; width: 100%; max-width: 600px; display: flex; flex-direction: column; overflow: hidden; max-height: 90vh; pointer-events: auto; }
-        
-        .glass-modal {
-            background: rgba(28, 28, 30, 0.65) !important;
-            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-            border-top: 1px solid rgba(255,255,255,0.1); border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05);
+        .modal-content {
+            background-color: var(--tg-theme-secondary-bg-color);
+            border-top-left-radius: 14px; border-top-right-radius: 14px;
+            width: 100%; max-width: 600px; display: flex; flex-direction: column; overflow: hidden;
+            max-height: 90vh;
+            /* To make click outside work better */
+            pointer-events: auto; 
         }
+        #customize-modal .modal-content { height: 90vh; }
 
         .modal-header-bar { padding: 16px; text-align: center; font-weight: 600; font-size: 1.1em; background: var(--tg-theme-secondary-bg-color); position: relative; z-index: 10; }
         .modal-scrollable-content { overflow-y: auto; padding: 0; flex-grow: 1; }
+        
         .modal-buttons-footer { padding: 15px; display: flex; gap: 10px; background: var(--tg-theme-secondary-bg-color); }
-        .close-btn { position: absolute; left: 16px; top: 16px; width: 30px; height: 30px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; color: #fff; backdrop-filter: blur(10px); }
-        .round-btn { width: 36px; height: 36px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff; backdrop-filter: blur(10px); font-weight: bold; }
-
-        /* Screenshot 3 & 5 Stats Tables */
-        .stat-table { background: rgba(255,255,255,0.05); border-radius: 16px; padding: 0 16px; margin: 15px 0; border: 1px solid rgba(255,255,255,0.03); }
-        .stat-table-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.95em; }
-        .stat-table-row:last-child { border-bottom: none; }
-        .stat-label { color: rgba(255,255,255,0.6); }
-        .stat-value { font-weight: 500; color: #fff; display: flex; align-items: center; gap: 8px; }
-        .sell-pill { background: rgba(62, 151, 240, 0.15); color: #62bcf9; padding: 2px 8px; border-radius: 8px; font-size: 0.8em; }
-        .percentage-pill { background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 8px; font-size: 0.8em; }
-        .owner-chip img { width: 20px; height: 20px; border-radius: 50%; }
-        .star-badge { color: #fff; background: #62bcf9; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; display: flex; align-items: center; justify-content: center; margin-left: 4px; }
-
-        /* Upgraded Profile Collectible Action Row */
-        .action-buttons-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 20px; }
-        .action-btn-item {
-            background: rgba(255,255,255,0.08); backdrop-filter: blur(15px); border-radius: 16px;
-            display: flex; flex-direction: column; align-items: center; padding: 12px; cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.05);
+        .modal-button {
+            flex: 1; padding: 12px; border-radius: 30px; border: none; font-size: 1em; font-weight: 600; cursor: pointer;
+            background-color: var(--tg-theme-button-color); color: var(--tg-theme-button-text-color);
         }
-        .action-btn-item svg { width: 24px; height: 24px; margin-bottom: 6px; }
-        .action-btn-item span { font-size: 0.85em; font-weight: 500; color: #fff; }
+        .modal-button.secondary { background-color: var(--tg-theme-bg-color); color: var(--tg-theme-link-color); }
+        
+        /* New Collectible Modal Styles */
+        .collectible-header {
+            position: relative; padding: 40px 0 30px; text-align: center; overflow: hidden;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: #ffffff;
+        }
+        .collectible-header h3 { margin-top: 15px; position: relative; z-index: 2; font-size: 1.5em; margin-bottom: 6px; font-weight: 700; }
+        .collectible-header .sub-header { position: relative; z-index: 2; font-size: 1em; opacity: 0.9; }
 
-        /* Upgrade Features List */
-        .feature-row { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; text-align: left; }
-        .feature-row svg { flex-shrink: 0; width: 24px; height: 24px; stroke: #62bcf9; }
-        .feature-row h4 { margin:0 0 6px 0; font-size:1.05em; color:#fff; font-weight: 600; }
-        .feature-row p { margin:0; font-size:0.9em; color:rgba(255,255,255,0.6); line-height:1.4; }
+        .stats-table {
+            background-color: var(--tg-theme-secondary-bg-color); border-radius: 12px; overflow: hidden; margin-top: 0; margin-bottom: 24px;
+        }
+        .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid rgba(0,0,0,0.1); }
+        .stat-row:last-child { border-bottom: none; }
+        .stat-label { font-weight: 500; color: var(--tg-theme-text-color); font-size: 0.95em; }
+        .stat-value { display: flex; align-items: center; gap: 8px; font-size: 0.95em; color: var(--tg-theme-text-color); }
+        
+        .owner-chip { display: flex; align-items: center; gap: 6px; }
+        .owner-chip img { width: 20px; height: 20px; border-radius: 50%; }
+        .owner-chip span { color: var(--tg-theme-link-color); }
+        
+        .percentage-pill { background-color: var(--app-rarity-chip-bg); color: var(--app-rarity-text); padding: 2px 6px; border-radius: 6px; font-size: 0.8em; font-weight: 600; }
+        .learn-more { font-size: 0.8em; color: var(--tg-theme-link-color); margin-left: 4px; opacity: 0.8; }
+        
+        .big-rounded-btn {
+            width: 100%; background-color: var(--tg-theme-button-color); color: var(--tg-theme-button-text-color);
+            border: none; padding: 14px; border-radius: 30px; font-size: 1.1em; font-weight: 600; cursor: pointer;
+        }
 
-        /* Glow Elements */
-        .glowing-bg .glow-circle { position: absolute; width: 100px; height: 100px; background: rgba(85, 255, 120, 0.4); filter: blur(40px); border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; }
+        /* Roulette Animations */
+        /* Updated: Full Width */
+        .roulette-image-wrapper {
+            width: 100%; height: 160px; position: relative; overflow: hidden; display: flex;
+            align-items: center; justify-content: center;
+        }
+        .roulette-strip {
+            display: flex; height: 100%; position: absolute; left: 0; top: 0;
+            /* Will be animated via JS/Keyframes */
+        }
+        .roulette-strip img {
+            width: 160px; height: 160px; object-fit: contain; flex-shrink: 0;
+        }
+        
+        /* Vertical Text Slot */
+        .slot-mask {
+            height: 1.2em; overflow: hidden; position: relative; display: inline-block; vertical-align: bottom;
+            width: 120px; text-align: right;
+        }
+        .slot-scroll {
+            display: flex; flex-direction: column; position: absolute; top: 0; right: 0; width: 100%;
+            transition: transform 0.1s linear;
+        }
+        .slot-item {
+            height: 1.2em; display: flex; align-items: center; justify-content: flex-end; width: 100%;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
 
-        /* Roulette Core */
-        .roulette-image-wrapper { width: 100%; height: 160px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-        .roulette-strip { display: flex; height: 100%; position: absolute; left: 0; top: 0; }
-        .roulette-strip img { width: 160px; height: 160px; object-fit: contain; flex-shrink: 0; }
-        .slot-mask { height: 1.2em; overflow: hidden; position: relative; display: inline-block; vertical-align: bottom; width: 120px; text-align: right; }
-        .slot-scroll { display: flex; flex-direction: column; position: absolute; top: 0; right: 0; width: 100%; transition: transform 0.1s linear; }
-        .slot-item { height: 1.2em; display: flex; align-items: center; justify-content: flex-end; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        /* Menu */
+        #long-press-menu {
+            position: fixed; background: var(--tg-theme-secondary-bg-color);
+            border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 2000; min-width: 200px; padding: 6px 0; overflow: hidden;
+        }
+        #long-press-menu li { padding: 14px 20px; list-style: none; cursor: pointer; color: var(--tg-theme-text-color); font-size: 1em; font-weight: 500; display:flex; align-items:center; gap: 10px; }
+        #long-press-menu li:hover { background: rgba(255,255,255,0.05); }
+        #long-press-menu li.danger { color: #ff595a; }
 
-        /* Remaining UI elements (Filter options, Queue, Switches) */
-        #action-toolbar { padding: 10px 15px; display: flex; justify-content: flex-end; gap: 10px; background-color: var(--tg-theme-bg-color); }
-        .hidden { display: none !important; }
+        /* Queue Bar */
+        .queue-bar { display: flex; overflow-x: auto; padding: 12px 15px; gap: 8px; background: var(--tg-theme-bg-color); white-space: nowrap; scrollbar-width: none; }
+        .queue-bar::-webkit-scrollbar { display: none; }
+        .queue-chip { 
+            padding: 8px 14px; background: var(--tg-theme-secondary-bg-color); border-radius: 20px; font-size: 0.9em; cursor: pointer; border: 1px solid transparent; 
+            display: flex; align-items: center; gap: 8px; font-weight: 500;
+        }
+        .queue-chip.active { border-color: var(--tg-theme-link-color); background: rgba(98, 188, 249, 0.1); color: var(--tg-theme-link-color); }
+        .queue-chip .close-x { opacity: 0.6; font-size: 1.2em; font-weight: 300; }
+        .add-gift-chip { background: var(--tg-theme-button-color); color: var(--tg-theme-button-text-color); }
+
+        .filter-section { padding: 0 15px; margin-bottom: 20px; }
+        .filter-section h4 { margin: 15px 0 8px; color: var(--tg-theme-hint-color); font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; padding-left: 4px; }
+        
+        .filter-options-grid { 
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; 
+            overflow-y: auto; padding: 4px; max-height: 220px; border-radius: 8px;
+        }
+        .filter-option {
+            background: var(--tg-theme-secondary-bg-color); border-radius: 12px; padding: 10px;
+            cursor: pointer; border: 2px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 100px;
+        }
+        .filter-option.selected { border-color: var(--tg-theme-link-color); background: rgba(98, 188, 249, 0.05); }
+        .filter-option img { width: 55px; height: 55px; object-fit: contain; margin-bottom: 5px; }
+        .filter-option .label { font-size: 0.75em; text-align: center; overflow: hidden; white-space: nowrap; width: 100%; text-overflow: ellipsis;}
+        .gradient-square { width: 55px; height: 55px; border-radius: 50%; margin-bottom: 5px; }
+
         .switch-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid rgba(0,0,0,0.1); font-weight: 500; }
         .switch { position: relative; display: inline-block; width: 50px; height: 30px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -200,41 +282,214 @@
         .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         input:checked + .slider { background-color: var(--tg-theme-button-color); opacity: 1; }
         input:checked + .slider:before { transform: translateX(20px); }
-        
-        .queue-bar { display: flex; overflow-x: auto; padding: 12px 15px; gap: 8px; background: var(--tg-theme-bg-color); white-space: nowrap; scrollbar-width: none; }
-        .queue-chip { padding: 8px 14px; background: var(--tg-theme-secondary-bg-color); border-radius: 20px; font-size: 0.9em; cursor: pointer; border: 1px solid transparent; display: flex; align-items: center; gap: 8px; font-weight: 500; }
-        .queue-chip.active { border-color: var(--tg-theme-link-color); background: rgba(98, 188, 249, 0.1); color: var(--tg-theme-link-color); }
-        .filter-options-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; overflow-y: auto; padding: 4px; max-height: 220px; }
-        .filter-option { background: var(--tg-theme-secondary-bg-color); border-radius: 12px; padding: 10px; cursor: pointer; border: 2px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100px; }
-        .filter-option.selected { border-color: var(--tg-theme-link-color); background: rgba(98, 188, 249, 0.05); }
-        .filter-option img { width: 55px; height: 55px; object-fit: contain; margin-bottom: 5px; }
 
-        /* Crafting Visuals */
-        .craft-container { background: transparent; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 100%; position: relative; }
+        .spinner { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--tg-theme-link-color); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .hidden { display: none !important; }
+        .reordering .gift-card { opacity: 0.5; }
+        .reordering .gift-card[data-pinned="true"] { opacity: 1; cursor: grab; box-shadow: 0 0 0 2px var(--tg-theme-link-color); }
+        
+        #qty-modal input { background: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); border: none; padding: 12px; border-radius: 12px; width: 100%; font-size: 1.4em; text-align: center; margin-bottom: 15px; outline: none; font-weight: bold; }
+
+        /* Loading */
+        .glass-panel { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; animation: glassFloat 4s ease-in-out infinite; }
+        .liquid-blob { position: absolute; border-radius: 50%; filter: blur(50px); opacity: 0.5; z-index: 1; animation: blobFloat 10s infinite alternate; }
+        .blob-1 { width: 200px; height: 200px; background: #007AFF; top: 20%; left: 15%; }
+        .blob-2 { width: 250px; height: 250px; background: #5ac8fa; bottom: 20%; right: 10%; animation-delay: -2s; }
+        @keyframes blobFloat { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(20px, -20px) scale(1.1); } 100% { transform: translate(-20px, 20px) scale(0.9); } }
+        @keyframes glassFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        /* --- CRAFTING MODAL STYLES --- */
+        .craft-header-btn {
+            position: absolute; top: 16px; right: 16px; width: 32px; height: 32px;
+            background-color: rgba(0,0,0,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 10; backdrop-filter: blur(4px);
+        }
+        .craft-icon {
+            width: 20px; height: 20px;
+            -webkit-mask-image: url('https://raw.githubusercontent.com/Vasiliy-katsyka/upgradeEmpty/8e8c2524c119384132502547e562a1d128661cd9/telelakel_tgb_AgADOZMAAsCtWEs.svg');
+            mask-image: url('https://raw.githubusercontent.com/Vasiliy-katsyka/upgradeEmpty/8e8c2524c119384132502547e562a1d128661cd9/telelakel_tgb_AgADOZMAAsCtWEs.svg');
+            -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+            background-color: #ffffff;
+        }
+
+        /* Updated Craft Container Background */
+        .craft-container {
+            background: transparent; 
+            padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 100%;
+            position: relative;
+        }
+
+        /* Green Gradient Button */
+        #btn-craft-action {
+            width: 90%; 
+            height: auto;
+            min-height: 56px;
+            margin: 0 auto 10px auto;
+            
+            /* Exact Gradient: Bright Green to Teal/Cyan */
+            background: linear-gradient(90deg, #4cd964 0%, #29b6f6 100%);
+            
+            /* Fully Rounded Pill Shape */
+            border-radius: 30px; 
+            border: none;
+            
+            /* Text Styling */
+            color: #ffffff;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(46, 204, 113, 0.4);
+            
+            /* Font adjustments */
+            font-size: 1.1em; 
+            font-weight: 700;
+            line-height: 1.2;
+            padding: 12px 20px;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        }
+
+        #btn-craft-action:disabled {
+            background: #2c3e50;
+            color: #7f8c8d;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* Ensure the success text inside button is styled */
+        .craft-btn-subtext {
+            font-size: 0.75em; 
+            font-weight: 500; 
+            opacity: 0.9; 
+            margin-top: 2px;
+        }
+
+        /* Animation Modal Sizing - Match other modals */
+        #craft-modal .modal-content {
+            background: #094d4f;
+            background: radial-gradient(circle,rgba(9, 77, 79, 1) 0%, rgba(0, 20, 16, 1) 100%);
+            height: 90vh;
+        }
+
+        /* Rest of Craft Styles (Slots, etc) */
         .craft-slots-area { position: relative; width: 300px; height: 300px; margin-top: 20px; }
-        .craft-center-progress { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .craft-center-progress {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 120px; height: 120px; display: flex; align-items: center; justify-content: center;
+            flex-direction: column;
+        }
         .craft-svg-circle { transform: rotate(-90deg); width: 100%; height: 100%; }
         .craft-svg-circle circle { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
         .craft-bg-circle { stroke: rgba(255,255,255,0.1); }
         .craft-fg-circle { stroke: #ffffff; }
-        .craft-slot { position: absolute; width: 70px; height: 70px; background: rgba(255,255,255,0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; border: 2px solid transparent; }
-        .craft-slot.top-left { top: 0; left: 0; } .craft-slot.top-right { top: 0; right: 0; } .craft-slot.bottom-left { bottom: 0; left: 0; } .craft-slot.bottom-right { bottom: 0; right: 0; }
+
+        .craft-anvil-icon {
+            position: absolute; width: 50px; height: 50px;
+            -webkit-mask-image: url('https://raw.githubusercontent.com/Vasiliy-katsyka/upgradeEmpty/8e8c2524c119384132502547e562a1d128661cd9/telelakel_tgb_AgADOZMAAsCtWEs.svg');
+            mask-image: url('https://raw.githubusercontent.com/Vasiliy-katsyka/upgradeEmpty/8e8c2524c119384132502547e562a1d128661cd9/telelakel_tgb_AgADOZMAAsCtWEs.svg');
+            -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+            background-color: #ffffff;
+        }
+        .craft-pct-text { position: absolute; bottom: 25px; color: #fff; font-size: 0.9em; font-weight: 700; }
+
+        .craft-slot {
+            position: absolute; width: 70px; height: 70px;
+            background: rgba(255,255,255,0.1); border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; overflow: hidden; border: 2px solid transparent;
+            transition: transform 0.1s;
+        }
+        .craft-slot.top-left { top: 0; left: 0; }
+        .craft-slot.top-right { top: 0; right: 0; }
+        .craft-slot.bottom-left { bottom: 0; left: 0; }
+        .craft-slot.bottom-right { bottom: 0; right: 0; }
         .craft-slot img { width: 100%; height: 100%; object-fit: contain; }
+        .craft-slot .add-icon { font-size: 24px; color: rgba(255,255,255,0.5); }
+        .craft-slot .remove-btn {
+            position: absolute; top: 2px; right: 2px; width: 16px; height: 16px; background: rgba(0,0,0,0.6);
+            border-radius: 50%; color: #fff; font-size: 10px; display: flex; align-items: center; justify-content: center;
+        }
+
+        .craft-probability-row { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; justify-content: center; }
+        .prob-pill { display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 20px; color: #fff; font-size: 0.85em; }
+        .prob-dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); }
+
+        /* Selection Grid */
+        .craft-select-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
+        .craft-select-item { position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 1/1; background: var(--tg-theme-secondary-bg-color); border: 2px solid transparent; }
+        .craft-select-item.selected { border-color: #3e97f0; background: rgba(62, 151, 240, 0.2); }
+        .craft-select-item img { width: 100%; height: 100%; object-fit: contain; }
+        .rarity-badge { position: absolute; top: 4px; left: 4px; background: rgba(0,0,0,0.6); color: #fff; font-size: 0.7em; padding: 2px 6px; border-radius: 4px; }
+
+        /* CUBE & BURNING ANIMATION */
+        .cube-wrapper { width: 150px; height: 150px; perspective: 600px; margin: 0 auto; position: relative; }
+        .cube { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transform: translateZ(-75px); }
+        .cube.spinning { animation: spinCube 3s cubic-bezier(0.1, 0.7, 0.1, 1) forwards; }
+        .cube.burning { animation: burnToAsh 1.5s ease-in forwards; }
+
+        #craft-anim-modal .modal-content {
+            background: linear-gradient(180deg, #18222d 0%, #0e1621 100%) !important;
+            height: 90vh !important;
+            max-height: 90vh !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: none !important;
+            border-top-left-radius: 14px;
+            border-top-right-radius: 14px;
+        }
+
+        #craft-anim-modal .cube-wrapper {
+            margin-bottom: 30px; /* Space between cube and text */
+            flex-shrink: 0;
+        }
+
+        .cube-face {
+            position: absolute; width: 150px; height: 150px;
+            background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2);
+            display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(5px); border-radius: 12px; overflow: hidden;
+        }
+        .cube-face img { width: 80%; height: 80%; object-fit: contain; }
+        .cube-face.front  { transform: rotateY(  0deg) translateZ(75px); }
+        .cube-face.right  { transform: rotateY( 90deg) translateZ(75px); }
+        .cube-face.back   { transform: rotateY(180deg) translateZ(75px); }
+        .cube-face.left   { transform: rotateY(-90deg) translateZ(75px); }
+        .cube-face.top    { transform: rotateX( 90deg) translateZ(75px); }
+        .cube-face.bottom { transform: rotateX(-90deg) translateZ(75px); }
+
+        @keyframes spinCube {
+            0% { transform: translateZ(-75px) rotateX(0deg) rotateY(0deg); }
+            20% { transform: translateZ(-75px) rotateX(-180deg) rotateY(-90deg); }
+            60% { transform: translateZ(-75px) rotateX(360deg) rotateY(720deg); }
+            100% { transform: translateZ(-75px) rotateX(1440deg) rotateY(1800deg); }
+        }
+
+        @keyframes burnToAsh {
+            0% { filter: brightness(1); opacity: 1; transform: scale(1) translateZ(-75px); }
+            50% { filter: brightness(3) sepia(1) hue-rotate(-30deg) blur(2px); opacity: 0.8; }
+            100% { filter: grayscale(1) brightness(0.2) blur(10px); opacity: 0; transform: scale(0.5) translateZ(-75px) translateY(50px); }
+        }
+</style>
     </style>
 </head>
 <body>
 
 <div id="loading-overlay" class="modal-overlay active" style="align-items: center; justify-content: center; background: var(--tg-theme-bg-color); z-index: 9999;">
-    <div class="glass-btn blue" style="width:120px; height:120px; border-radius:30px; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-        <div id="loading-anim" style="width: 80px; height: 80px;"></div>
+    <div class="liquid-blob blob-1"></div>
+    <div class="liquid-blob blob-2"></div>
+    <div class="glass-panel">
+        <div id="loading-anim" style="width: 100px; height: 100px;"></div>
+        <h2 style="font-weight:700; margin-top:15px; color:var(--tg-theme-text-color);">Gift Simulator</h2>
     </div>
 </div>
 
 <div class="app-container">
+    <!-- Profile Page -->
     <div id="profile-page" class="page">
         <div class="page-header">
             <h2>Profile</h2>
-            <div><button class="action-button glass-btn" onclick="openSettingsModal()">Settings</button></div>
+            <div><button class="action-button" onclick="openSettingsModal()">Settings</button></div>
         </div>
         <div class="profile-top-section" id="profile-bg">
             <div id="profile-pattern-overlay"></div>
@@ -246,304 +501,422 @@
                 </div>
             </div>
         </div>
+        
         <div class="profile-info-block">
             <div class="profile-info-header">Info</div>
-            <div class="info-item"><span class="value" id="profile-phone">+888 0000 0000</span><span class="label">Mobile</span></div>
-            <div class="info-item clickable" onclick="editBio()"><span class="value" id="profile-bio">Hello world</span><span class="label">Bio</span></div>
-            <div class="info-item"><span class="value" id="profile-username">@username</span><span class="label">Username</span></div>
+            <div class="info-item">
+                <span class="value" id="profile-phone">+888 0000 0000</span>
+                <span class="label">Mobile</span>
+            </div>
+            <div class="info-item clickable" onclick="editBio()">
+                <span class="value" id="profile-bio">Hello world</span>
+                <span class="label">Bio</span>
+            </div>
+            <div class="info-item">
+                <span class="value" id="profile-username">@username</span>
+                <span class="label">Username</span>
+            </div>
         </div>
+
         <div class="profile-tabs">
             <button class="active" onclick="switchTab('inventory')">Inventory</button>
             <button onclick="switchTab('shop')">Gift Shop</button>
         </div>
+        
         <div id="action-toolbar" class="hidden"></div>
         <div class="gifts-grid" id="inventory-grid"></div>
     </div>
 
+    <!-- Shop Page -->
     <div id="shop-page" class="page">
         <div class="page-header">
             <h2>Gift Shop</h2>
-            <button class="action-button glass-btn blue" onclick="openCustomizeModal()">Customize</button>
+            <button class="action-button" onclick="openCustomizeModal()">Customize</button>
         </div>
-        <div class="gifts-grid" id="shop-grid"></div>
+        <div class="gifts-grid" id="shop-grid">
+            <div class="spinner"></div>
+        </div>
     </div>
 </div>
 
-<!-- ================= ALL MODALS ================= -->
+<!-- Modals -->
 
-<!-- Settings Modal -->
 <div id="settings-modal" class="modal-overlay">
-    <div class="modal-content glass-modal">
-        <div class="modal-header-bar" style="background:transparent; border-bottom:1px solid rgba(255,255,255,0.05);">Settings</div>
+    <div class="modal-content">
+        <div class="modal-header-bar">Settings</div>
         <div class="modal-scrollable-content">
-            <div class="switch-row"><span>Animations (Lottie)</span><label class="switch"><input type="checkbox" id="setting-animations" onchange="toggleSetting('animations', this.checked)"><span class="slider"></span></label></div>
-            <div class="switch-row"><span>Show Hidden Gifts</span><label class="switch"><input type="checkbox" id="setting-hidden" onchange="toggleSetting('showHidden', this.checked)"><span class="slider"></span></label></div>
-            <div style="padding: 20px; display: flex; flex-direction: column; gap: 15px;">
-                <button class="glass-btn blue" onclick="startSelectionMode('hide')">Select & Hide Multiple</button>
-                <button class="glass-btn" style="color: #ff595a;" onclick="resetAppData()">Reset All Data</button>
+            <div class="switch-row">
+                <span>Animations (Lottie)</span>
+                <label class="switch">
+                    <input type="checkbox" id="setting-animations" onchange="toggleSetting('animations', this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="switch-row">
+                <span>Show Hidden Gifts</span>
+                <label class="switch">
+                    <input type="checkbox" id="setting-hidden" onchange="toggleSetting('showHidden', this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div style="padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+                <button class="modal-button" style="width:100%; background: var(--app-accent-blue);" onclick="startSelectionMode('hide')">Select & Hide Multiple</button>
+                <button class="modal-button secondary" style="width:100%; color: #ff595a;" onclick="resetAppData()">Reset All Data</button>
             </div>
         </div>
-        <div class="modal-buttons-footer" style="background:transparent;"><button class="glass-btn" onclick="closeModal('settings-modal')">Close</button></div>
+        <div class="modal-buttons-footer">
+            <button class="modal-button" onclick="closeModal('settings-modal')">Close</button>
+        </div>
     </div>
 </div>
 
-<!-- Shop Buy Modal (replaces old qty-modal with rich UI) -->
 <div id="qty-modal" class="modal-overlay">
-    <div class="modal-content glass-modal" style="background:#0e1621; border-radius:24px;">
-        <div style="text-align:center; margin-top:-20px; margin-bottom:10px; position:relative; z-index:20;">
-            <span style="background:rgba(255,255,255,0.1); padding:6px 16px; border-radius:20px; font-size:0.9em; backdrop-filter:blur(10px); color:#fff; border:1px solid rgba(255,255,255,0.1);">You got a gift for Free</span>
-        </div>
+    <div class="modal-content" style="max-height: auto;">
+        <div class="modal-header-bar">Buy Multiple</div>
         <div class="modal-scrollable-content" style="padding: 20px;">
-            <div style="background: rgba(255,255,255,0.08); border-radius: 20px; padding: 24px; position: relative; overflow: hidden; margin-bottom: 20px; border:1px solid rgba(255,255,255,0.05);">
-                <div class="top-right-label" style="background: linear-gradient(to bottom, #0f1c35, #1c3666);">1 of 3,000</div>
-                <div style="text-align:center;"><img id="buy-inner-img" src="https://cdn.changes.tg/gifts/originals/Kissed%20Frog/Original.png" style="width:110px; height:110px; filter:drop-shadow(0 10px 15px rgba(0,0,0,0.5));"></div>
-                <h3 style="text-align:center; margin:15px 0 5px; font-size:1.3em;">Saved Gift</h3>
-                <p style="text-align:center; font-size:0.9em; color:rgba(255,255,255,0.7); margin-bottom:15px; line-height:1.4;">Add this gift to your profile or convert it to Free</p>
-                <div style="text-align:center;"><button class="glass-btn" style="width:auto; padding:8px 30px; font-size:0.95em;">View</button></div>
-            </div>
-
-            <input type="text" placeholder="Enter Message (Optional)" style="width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:16px; color:#fff; font-size:1em; outline:none; margin-bottom:15px;">
-            <input type="number" id="qty-input" value="1" style="display:none;">
-
-            <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.05); padding:16px; border-radius:16px; margin-bottom:15px;">
-                <div><h4 style="margin:0 0 5px 0; font-weight:600;">Hide My Name</h4><p style="margin:0; font-size:0.85em; color:rgba(255,255,255,0.5);">Hide my name and message from visitors.</p></div>
-                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
-            </div>
-
-            <div style="background:rgba(62,151,240,0.15); border-radius:12px; display:flex; justify-content:space-between; padding:12px 16px; margin-bottom:10px; border:1px solid rgba(62,151,240,0.3);">
-                <span style="color:#62bcf9; font-weight:600; font-size:0.95em;">2,872 left</span>
-                <span style="color:rgba(255,255,255,0.7); font-size:0.95em;">127 sold</span>
-            </div>
-            <p style="text-align:center; font-size:0.85em; color:rgba(255,255,255,0.5); margin-bottom:10px;">Once all the gifts are sold, you will no longer be able to purchase them.</p>
+            <p style="margin-bottom: 10px; color: var(--tg-theme-hint-color);">Enter quantity:</p>
+            <input type="number" id="qty-input" value="1" min="1" max="1000">
         </div>
-        <div class="modal-buttons-footer" style="background:transparent; padding:0 20px 20px;">
-            <button class="glass-btn blue" onclick="handleBuyMultiple()">Receive gift for Free</button>
+        <div class="modal-buttons-footer">
+            <button class="modal-button" onclick="handleBuyMultiple()">Buy</button>
+            <!-- Removed Cancel Button -->
         </div>
     </div>
 </div>
 
-<!-- Detail Modal (Before Upgrade / Non Unique) -->
 <div id="detail-modal" class="modal-overlay">
-    <div class="modal-content glass-modal" style="background:#1c1c1e;">
-        <div class="modal-header-bar" style="background:transparent; border:none;">
-            <div class="close-btn" onclick="closeModal('detail-modal')">✕</div>
-        </div>
-        <div class="modal-scrollable-content" style="padding: 0 20px 20px;">
-            <div class="image-container glowing-bg" style="width: 160px; height: 160px; margin: 0 auto; position:relative;">
-                <div class="glow-circle"></div>
-                <img id="detail-image" src="" style="display:none; width: 100%; height: 100%; object-fit: contain; position:relative; z-index:2; filter:drop-shadow(0 10px 20px rgba(0,0,0,0.6));">
-                <div id="detail-lottie" class="lottie-wrapper" style="position:relative; z-index:2;"></div>
+    <div class="modal-content">
+        <div class="modal-header-bar"><span id="detail-title">Gift</span></div>
+        <div class="modal-scrollable-content" style="padding: 20px; text-align: center;">
+            <div class="image-container" style="width: 160px; height: 160px; margin: 0 auto;">
+                <img id="detail-image" src="" style="display:none; width: 100%; height: 100%; object-fit: contain;">
+                <div id="detail-lottie" class="lottie-wrapper"></div>
             </div>
-            <h2 id="detail-title" style="text-align:center; margin:15px 0 5px; font-size:1.5em; font-weight:700;">Saved Gift</h2>
-            <p style="text-align:center; color: var(--tg-theme-hint-color); font-size:0.95em; margin-bottom:20px; padding:0 20px; line-height:1.4;">
-                You can add this gift to your Profile or convert it to Free.
+            <p style="color: var(--tg-theme-hint-color); margin-top: 15px; line-height: 1.5;" id="detail-desc">
+                This is a regular gift. Upgrade it to make it a unique collectible!
             </p>
-
-            <div class="stat-table">
-                <div class="stat-table-row"><span class="stat-label">Date</span><span class="stat-value">14.04.26 in 23:30</span></div>
-                <div class="stat-table-row"><span class="stat-label">Value</span><span class="stat-value">Free <span class="sell-pill">Sell for Free</span></span></div>
-                <div class="stat-table-row"><span class="stat-label">Availability</span><span class="stat-value">3 671 of 4 908 left</span></div>
-                <div class="stat-table-row"><span class="stat-label">Status</span><span class="stat-value">Non-unique</span></div>
-            </div>
-
-            <div style="text-align:center; margin: 20px 0 10px;">
-                <span style="color:var(--tg-theme-hint-color); font-size:0.9em;">This gift is visible on your profile. <a href="#" style="color:#62bcf9; text-decoration:none;">Hide ></a></span>
-            </div>
         </div>
-        <div class="modal-buttons-footer" style="background:transparent; padding:0 20px 20px;">
-            <!-- Opens the Pre-Upgrade Info Modal -->
-            <button class="glass-btn blue" onclick="closeModal('detail-modal'); document.getElementById('upgrade-info-modal').classList.add('active');">Upgrade</button>
+        <div class="modal-buttons-footer">
+            <button class="modal-button" id="btn-upgrade" onclick="handleUpgrade()">Upgrade</button>
+            <!-- Removed Close Button -->
         </div>
     </div>
 </div>
 
-<!-- Pre-Upgrade Info Modal (Screenshot 1) -->
-<div id="upgrade-info-modal" class="modal-overlay">
-    <div class="modal-content glass-modal" style="background: linear-gradient(180deg, #5bb5a2 0%, #1c1c1e 50%);">
-        <div class="modal-header-bar" style="background:transparent; border:none;"><div class="close-btn" onclick="closeModal('upgrade-info-modal')">✕</div></div>
-        <div class="modal-scrollable-content" style="padding: 0 20px 20px;">
-            <div style="text-align:center; margin-bottom: 20px;">
-                 <img src="https://cdn.changes.tg/gifts/originals/Kissed%20Frog/Original.png" style="width:140px; height:140px; object-fit:contain; filter:drop-shadow(0 15px 20px rgba(0,0,0,0.3));">
-            </div>
-            <h2 style="text-align:center; margin-bottom:12px; font-size:1.7em; font-weight:700;">Upgrade Gifts</h2>
-            <p style="text-align:center; color: rgba(255,255,255,0.85); font-size:1em; margin-bottom:35px; line-height:1.5; padding:0 15px;">
-                Turn your gift into a unique collectible that you can sell or keep for yourself.
-            </p>
-
-            <div class="feature-row">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#62bcf9" stroke-width="2"><path d="M6 3h12l4 6-10 12L2 9l4-6z"/><path d="M2 9h20M12 21V9M6 3l6 6M18 3l-6 6"/></svg>
-                <div><h4>Unique</h4><p>Get a unique number, model, backdrop and a symbol for your gift.</p></div>
-            </div>
-            <div class="feature-row">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#62bcf9" stroke-width="2"><path d="M8 7h12m0 0l-4-4m4 4l-4 4m4 6H4m0 0l4 4m-4-4l4-4"/></svg>
-                <div><h4>Transferable</h4><p>You can share a collector's gift with any friend at the library.</p></div>
-            </div>
-            <div class="feature-row">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#62bcf9" stroke-width="2"><path d="M12 2l10 10-10 10L2 12 12 2z"/></svg> 
-                <div><h4>Tradable</h4><p>A gift can be sold, saved in the profile, or hidden.</p></div>
-            </div>
-        </div>
-        <div class="modal-buttons-footer" style="background:transparent; padding:0 20px 20px;">
-            <!-- Start actual upgrade logic -->
-            <button id="btn-upgrade" class="glass-btn blue" onclick="closeModal('upgrade-info-modal'); handleUpgrade();">Processing...</button>
-        </div>
-    </div>
-</div>
-
-<!-- Collectible Modal (Upgraded Profile - Screenshot 5) -->
+<!-- COLLECTIBLE / ROULETTE MODAL -->
 <div id="collectible-modal" class="modal-overlay">
-    <div class="modal-content glass-modal" style="background:#1c1c1e;">
-        <div id="collectible-header" style="position:relative; border-bottom-left-radius:24px; border-bottom-right-radius:24px; padding:20px; overflow:hidden;">
-            <div style="display:flex; justify-content:space-between; position:relative; z-index:10;">
-                <div class="round-btn" style="width:32px; height:32px;" onclick="closeModal('collectible-modal')">✕</div>
-                <div class="round-btn" style="width:32px; height:32px; font-size:20px; line-height:10px;">...</div>
-            </div>
+    <div class="modal-content" style="background-color: var(--tg-theme-bg-color);">
+        <!-- Top Gradient Section -->
+        <div id="collectible-header" class="collectible-header">
             <div id="collectible-pattern-container" class="dynamic-pattern-container"></div>
-            <div style="position: relative; z-index: 2; width: 100%; display: flex; flex-direction: column; align-items: center; margin-top:5px;">
+            <div style="position: relative; z-index: 2; width: 100%; display: flex; flex-direction: column; align-items: center;">
                 <div class="roulette-image-wrapper">
                     <div id="roulette-strip" class="roulette-strip" style="display:none;"></div>
-                    <img id="collectible-image" src="" style="width:150px; height:150px; object-fit:contain; display:none; filter:drop-shadow(0 10px 20px rgba(0,0,0,0.5));">
-                    <div id="collectible-lottie" class="lottie-wrapper" style="width:150px; height:150px; display:none;"></div>
+                    <img id="collectible-image" src="" style="width:160px; height:160px; object-fit:contain; display:none;">
+                    <div id="collectible-lottie" class="lottie-wrapper" style="width:160px; height:160px; display:none;"></div>
                 </div>
-                <h3 id="collectible-title" style="font-size:1.5em; font-weight:700; margin-top:10px; text-shadow:0 2px 4px rgba(0,0,0,0.5);">Gift #000</h3>
-                <div class="sub-header" id="collectible-model-name" style="color:rgba(255,255,255,0.8); font-size:1em; margin-bottom:10px; text-shadow:0 1px 2px rgba(0,0,0,0.5);">Model Name</div>
+                <h3 id="collectible-title">Gift Name #000</h3>
+                <div class="sub-header" id="collectible-model-name">Model Name</div>
             </div>
-            <div class="action-buttons-row">
-                <div class="action-btn-item">
-                    <svg viewBox="0 0 24 24" fill="#fff"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5z"/></svg><span>wear</span>
+        </div>
+
+        <!-- Scrollable Content with Table -->
+        <div class="modal-scrollable-content" style="padding: 16px;">
+            <div class="stats-table">
+                <!-- Owner -->
+                <div class="stat-row">
+                    <div class="stat-label">Owner</div>
+                    <div class="stat-value owner-chip">
+                        <img id="col-owner-img" src="">
+                        <span id="col-owner-name">User</span>
+                    </div>
                 </div>
-                <div class="action-btn-item">
-                    <svg viewBox="0 0 24 24" fill="#fff"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.41l9 9c.36.36.86.58 1.41.58s1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.41zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg><span>sell</span>
+                <!-- Model -->
+                <div class="stat-row">
+                    <div class="stat-label">Model</div>
+                    <div class="stat-value">
+                        <div class="slot-mask" id="slot-model"><div class="slot-scroll"></div></div>
+                        <span class="percentage-pill" id="col-model-pct">0%</span>
+                    </div>
                 </div>
-                <div class="action-btn-item">
-                    <svg viewBox="0 0 24 24" fill="#fff"><path d="M15 4V3H9v1H4v2h1v13c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V6h1V4h-5zm2 15H7V6h10v13z"/></svg><span>delete</span>
+                <!-- Symbol -->
+                <div class="stat-row">
+                    <div class="stat-label">Symbol</div>
+                    <div class="stat-value">
+                        <div class="slot-mask" id="slot-symbol"><div class="slot-scroll"></div></div>
+                        <span class="percentage-pill" id="col-symbol-pct">0%</span>
+                    </div>
+                </div>
+                <!-- Backdrop -->
+                <div class="stat-row">
+                    <div class="stat-label">Backdrop</div>
+                    <div class="stat-value">
+                        <div class="slot-mask" id="slot-backdrop"><div class="slot-scroll"></div></div>
+                        <span class="percentage-pill" id="col-backdrop-pct">0%</span>
+                    </div>
+                </div>
+                <!-- Quantity -->
+                <div class="stat-row">
+                    <div class="stat-label">Quantity</div>
+                    <div class="stat-value" id="col-quantity">100/1000 issued</div>
+                </div>
+                <!-- Value -->
+                <div class="stat-row">
+                    <div class="stat-label">Value</div>
+                    <div class="stat-value" style="color: var(--tg-theme-link-color);">
+                        <span id="col-value">~10 TON</span> 
+                        <span class="learn-more">learn more</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="modal-scrollable-content" style="padding: 16px;">
-            <div class="stat-table">
-                <div class="stat-table-row">
-                    <div class="stat-label">Owner</div>
-                    <div class="stat-value owner-chip"><img id="col-owner-img" src=""><span id="col-owner-name" style="color:#62bcf9;">User</span><span class="star-badge">★</span></div>
-                </div>
-                <div class="stat-table-row">
-                    <div class="stat-label">Model</div>
-                    <div class="stat-value"><div class="slot-mask" id="slot-model"><div class="slot-scroll"></div></div><span class="percentage-pill" id="col-model-pct">4%</span></div>
-                </div>
-                <div class="stat-table-row">
-                    <div class="stat-label">Pattern</div>
-                    <div class="stat-value"><div class="slot-mask" id="slot-symbol"><div class="slot-scroll"></div></div><span class="percentage-pill" id="col-symbol-pct" style="color:#62bcf9; background:rgba(98,188,249,0.15);">0.2%</span></div>
-                </div>
-                <div class="stat-table-row">
-                    <div class="stat-label">Backdrop</div>
-                    <div class="stat-value"><div class="slot-mask" id="slot-backdrop"><div class="slot-scroll"></div></div><span class="percentage-pill" id="col-backdrop-pct">2%</span></div>
-                </div>
-                <div class="stat-table-row">
-                    <div class="stat-label">Availability</div>
-                    <div class="stat-value" id="col-quantity">1 895/4 933 issued</div>
-                </div>
-            </div>
-            <div style="text-align:center; margin: 15px 0 10px;">
-                <span style="color:var(--tg-theme-hint-color); font-size:0.85em;">This gift is visible on your profile. <a href="#" style="color:#62bcf9; text-decoration:none;">Hide ></a></span>
-            </div>
-        </div>
-        <div class="modal-buttons-footer" style="padding-top: 0; background: transparent;">
-            <button id="btn-collectible-action" class="glass-btn blue" onclick="closeModal('collectible-modal')">OK</button>
+        <!-- Footer -->
+        <div class="modal-buttons-footer" style="padding-top: 0; background: var(--tg-theme-bg-color);">
+            <button id="btn-collectible-action" class="big-rounded-btn" onclick="closeModal('collectible-modal')">OK</button>
         </div>
     </div>
 </div>
 
-<!-- Customize Modal -->
 <div id="customize-modal" class="modal-overlay">
-    <div class="modal-content glass-modal">
-        <div class="modal-header-bar" style="background:transparent;">Customize</div>
-        <div class="queue-bar" id="cust-queue-bar" style="background:rgba(0,0,0,0.1);"></div>
-        <div class="modal-scrollable-content" style="padding: 0; background: transparent;">
-            <div class="filter-section" style="padding: 15px;">
-                <h4 style="margin: 0 0 12px; color: #fff;">Select Base Gift</h4>
+    <div class="modal-content">
+        <div class="modal-header-bar">Customize</div>
+        
+        <!-- Queue Bar -->
+        <div class="queue-bar" id="cust-queue-bar"></div>
+        
+        <div class="modal-scrollable-content" style="padding: 0; background: var(--tg-theme-secondary-bg-color);">
+            
+            <!-- Base Gift Selection -->
+            <div class="filter-section">
+                <h4>Select Base Gift</h4>
                 <div class="filter-options-grid" id="cust-base-grid"></div>
             </div>
+
+            <!-- Parts Selection Container -->
             <div id="cust-parts-container" class="hidden">
-                <div class="filter-section" style="padding: 15px;"><h4 style="color:#fff;">Select Model</h4><div class="filter-options-grid" id="cust-model-grid"></div></div>
-                <div class="filter-section" style="padding: 15px;"><h4 style="color:#fff;">Select Backdrop</h4><div class="filter-options-grid" id="cust-backdrop-grid"></div></div>
-                <div class="filter-section" style="padding: 15px;"><h4 style="color:#fff;">Select Symbol</h4><div class="filter-options-grid" id="cust-pattern-grid"></div></div>
-                <div id="cust-bulk-controls" style="margin: 15px; background: rgba(255,255,255,0.05); border-radius: 16px; overflow: hidden; border:1px solid rgba(255,255,255,0.05);">
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding: 16px; border-bottom:1px solid rgba(255,255,255,0.05);">
-                        <span style="font-weight:600;">Quantity</span>
-                        <input type="number" id="cust-qty" value="1" min="1" max="1000" oninput="updateCreateButton()" style="width:80px; padding:10px; border-radius:12px; border:none; background:rgba(0,0,0,0.3); color:#fff; text-align:center; font-weight:bold; outline:none;">
+                
+                <!-- Model Grid -->
+                <div class="filter-section">
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding-right: 4px;">
+                        <h4>Select Model</h4>
+                        <span id="lbl-rnd-model" class="hidden" style="font-size:0.75em; color:var(--tg-theme-link-color); font-weight:600; letter-spacing:0.5px; text-transform:uppercase;">Randomized</span>
                     </div>
-                    <div class="switch-row" style="border-bottom:1px solid rgba(255,255,255,0.05);"><span>Random Model</span><label class="switch"><input type="checkbox" id="cb-rnd-model" onchange="toggleRandomPart('model'); updateCreateButton()"><span class="slider"></span></label></div>
-                    <div class="switch-row" style="border-bottom:1px solid rgba(255,255,255,0.05);"><span>Random Backdrop</span><label class="switch"><input type="checkbox" id="cb-rnd-backdrop" onchange="toggleRandomPart('backdrop'); updateCreateButton()"><span class="slider"></span></label></div>
-                    <div class="switch-row"><span>Random Symbol</span><label class="switch"><input type="checkbox" id="cb-rnd-pattern" checked onchange="toggleRandomPart('pattern'); updateCreateButton()"><span class="slider"></span></label></div>
+                    <div class="filter-options-grid" id="cust-model-grid"></div>
+                </div>
+
+                <!-- Backdrop Grid -->
+                <div class="filter-section">
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding-right: 4px;">
+                        <h4>Select Backdrop</h4>
+                        <span id="lbl-rnd-backdrop" class="hidden" style="font-size:0.75em; color:var(--tg-theme-link-color); font-weight:600; letter-spacing:0.5px; text-transform:uppercase;">Randomized</span>
+                    </div>
+                    <div class="filter-options-grid" id="cust-backdrop-grid"></div>
+                </div>
+
+                <!-- Pattern Grid -->
+                <div class="filter-section">
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding-right: 4px;">
+                        <h4>Select Symbol (Optional)</h4>
+                        <span id="lbl-rnd-pattern" class="hidden" style="font-size:0.75em; color:var(--tg-theme-link-color); font-weight:600; letter-spacing:0.5px; text-transform:uppercase;">Randomized</span>
+                    </div>
+                    <div class="filter-options-grid" id="cust-pattern-grid"></div>
+                </div>
+
+                <!-- NEW: Bulk / Random Controls -->
+                <div id="cust-bulk-controls" style="margin: 20px 15px 30px 15px; background: var(--tg-theme-bg-color); border-radius: 12px; overflow: hidden;">
+                    
+                    <!-- Quantity Row -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 16px; border-bottom:1px solid rgba(0,0,0,0.05);">
+                        <span style="font-weight:500; font-size: 0.95em;">Quantity</span>
+                        <input type="number" id="cust-qty" value="1" min="1" max="1000" oninput="updateCreateButton()" style="width:80px; padding:8px; border-radius:8px; border:none; background:var(--tg-theme-secondary-bg-color); color:var(--tg-theme-text-color); text-align:center; font-weight:bold; font-size:1.1em; outline:none;">
+                    </div>
+                    
+                    <!-- Random Model Switch -->
+                    <div class="switch-row" style="border-bottom:1px solid rgba(0,0,0,0.05); padding: 12px 16px;">
+                        <span style="font-size: 0.95em;">Random Model</span>
+                        <label class="switch">
+                            <input type="checkbox" id="cb-rnd-model" onchange="toggleRandomPart('model'); updateCreateButton()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <!-- Random Backdrop Switch -->
+                    <div class="switch-row" style="border-bottom:1px solid rgba(0,0,0,0.05); padding: 12px 16px;">
+                        <span style="font-size: 0.95em;">Random Backdrop</span>
+                        <label class="switch">
+                            <input type="checkbox" id="cb-rnd-backdrop" onchange="toggleRandomPart('backdrop'); updateCreateButton()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <!-- Random Pattern Switch (Default Checked) -->
+                    <div class="switch-row" style="border:none; padding: 12px 16px;">
+                        <span style="font-size: 0.95em;">Random Symbol</span>
+                        <label class="switch">
+                            <input type="checkbox" id="cb-rnd-pattern" checked onchange="toggleRandomPart('pattern'); updateCreateButton()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+        <div class="modal-buttons-footer">
+            <button class="modal-button" id="btn-create-custom" disabled onclick="handleCreateQueue()">Create</button>
+        </div>
+    </div>
+</div>
+
+<!-- CRAFTING MAIN MODAL -->
+<div id="craft-modal" class="modal-overlay">
+    <div class="modal-content" style="height: 90vh; color: white;">
+        <div class="modal-header-bar" style="background:transparent; border:none; color:white;">
+            <span style="opacity:0.8">Craft Gift</span>
+            <div style="position:absolute; right:15px; top:15px; cursor:pointer;" onclick="closeModal('craft-modal')">✕</div>
+        </div>
+        
+        <div class="craft-container">
+            <!-- Central Crafting Area -->
+            <div class="craft-slots-area">
+                <!-- Center Progress -->
+                <div class="craft-center-progress">
+                    <svg class="craft-svg-circle" viewBox="0 0 100 100">
+                        <circle class="craft-bg-circle" cx="50" cy="50" r="45"></circle>
+                        <circle id="craft-progress-ring" class="craft-fg-circle" cx="50" cy="50" r="45" stroke-dasharray="283" stroke-dashoffset="283"></circle>
+                    </svg>
+                    <div class="craft-anvil-icon"></div>
+                    <div class="craft-pct-text" id="craft-chance-text">0%</div>
+                </div>
+
+                <!-- 4 Slots -->
+                <div class="craft-slot top-left" id="slot-0" onclick="openCraftSelect()">
+                    <span class="add-icon">+</span>
+                </div>
+                <div class="craft-slot top-right" id="slot-1" onclick="openCraftSelect()">
+                    <span class="add-icon">+</span>
+                </div>
+                <div class="craft-slot bottom-left" id="slot-2" onclick="openCraftSelect()">
+                    <span class="add-icon">+</span>
+                </div>
+                <div class="craft-slot bottom-right" id="slot-3" onclick="openCraftSelect()">
+                    <span class="add-icon">+</span>
                 </div>
             </div>
+
+            <div style="text-align:center; margin-top: -20px;">
+                <p style="font-size:0.9em; opacity:0.7; max-width: 80%; margin: 0 auto;">
+                    Add up to 4 gifts to craft new <br>
+                    <b id="craft-target-name">Cake #000</b>.
+                </p>
+                <p style="font-size:0.8em; color: #ff595a; margin-top:8px;">
+                    If crafting fails, all selected gifts will be consumed.
+                </p>
+                
+                <!-- Backdrop Probabilities -->
+                <div class="craft-probability-row" id="craft-probs"></div>
+            </div>
+            <!-- Add this before the "Craft Gift" button -->
+            <div id="craft-mix-container" class="switch-row" style="background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 15px; width: 90%; opacity: 0.5; pointer-events: none; padding: 12px 16px; border: none;">
+                <span style="font-size: 0.95em;">Backdrop Mixing</span>
+                <label class="switch">
+                    <input type="checkbox" id="cb-mix-backdrop">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <button id="btn-craft-action" class="big-rounded-btn" onclick="startCrafting()">
+                Craft Gift
+            </button>
         </div>
-        <div class="modal-buttons-footer" style="background:transparent;"><button class="glass-btn blue" id="btn-create-custom" disabled onclick="handleCreateQueue()">Create</button></div>
     </div>
 </div>
 
-<!-- Craft Main Modal -->
-<div id="craft-modal" class="modal-overlay">
-    <div class="modal-content glass-modal" style="height: 90vh;">
-        <div class="modal-header-bar" style="background:transparent;"><div class="close-btn" onclick="closeModal('craft-modal')">✕</div><span>Craft Gift</span></div>
-        <div class="craft-container">
-            <div class="craft-slots-area">
-                <div class="craft-center-progress"><svg class="craft-svg-circle" viewBox="0 0 100 100"><circle class="craft-bg-circle" cx="50" cy="50" r="45"></circle><circle id="craft-progress-ring" class="craft-fg-circle" cx="50" cy="50" r="45" stroke-dasharray="283" stroke-dashoffset="283"></circle></svg><div class="craft-pct-text" id="craft-chance-text" style="font-size:1.2em;">0%</div></div>
-                <div class="craft-slot top-left" id="slot-0" onclick="openCraftSelect()"><span class="add-icon">+</span></div>
-                <div class="craft-slot top-right" id="slot-1" onclick="openCraftSelect()"><span class="add-icon">+</span></div>
-                <div class="craft-slot bottom-left" id="slot-2" onclick="openCraftSelect()"><span class="add-icon">+</span></div>
-                <div class="craft-slot bottom-right" id="slot-3" onclick="openCraftSelect()"><span class="add-icon">+</span></div>
-            </div>
-            <div style="text-align:center; margin-top:-10px;">
-                <p style="font-size:0.95em; opacity:0.8;">Add up to 4 gifts to craft new <br><b id="craft-target-name">Gift #000</b>.</p>
-                <p style="font-size:0.85em; color:#ff595a; margin-top:8px;">If crafting fails, all selected gifts are consumed.</p>
-                <div class="craft-probability-row" id="craft-probs" style="margin-top:15px;"></div>
-            </div>
-            <button id="btn-craft-action" class="glass-btn blue" onclick="startCrafting()">Craft Gift</button>
-        </div>
-    </div>
-</div>
-
-<!-- Craft Select Modal -->
+<!-- CRAFT SELECTION MODAL -->
 <div id="craft-select-modal" class="modal-overlay">
-    <div class="modal-content glass-modal"><div class="modal-header-bar" style="background:transparent;">Select Gifts</div><div class="modal-scrollable-content"><div class="craft-select-grid" id="craft-select-grid" style="padding:15px; display:grid; grid-template-columns:repeat(3,1fr); gap:10px;"></div></div><div class="modal-buttons-footer" style="background:transparent;"><button class="glass-btn" onclick="closeModal('craft-select-modal')">Done</button></div></div>
-</div>
-
-<!-- Craft Anim Modal -->
-<div id="craft-anim-modal" class="modal-overlay" style="z-index:2000;">
-    <div class="modal-content glass-modal" style="background:transparent; align-items:center; justify-content:center; box-shadow:none;">
-        <h2 style="color:#fff; font-size:2em; font-weight:700;">Crafting...</h2>
-        <p id="craft-anim-status" style="color:rgba(255,255,255,0.7); margin-top:10px; font-size:1.1em;">Heating up the anvil</p>
+    <div class="modal-content">
+        <div class="modal-header-bar">Select Gifts</div>
+        <div class="modal-scrollable-content">
+            <div class="craft-select-grid" id="craft-select-grid"></div>
+        </div>
+        <div class="modal-buttons-footer">
+            <button class="modal-button" onclick="closeModal('craft-select-modal')">Done</button>
+        </div>
     </div>
 </div>
 
-<!-- Failure Modal -->
+<!-- ANIMATION MODAL -->
+<div id="craft-anim-modal" class="modal-overlay" style="z-index: 2000; background: rgba(14, 22, 33, 0.95);">
+    <div class="modal-content" style="background: transparent; align-items: center; justify-content: center; box-shadow:none;">
+        <div class="cube-wrapper">
+            <div class="cube" id="craft-cube">
+                <div class="cube-face front"><img src=""></div>
+                <div class="cube-face back"><img src=""></div>
+                <div class="cube-face right"><img src=""></div>
+                <div class="cube-face left"><img src=""></div>
+                <div class="cube-face top"><div class="craft-anvil-icon" style="background:white"></div></div>
+                <div class="cube-face bottom"><div class="craft-anvil-icon" style="background:white"></div></div>
+            </div>
+        </div>
+        <h2 style="margin-top:40px; color:white; font-weight:700;">Crafting...</h2>
+        <p id="craft-anim-status" style="color:rgba(255,255,255,0.7); margin-top:10px;">Heating up the anvil</p>
+    </div>
+</div>
+
+<!-- FAILURE MODAL -->
 <div id="failure-modal" class="modal-overlay">
-    <div class="modal-content glass-modal" style="height:auto; min-height:60vh;">
-        <div class="modal-header-bar" style="background:transparent;"><div class="close-btn" onclick="closeModal('failure-modal')">✕</div></div>
-        <div class="modal-scrollable-content" style="display:flex; flex-direction:column; align-items:center; padding:20px;">
-            <div style="width:90px; height:90px; background:rgba(255,89,90,0.2); border-radius:24px; display:flex; align-items:center; justify-content:center; margin-bottom:20px;"><div style="font-size:40px; color:#ff595a; font-weight:bold;">✕</div></div>
-            <h2 style="color:#ff595a; font-size:1.6em; margin-bottom:10px; font-weight:700;">Unsuccessful attempt</h2>
-            <p style="text-align:center; color:rgba(255,255,255,0.6); margin-bottom:30px;">The attempt failed.<br><span id="fail-count-text">4</span> gifts were lost.</p>
-            <div id="failed-items-grid" style="display:flex; justify-content:center; gap:12px; margin-bottom:40px; width:100%;"></div>
-            <button class="glass-btn blue" onclick="retryCrafting()">Craft Again</button>
+    <div class="modal-content" style="background-color: #1c1c1e; color: white; height: auto; min-height: 60vh; border-radius: 16px;">
+        
+        <!-- Header -->
+        <div class="modal-header-bar" style="background: transparent; border: none; display: flex; justify-content: space-between; align-items: center; padding: 16px;">
+            <div onclick="closeModal('failure-modal')" style="cursor: pointer; background: rgba(255,255,255,0.1); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">✕</div>
+            <span style="font-weight: 600; font-size: 1.1em;">Crafting Gift</span>
+            <div style="width: 32px;"></div> <!-- Spacer -->
+        </div>
+
+        <div class="modal-scrollable-content" style="display: flex; flex-direction: column; align-items: center; padding: 20px 20px 40px;">
+            
+            <!-- Central Icon -->
+            <div style="width: 100px; height: 100px; background: #3a2525; border-radius: 24px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; position: relative;">
+                <div class="craft-anvil-icon" style="background-color: #ff595a; transform: scale(1.5);"></div>
+                <div style="position: absolute; bottom: -10px; background: #3a2525; padding: 2px 8px; border-radius: 10px; font-weight: bold; font-size: 0.9em; border: 2px solid #1c1c1e;">
+                    4
+                </div>
+            </div>
+
+            <!-- Text -->
+            <h2 style="color: #ff595a; margin: 0 0 10px 0; font-weight: 700; font-size: 1.5em;">Unsuccessful attempt</h2>
+            <p style="text-align: center; color: #8e8e93; font-size: 0.95em; line-height: 1.4; margin: 0 0 30px 0;">
+                The crafting attempt failed.<br>
+                <span id="fail-count-text">4</span> gifts were lost.
+            </p>
+
+            <!-- Lost Items Grid -->
+            <div id="failed-items-grid" style="display: flex; justify-content: center; gap: 12px; margin-bottom: 40px; width: 100%;">
+                <!-- Items injected here -->
+            </div>
+
+            <!-- Button -->
+            <button onclick="retryCrafting()" style="width: 100%; background: #ffffff; color: #000000; font-weight: 600; font-size: 1.1em; padding: 16px; border-radius: 12px; border: none; cursor: pointer;">
+                Craft Again
+            </button>
+
         </div>
     </div>
 </div>
 
 <!-- Menus -->
-<div id="long-press-menu" class="hidden" style="position:fixed; background:rgba(30,40,55,0.9); backdrop-filter:blur(20px); border-radius:16px; border:1px solid rgba(255,255,255,0.1); z-index:2000; min-width:200px; padding:8px 0; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
-    <ul style="list-style:none;">
-        <li id="menu-pin" onclick="togglePin()" style="padding:14px 20px; cursor:pointer; font-weight:500;">Pin to Profile</li>
-        <li id="menu-wear" onclick="toggleWear()" style="padding:14px 20px; cursor:pointer; font-weight:500;">Wear Gift</li>
-        <li id="menu-reorder" class="hidden" onclick="startReorderMode()" style="padding:14px 20px; cursor:pointer; font-weight:500;">Reorder Pins</li>
-        <li id="menu-hide" onclick="toggleHide()" style="padding:14px 20px; cursor:pointer; font-weight:500;">Hide Gift</li>
-        <li class="danger" onclick="deleteGift()" style="padding:14px 20px; cursor:pointer; font-weight:500; color:#ff595a;">Delete</li>
+<div id="long-press-menu" class="hidden">
+    <ul>
+        <li id="menu-pin" onclick="togglePin()">Pin to Profile</li>
+        <li id="menu-wear" onclick="toggleWear()">Wear Gift</li>
+        <li id="menu-reorder" class="hidden" onclick="startReorderMode()">Reorder Pins</li>
+        <li id="menu-hide" onclick="toggleHide()">Hide Gift</li>
+        <li class="danger" onclick="deleteGift()">Delete</li>
     </ul>
 </div>
-<div id="reorder-controls" class="page-header hidden" style="position:fixed; top:0; left:0; right:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(20px); z-index:100; justify-content:center;">
-    <button class="glass-btn blue" style="width:auto; padding:10px 30px;" onclick="stopReorderMode()">Done Reordering</button>
+<div id="reorder-controls" class="page-header hidden" style="position:fixed; top:0; left:0; right:0; background:var(--tg-theme-bg-color); z-index:100; justify-content:center;">
+    <button class="action-button" onclick="stopReorderMode()">Done Reordering</button>
 </div>
 
 <script>
@@ -696,19 +1069,10 @@
                 const cd = gift.collectibleData;
                 const bgStyle = getBackdropStyle(cd.backdrop);
                 const imgUrl = cd.model.isCustom ? cd.model.imageUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/png/${encodeURIComponent(cd.model.name)}.png`;
-                
-                if (state.settings.animations) { 
-                    visualHtml = `<div class="lottie-wrapper" id="lot-${gift.uniqueId}"></div>`; 
-                    setTimeout(() => playLottie(`lot-${gift.uniqueId}`, cd.model.isCustom ? cd.model.lottieUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/lottie/${encodeURIComponent(cd.model.name)}.json`), 0); 
-                } else {
-                    visualHtml = `<img src="${imgUrl}" loading="lazy">`;
-                }
-                
-                // THE FIX IS HERE: Added the missing "}" after topIcon
-                el.innerHTML = `${topIcon}<div class="top-right-label" style="background: linear-gradient(to bottom, ${cd.backdrop.hex.edgeColor}, ${cd.backdrop.hex.centerColor});">#${gift.collectibleNumber}</div><div class="gift-card-bg-pattern" style="background:${bgStyle}"></div><div class="dynamic-pattern-container" id="pat-${gift.uniqueId}"></div><div class="image-container">${visualHtml}</div>`; 
-                
+                if (state.settings.animations) { visualHtml = `<div class="lottie-wrapper" id="lot-${gift.uniqueId}"></div>`; setTimeout(() => playLottie(`lot-${gift.uniqueId}`, cd.model.isCustom ? cd.model.lottieUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/lottie/${encodeURIComponent(cd.model.name)}.json`), 0); } 
+                else visualHtml = `<img src="${imgUrl}" loading="lazy">`;
+                el.innerHTML = `${topIcon}<div class="top-right-label">#${gift.collectibleNumber}</div><div class="gift-card-bg-pattern" style="background:${bgStyle}"></div><div class="dynamic-pattern-container" id="pat-${gift.uniqueId}"></div><div class="image-container">${visualHtml}</div>`; 
                 setTimeout(() => generatePattern(`pat-${gift.uniqueId}`, cd.pattern, gift.name, true, cd.backdrop.hex.patternColor), 0);
-                
                 if (!appRuntime.selectionMode) el.onclick = () => openCollectibleModal(gift, false);
             } else {
                 const imgUrl = `${CDN_BASE}originals/${gift.originalId}/Original.png`;
@@ -1775,81 +2139,82 @@
             btn.innerText = customizationQueue.length > 1 ? `Create All (${customizationQueue.length})` : 'Create'; 
         }
     }
-    async function handleCreateQueue() {
+    async function handleCreateQueue() { 
         const btn = document.getElementById('btn-create-custom');
         btn.disabled = true;
         btn.innerText = "Creating...";
     
         const qtyInput = parseInt(document.getElementById('cust-qty').value) || 1;
+        // Check checkboxes
         const isRandomModel = document.getElementById('cb-rnd-model').checked;
         const isRandomBackdrop = document.getElementById('cb-rnd-backdrop').checked;
         const isRandomPattern = document.getElementById('cb-rnd-pattern').checked;
     
-        // Use a slight timeout to prevent UI freeze on large batches
-        setTimeout(async () => {
-            for (const q of customizationQueue) {
-                if(!q.id) continue;
-                let partsPool = cachedParts[q.id];
-                if (!partsPool) {
-                    partsPool = await fetchGiftParts(q.name);
-                    cachedParts[q.id] = partsPool;
-                }
+        // Loop through every item in the customization queue
+        for (const q of customizationQueue) {
+            if(!q.id) continue;
     
-                const loopCount = customizationQueue.length === 1 ? qtyInput : 1;
-    
-                for (let i = 0; i < loopCount; i++) {
-                    let finalModel = q.parts.model;
-                    if (!finalModel || (customizationQueue.length === 1 && isRandomModel)) {
-                        const validModels = partsPool.models.filter(m => !m.crafted);
-                        const pool = validModels.length > 0 ? validModels : partsPool.models;
-                        finalModel = pool[Math.floor(Math.random() * pool.length)];
-                    }
-    
-                    let finalBackdrop = q.parts.backdrop;
-                    if (!finalBackdrop || (customizationQueue.length === 1 && isRandomBackdrop)) {
-                        finalBackdrop = partsPool.backdrops[Math.floor(Math.random() * partsPool.backdrops.length)];
-                    }
-    
-                    let finalPattern = q.parts.pattern;
-                    if (!finalPattern || (customizationQueue.length === 1 && isRandomPattern)) {
-                        finalPattern = partsPool.patterns[Math.floor(Math.random() * partsPool.patterns.length)];
-                    }
-    
-                    if(!finalModel || !finalBackdrop || !finalPattern) continue;
-    
-                    state.lastCollectibleNumber++;
-                    state.inventory.unshift({
-                        uniqueId: Date.now() + Math.random(),
-                        originalId: q.id,
-                        name: q.name,
-                        isCollectible: true,
-                        timestamp: Date.now(),
-                        pinned: false,
-                        collectibleNumber: state.lastCollectibleNumber,
-                        collectibleData: {
-                            model: JSON.parse(JSON.stringify(finalModel)), // Deep Clone fixes reference bug
-                            backdrop: JSON.parse(JSON.stringify(finalBackdrop)),
-                            pattern: JSON.parse(JSON.stringify(finalPattern))
-                        }
-                    });
-                }
+            // BUG FIX: Ensure parts are loaded even if user didn't click the tab
+            let partsPool = cachedParts[q.id];
+            if (!partsPool) {
+                partsPool = await fetchGiftParts(q.name);
+                cachedParts[q.id] = partsPool;
             }
-            hapticNotify('success');
-            saveState();
-            renderInventory();
-            closeModal('customize-modal');
-            switchTab('inventory');
-        }, 50);
+    
+            // Logic: If queue has 1 item, use the input box quantity. 
+            // If queue has multiple items, create 1 of each.
+            const loopCount = customizationQueue.length === 1 ? qtyInput : 1;
+    
+            for (let i = 0; i < loopCount; i++) {
+                
+                // 1. Determine Model
+                let finalModel = q.parts.model;
+                // Apply random if: Checkbox is checked OR model wasn't manually selected
+                if (!finalModel || (customizationQueue.length === 1 && isRandomModel)) {
+                    const validModels = partsPool.models.filter(m => !m.crafted);
+                    const pool = validModels.length > 0 ? validModels : partsPool.models;
+                    finalModel = pool[Math.floor(Math.random() * pool.length)];
+                }
+    
+                // 2. Determine Backdrop
+                let finalBackdrop = q.parts.backdrop;
+                if (!finalBackdrop || (customizationQueue.length === 1 && isRandomBackdrop)) {
+                    finalBackdrop = partsPool.backdrops[Math.floor(Math.random() * partsPool.backdrops.length)];
+                }
+    
+                // 3. Determine Pattern
+                let finalPattern = q.parts.pattern;
+                if (!finalPattern || (customizationQueue.length === 1 && isRandomPattern)) {
+                    finalPattern = partsPool.patterns[Math.floor(Math.random() * partsPool.patterns.length)];
+                }
+    
+                // If we still fail to find a part (rare error), skip
+                if(!finalModel || !finalBackdrop || !finalPattern) continue;
+    
+                state.lastCollectibleNumber++; 
+                state.inventory.unshift({ 
+                    uniqueId: Date.now() + Math.random(), 
+                    originalId: q.id, 
+                    name: q.name, 
+                    isCollectible: true, 
+                    timestamp: Date.now(), 
+                    pinned: false, 
+                    collectibleNumber: state.lastCollectibleNumber, 
+                    collectibleData: { 
+                        model: finalModel, 
+                        backdrop: finalBackdrop, 
+                        pattern: finalPattern 
+                    } 
+                }); 
+            }
+        }
+    
+        hapticNotify('success'); 
+        saveState(); 
+        renderInventory(); 
+        closeModal('customize-modal'); 
+        switchTab('inventory'); 
     }
-
-/* 
-  NOTE FOR DYNAMIC GRID RIBBONS: To make the Grid NFT ribbons perfectly match the 
-  backdrop edge/center colors dynamically, update the line in your JS `renderInventory` where 
-  `<div class="top-right-label">` is generated to include the inline gradient:
-  
-  <div class="top-right-label" style="background: linear-gradient(to bottom, ${cd.backdrop.hex.edgeColor}, ${cd.backdrop.hex.centerColor});">#${gift.collectibleNumber}</div>
-*/
-
 </script>
 </body>
 </html>
