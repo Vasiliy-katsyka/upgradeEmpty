@@ -36,39 +36,9 @@
             user-select: none;
         }
 
-        /* Top Safe-padding to compensate for full-screen webview controls */
-        .app-container { 
-            max-width: 600px; 
-            margin: 0 auto; 
-            min-height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            position: relative; 
-            padding-top: 45px; 
-        }
+        .app-container { max-width: 600px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; position: relative; }
         .page { display: none; flex-direction: column; flex-grow: 1; background-color: var(--tg-theme-bg-color); }
         .page.active { display: flex; }
-
-        /* Custom profile settings settings trigger shifted down for Telegram Fullscreen UI */
-        .profile-settings-btn {
-            position: absolute;
-            top: 55px; 
-            right: 16px;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: rgba(255, 255, 255, 0.8);
-            cursor: pointer;
-            z-index: 100;
-            border-radius: 50%;
-            transition: background 0.2s;
-        }
-        .profile-settings-btn:active {
-            background: rgba(255, 255, 255, 0.1);
-        }
 
         .page-header {
             display: flex; align-items: center; justify-content: space-between;
@@ -77,8 +47,33 @@
         }
         .page-header h2 { font-size: 1.15em; font-weight: 500; margin: 0; }
         
+        #profile-page {
+            padding-top: 55px; /* Offset content down for safe space fullscreen */
+        }
+
+        #profile-settings-btn {
+            position: absolute;
+            top: 55px;
+            right: 20px;
+            font-size: 26px;
+            color: #ffffff;
+            cursor: pointer;
+            z-index: 100;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.3);
+            transition: background 0.2s;
+        }
+        #profile-settings-btn:active {
+            background: rgba(0,0,0,0.5);
+        }
+
         .profile-top-section {
-            padding-top: 30px; padding-bottom: 20px;
+            padding-top: 40px; padding-bottom: 25px;
             background: var(--app-profile-gradient-fallback);
             display: flex; justify-content: center; position: relative;
             transition: background 0.5s ease;
@@ -103,82 +98,83 @@
         }
 
         .profile-main-info { display: flex; flex-direction: column; align-items: center; z-index: 2; position: relative; }
+        
+        /* Pinned Avatar Container */
+        .profile-avatar-wrapper {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin-bottom: 15px;
+        }
         .profile-avatar {
             width: 100px; height: 100px; border-radius: 50%;
             background-color: var(--tg-theme-hint-color);
             object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 2;
         }
         
-        /* Pinned floating gifts around avatar */
-        .avatar-floater {
+        /* Floating Pinned Gifts around profile photo */
+        .pinned-floating-gift {
             position: absolute;
-            width: 36px;
-            height: 36px;
-            z-index: 10;
+            width: 34px;
+            height: 34px;
             pointer-events: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: floatAnimation 3s ease-in-out infinite;
+            z-index: 5;
+            animation: floatGently 5s ease-in-out infinite;
         }
-        .avatar-floater:nth-child(even) {
-            animation-delay: 1.5s;
+        .pinned-floating-gift img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
-        @keyframes floatAnimation {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-6px) rotate(5deg); }
+        .pinned-floating-gift.pos-0 { top: -25px; left: -25px; animation-delay: 0s; }
+        .pinned-floating-gift.pos-1 { top: -35px; left: 34px; animation-delay: 0.8s; }
+        .pinned-floating-gift.pos-2 { top: -25px; right: -25px; animation-delay: 1.6s; }
+        .pinned-floating-gift.pos-3 { bottom: 0px; left: -35px; animation-delay: 2.4s; }
+        .pinned-floating-gift.pos-4 { bottom: 0px; right: -35px; animation-delay: 3.2s; }
+        .pinned-floating-gift.pos-5 { bottom: -25px; left: 34px; animation-delay: 4.0s; }
+
+        @keyframes floatGently {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-5px) rotate(5deg); }
         }
 
         .profile-name-status h1 { font-size: 1.4em; font-weight: 700; text-align: center; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; }
         .profile-name-status p { font-size: 0.9em; opacity: 0.7; text-align: center; margin: 0; color: var(--tg-theme-text-color); }
 
-        /* Compact specialized list info container */
-        .profile-info-container {
-            background: #1c1c1e;
-            border-radius: 16px;
-            padding: 16px;
-            margin: 16px;
+        /* Unified Info Section Container */
+        .profile-info-block { 
+            background-color: #121214; 
+            border-radius: 20px; 
+            padding: 16px; 
+            margin: 15px; 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
         }
-        .info-item { margin-bottom: 14px; cursor: default; }
-        .info-item:last-child { margin-bottom: 0; }
-        .info-item .value { color: var(--tg-theme-text-color); font-size: 1.05em; display: block; margin-bottom: 2px; line-height: 1.2; font-weight: 500; }
-        .info-item .label { color: var(--tg-theme-hint-color); font-size: 0.8em; }
+        .info-item { margin-bottom: 12px; cursor: default; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 12px; }
+        .info-item:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
+        .info-item .value { color: var(--tg-theme-text-color); font-size: 1.05em; display: block; margin-bottom: 2px; line-height: 1.2;}
+        .info-item .label { color: var(--tg-theme-hint-color); font-size: 0.85em; }
         .info-item .clickable { cursor: pointer; }
 
-        /* Unified native bottom pill style switcher */
-        .profile-tabs-wrapper {
-            display: flex;
-            justify-content: center;
-            padding: 12px 16px;
-            background: var(--tg-theme-bg-color);
+        /* Capsule Tab Switcher */
+        .profile-tabs-pill-container {
+            display: inline-flex;
+            background-color: #1a1a1c;
+            padding: 4px;
+            border-radius: 40px;
+            gap: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
-        .pill-tabs {
-            display: flex;
-            background: #1c1c1e;
-            border-radius: 20px;
-            padding: 3px;
-            width: 100%;
+        .profile-tabs-pill-container button {
+            background: none; border: none; color: #8e8e93;
+            padding: 8px 18px; border-radius: 40px; font-size: 0.9em;
+            font-weight: 600; cursor: pointer; transition: all 0.2s ease;
+            display: flex; align-items: center; gap: 6px;
         }
-        .pill-tab {
-            flex: 1;
-            background: none;
-            border: none;
-            color: var(--tg-theme-hint-color);
-            padding: 10px;
-            font-size: 0.9em;
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 18px;
-            transition: background 0.2s, color 0.2s;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-        .pill-tab.active {
-            background: #2c2c2e;
-            color: #ffffff;
+        .profile-tabs-pill-container button.active {
+            background-color: rgba(142, 90, 246, 0.15);
+            color: #af9bf5;
         }
 
         .gifts-grid {
@@ -187,16 +183,30 @@
             background: var(--tg-theme-bg-color);
         }
         
-        .gift-card {
+        .gift-card, .buy-gift-item {
             background-color: var(--tg-theme-secondary-bg-color);
             border-radius: 12px; padding: 6px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             cursor: pointer; position: relative; overflow: hidden;
             transition: transform 0.1s ease-out; border: none; 
-            aspect-ratio: 1 / 1;
         }
+        .gift-card { aspect-ratio: 1 / 1; }
+        
+        /* High-Contrast Card Style for Redesigned Shop */
+        .buy-gift-item { 
+            background-color: #121214; 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            border-radius: 16px; 
+            padding: 12px; 
+            aspect-ratio: 1 / 1.35; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: space-between; 
+        }
+        
         .gift-card.selected { box-shadow: inset 0 0 0 3px var(--tg-theme-link-color); background-color: rgba(98, 188, 249, 0.15); }
-        .gift-card:active { transform: scale(0.97); }
+        .gift-card:active, .buy-gift-item:active { transform: scale(0.97); }
         
         .status-icon {
             position: absolute; top: 6px; left: 6px; z-index: 5;
@@ -210,11 +220,52 @@
             width: 75%; height: 75%; display: flex; align-items: center; justify-content: center;
             position: relative; z-index: 2; margin-bottom: 0px; 
         }
+        .buy-gift-item .image-container { height: 55%; margin-bottom: 4px; margin-top: 8px; }
         .image-container img, .image-container .lottie-wrapper { max-width: 100%; max-height: 100%; object-fit: contain; }
         .lottie-wrapper { width: 100%; height: 100%; }
         
         .gift-name { font-size: 0.85em; font-weight: 500; text-align: center; margin-top: 4px; z-index: 2; width: 100%; line-height: 1.2; padding: 0 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .gift-price { font-size: 0.8em; color: var(--tg-theme-hint-color); margin: 4px 0 8px; font-weight: bold; z-index: 2;}
+        .buy-gift-item .gift-name { color: #ffffff; font-size: 0.9em; font-weight: 600; }
+
+        /* Sparkling Golden Star Price Badges */
+        .gold-price-badge {
+            background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
+            color: #000000;
+            font-weight: 700;
+            font-size: 0.85em;
+            padding: 6px 14px;
+            border-radius: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .gold-price-badge::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.4) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(30deg);
+            animation: sparkleSweep 2s infinite linear;
+        }
+        @keyframes sparkleSweep {
+            0% { transform: translate(-40%, -40%) rotate(30deg); }
+            100% { transform: translate(40%, 40%) rotate(30deg); }
+        }
+
         .gift-card-bg-pattern { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0; }
         .dynamic-pattern-container { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1; overflow: hidden; pointer-events: none; }
         .card-pattern-symbol { 
@@ -261,154 +312,192 @@
         }
         .modal-button.secondary { background-color: var(--tg-theme-bg-color); color: var(--tg-theme-link-color); }
         
-        /* REDESIGNED SHOP ITEMS (Black Background / Rounded Card containers) */
-        #shop-page {
-            background-color: #000000 !important;
-        }
-        #shop-grid {
-            background-color: #000000 !important;
-            padding: 16px;
-            gap: 12px;
-        }
-        .buy-gift-item {
-            background-color: #1a1a1c;
-            border-radius: 16px;
-            padding: 12px;
-            aspect-ratio: 1 / 1.3;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.1s ease-out;
-        }
-        .buy-gift-item:active { transform: scale(0.97); }
-        .buy-gift-item .image-container { height: 55%; margin-bottom: 0; margin-top: 4px; }
-        .buy-gift-item .gift-name { font-size: 0.9em; font-weight: 600; color: #ffffff; margin-top: 4px; text-align: center; }
-
-        /* Magic gold starry price indicator */
-        .shop-price-pill {
-            background: rgba(255, 179, 0, 0.1);
-            color: #ffb300;
-            border: 1px solid rgba(255, 179, 0, 0.2);
-            border-radius: 14px;
-            padding: 4px 12px;
-            font-size: 0.8em;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            margin-bottom: 6px;
-            position: relative;
-            overflow: hidden;
-            text-shadow: 0 0 4px rgba(255,179,0,0.3);
-        }
-        .shop-price-pill::before, .shop-price-pill::after {
-            content: "✨";
-            font-size: 0.7em;
-            opacity: 0.8;
-        }
-        
-        /* High flexible collectible modal styling */
-        #collectible-modal .modal-content {
-            background-color: #121214 !important;
-            max-height: 100vh !important;
-            height: auto !important; 
-            border-top-left-radius: 28px;
-            border-top-right-radius: 28px;
-        }
-        #collectible-modal .modal-scrollable-content {
-            background: transparent !important;
-            padding: 12px 16px 4px 16px;
-        }
-
+        /* New Collectible Modal Styles */
         .collectible-header {
-            position: relative; padding: 24px 16px 16px; text-align: center; overflow: hidden;
+            position: relative; padding: 40px 16px 24px; text-align: center; overflow: hidden;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             color: #ffffff;
-            border-top-left-radius: 28px; border-top-right-radius: 28px;
-            border-bottom-left-radius: 24px; border-bottom-right-radius: 24px;
         }
-        .collectible-header h3 { margin-top: 10px; position: relative; z-index: 2; font-size: 1.4em; margin-bottom: 4px; font-weight: 700; }
-        .collectible-header .sub-header { position: relative; z-index: 2; font-size: 0.9em; opacity: 0.8; }
+        .collectible-header h3 { margin-top: 15px; position: relative; z-index: 2; font-size: 1.5em; margin-bottom: 6px; font-weight: 700; }
+        .collectible-header .sub-header { position: relative; z-index: 2; font-size: 1em; opacity: 0.9; }
 
         /* Navigation Context Button (Three-dot Ellipsis) */
         .collectible-context-btn {
-            position: absolute; top: 16px; right: 16px; width: 36px; height: 36px;
-            display: flex; align-items: center; justify-content: center; font-size: 24px;
-            color: rgba(255, 255, 255, 0.8); cursor: pointer; z-index: 100;
-            transition: color 0.2s, background 0.2s; border-radius: 50%;
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            z-index: 100;
+            transition: color 0.2s, background 0.2s;
+            border-radius: 50%;
         }
         .collectible-context-btn:hover, .collectible-context-btn:active {
-            color: #ffffff; background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
         }
 
-        /* Compact Action Buttons Row */
+        /* Action Buttons Row */
         .modal-action-row {
-            display: flex; justify-content: space-between; gap: 10px; width: 92%;
-            margin: 16px auto 0 auto; position: relative; z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            width: 90%;
+            margin: 20px auto 0 auto;
+            position: relative;
+            z-index: 2;
         }
         .action-row-btn {
-            flex: 1; background: rgba(0, 0, 0, 0.35); border: none; border-radius: 12px;
-            padding: 10px 4px; display: flex; flex-direction: column; align-items: center;
-            justify-content: center; gap: 6px; cursor: pointer;
-            transition: background 0.2s ease, transform 0.1s; color: #ffffff;
+            flex: 1;
+            background: rgba(0, 0, 0, 0.35);
+            border: none;
+            border-radius: 14px;
+            padding: 12px 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.1s;
+            color: #ffffff;
         }
-        .action-row-btn:active { background: rgba(0, 0, 0, 0.5); transform: scale(0.97); }
-        .action-row-btn.disabled { opacity: 0.4; cursor: not-allowed; }
-        .action-row-btn.disabled:active { transform: none; background: rgba(0, 0, 0, 0.35); }
-        .action-btn-icon { width: 20px; height: 20px; object-fit: contain; }
-        .action-btn-text { font-size: 0.75em; font-weight: 600; letter-spacing: 0.2px; }
+        .action-row-btn:active {
+            background: rgba(0, 0, 0, 0.5);
+            transform: scale(0.97);
+        }
+        .action-row-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .action-row-btn.disabled:active {
+            transform: none;
+            background: rgba(0, 0, 0, 0.35);
+        }
+        .action-btn-icon {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
+        .action-btn-text {
+            font-size: 0.85em;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
 
         /* Bordered Grid Details Table Style */
         .stats-table {
-            background-color: #1c1c1e; border-radius: 14px; overflow: hidden; margin-top: 0; margin-bottom: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background-color: rgba(255, 255, 255, 0.03); 
+            border-radius: 14px; 
+            overflow: hidden; 
+            margin-top: 0; 
+            margin-bottom: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
-        .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .stat-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 14px 16px; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08); 
+        }
         .stat-row:last-child { border-bottom: none; }
-        .stat-label { font-weight: bold; color: var(--tg-theme-text-color); font-size: 0.9em; }
-        .stat-value { display: flex; align-items: center; gap: 8px; font-size: 0.9em; color: var(--tg-theme-text-color); }
+        .stat-label { font-weight: bold; color: var(--tg-theme-text-color); font-size: 0.95em; }
+        .stat-value { display: flex; align-items: center; gap: 8px; font-size: 0.95em; color: var(--tg-theme-text-color); }
         
         .owner-chip { display: flex; align-items: center; gap: 6px; }
         .owner-chip img { width: 20px; height: 20px; border-radius: 50%; }
         .owner-chip span { color: var(--tg-theme-link-color); }
         
-        /* Lavender desaturated purple badge */
+        /* Desaturated semi-transparent purple badge */
         .percentage-pill { 
-            background-color: rgba(157, 141, 242, 0.15); color: #9d8df2; padding: 2px 8px;
-            border-radius: 8px; font-size: 0.8em; font-weight: 600; 
+            background-color: rgba(157, 141, 242, 0.15); 
+            color: #9d8df2; 
+            padding: 2px 8px; 
+            border-radius: 8px; 
+            font-size: 0.8em; 
+            font-weight: 600; 
         }
         .learn-more { font-size: 0.8em; color: var(--tg-theme-link-color); margin-left: 4px; opacity: 0.8; }
         
+        /* Redesigned Collectible CTA */
         .big-rounded-btn {
-            width: 100%; background-color: #8e5af6; color: #ffffff; border: none;
-            padding: 12px; border-radius: 24px; font-size: 1em; font-weight: 600; cursor: pointer;
+            width: 100%; 
+            background-color: #8e5af6; 
+            color: #ffffff;
+            border: none; 
+            padding: 14px; 
+            border-radius: 30px; 
+            font-size: 1.1em; 
+            font-weight: 600; 
+            cursor: pointer;
             transition: background 0.2s;
         }
-        .big-rounded-btn:active { background-color: #7944de; }
+        .big-rounded-btn:active {
+            background-color: #7944de;
+        }
 
-        .collectible-footer-container { padding: 10px 20px 30px 20px; background: var(--tg-theme-bg-color); }
+        .collectible-footer-container {
+            padding: 15px 20px 42px 20px;
+            background: var(--tg-theme-bg-color);
+        }
 
         /* Visibility context styles */
-        .col-visibility-bar { text-align: center; margin: 10px auto 20px auto; font-size: 0.85em; cursor: pointer; user-select: none; }
-        .col-visibility-text { color: var(--tg-theme-hint-color); }
-        .col-visibility-action { color: #9d8df2; font-weight: 600; transition: opacity 0.1s; }
-        .col-visibility-action:active { opacity: 0.8; }
+        .col-visibility-bar {
+            text-align: center;
+            margin: 15px auto 25px auto;
+            font-size: 0.9em;
+            cursor: pointer;
+            user-select: none;
+        }
+        .col-visibility-text {
+            color: var(--tg-theme-hint-color);
+        }
+        .col-visibility-action {
+            color: #9d8df2;
+            font-weight: 600;
+            transition: opacity 0.1s;
+        }
+        .col-visibility-action:active {
+            opacity: 0.8;
+        }
 
-        /* Scaled Down Roulette Sizing */
-        .roulette-image-wrapper { width: 100%; height: 130px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-        .roulette-strip { display: flex; height: 100%; position: absolute; left: 0; top: 0; }
-        .roulette-strip img { width: 130px; height: 130px; object-fit: contain; flex-shrink: 0; }
-        #collectible-image, #collectible-lottie { width: 130px !important; height: 130px !important; }
+        @keyframes bounceWorn {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+
+        /* Roulette Animations */
+        .roulette-image-wrapper {
+            width: 100%; height: 160px; position: relative; overflow: hidden; display: flex;
+            align-items: center; justify-content: center;
+        }
+        .roulette-strip {
+            display: flex; height: 100%; position: absolute; left: 0; top: 0;
+        }
+        .roulette-strip img {
+            width: 160px; height: 160px; object-fit: contain; flex-shrink: 0;
+        }
         
         /* Vertical Text Slot */
-        .slot-mask { height: 1.2em; overflow: hidden; position: relative; display: inline-block; vertical-align: bottom; width: 120px; text-align: right; }
-        .slot-scroll { display: flex; flex-direction: column; position: absolute; top: 0; right: 0; width: 100%; transition: transform 0.1s linear; }
-        .slot-item { height: 1.2em; display: flex; align-items: center; justify-content: flex-end; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .slot-mask {
+            height: 1.2em; overflow: hidden; position: relative; display: inline-block; vertical-align: bottom;
+            width: 120px; text-align: right;
+        }
+        .slot-scroll {
+            display: flex; flex-direction: column; position: absolute; top: 0; right: 0; width: 100%;
+            transition: transform 0.1s linear;
+        }
+        .slot-item {
+            height: 1.2em; display: flex; align-items: center; justify-content: flex-end; width: 100%;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
 
         /* Menu */
         #long-press-menu {
@@ -493,19 +582,41 @@
         }
 
         #btn-craft-action {
-            width: 90%; height: auto; min-height: 56px; margin: 0 auto 10px auto;
+            width: 90%; 
+            height: auto;
+            min-height: 56px;
+            margin: 0 auto 10px auto;
             background: linear-gradient(90deg, #4cd964 0%, #29b6f6 100%);
-            border-radius: 30px; border: none; color: #ffffff;
+            border-radius: 30px; 
+            border: none;
+            color: #ffffff;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; box-shadow: 0 4px 20px rgba(46, 204, 113, 0.4);
-            font-size: 1.1em; font-weight: 700; line-height: 1.2; padding: 12px 20px; text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(46, 204, 113, 0.4);
+            font-size: 1.1em; 
+            font-weight: 700;
+            line-height: 1.2;
+            padding: 12px 20px;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.1);
         }
 
-        #btn-craft-action:disabled { background: #2c3e50; color: #7f8c8d; box-shadow: none; cursor: not-allowed; }
-        .craft-btn-subtext { font-size: 0.75em; font-weight: 500; opacity: 0.9; margin-top: 2px; }
+        #btn-craft-action:disabled {
+            background: #2c3e50;
+            color: #7f8c8d;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .craft-btn-subtext {
+            font-size: 0.75em; 
+            font-weight: 500; 
+            opacity: 0.9; 
+            margin-top: 2px;
+        }
 
         #craft-modal .modal-content {
-            background: #094d4f; background: radial-gradient(circle,rgba(9, 77, 79, 1) 0%, rgba(0, 20, 16, 1) 100%);
+            background: #094d4f;
+            background: radial-gradient(circle,rgba(9, 77, 79, 1) 0%, rgba(0, 20, 16, 1) 100%);
             height: 90vh;
         }
 
@@ -530,8 +641,10 @@
         .craft-pct-text { position: absolute; bottom: 25px; color: #fff; font-size: 0.9em; font-weight: 700; }
 
         .craft-slot {
-            position: absolute; width: 70px; height: 70px; background: rgba(255,255,255,0.1); border-radius: 16px;
-            display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; border: 2px solid transparent;
+            position: absolute; width: 70px; height: 70px;
+            background: rgba(255,255,255,0.1); border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; overflow: hidden; border: 2px solid transparent;
             transition: transform 0.1s;
         }
         .craft-slot.top-left { top: 0; left: 0; }
@@ -564,12 +677,22 @@
 
         #craft-anim-modal .modal-content {
             background: linear-gradient(180deg, #18222d 0%, #0e1621 100%) !important;
-            height: 90vh !important; max-height: 90vh !important; display: flex !important;
-            flex-direction: column !important; align-items: center !important; justify-content: center !important;
-            box-shadow: none !important; border-top-left-radius: 28px; border-top-right-radius: 28px;
+            height: 90vh !important;
+            max-height: 90vh !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: none !important;
+            border-top-left-radius: 28px;
+            border-top-right-radius: 28px;
         }
 
-        #craft-anim-modal .cube-wrapper { margin-bottom: 30px; flex-shrink: 0; }
+        #craft-anim-modal .cube-wrapper {
+            margin-bottom: 30px;
+            flex-shrink: 0;
+        }
+
         .cube-face {
             position: absolute; width: 150px; height: 150px;
             background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2);
@@ -596,6 +719,14 @@
             50% { filter: brightness(3) sepia(1) hue-rotate(-30deg) blur(2px); opacity: 0.8; }
             100% { filter: grayscale(1) brightness(0.2) blur(10px); opacity: 0; transform: scale(0.5) translateZ(-75px) translateY(50px); }
         }
+
+        /* Redesigned Collectible Sheet Height */
+        #collectible-modal .modal-content {
+            background-color: var(--tg-theme-bg-color);
+            border-top-left-radius: 28px; border-top-right-radius: 28px;
+            width: 100%; max-width: 600px; display: flex; flex-direction: column; 
+            height: 95vh; max-height: 95vh; overflow-y: auto;
+        }
     </style>
 </head>
 <body>
@@ -610,18 +741,17 @@
 </div>
 
 <div class="app-container">
-    <!-- Profile Page (Header completely removed per reference Image 1) -->
+    <!-- Profile Page -->
     <div id="profile-page" class="page">
-        <!-- Settings 3 dots icon placed absolutely at offset 55px -->
-        <div class="profile-settings-btn" onclick="openProfileSettingsMenu(event)">⋮</div>
-        
+        <!-- 3 Dots settings replacing normal header, moved down 55px -->
+        <div id="profile-settings-btn" onclick="openSettingsModal()">⋮</div>
+
         <div class="profile-top-section" id="profile-bg">
             <div id="profile-pattern-overlay"></div>
             <div class="profile-main-info">
-                <!-- Relative wrapper for profile avatar containing floating pinned gifts -->
-                <div class="profile-avatar-wrapper" style="position: relative; width: 100px; height: 100px; margin-bottom: 12px;">
-                    <img src="" class="profile-avatar" id="user-avatar" style="width: 100%; height: 100%; margin-bottom: 0;">
-                    <div id="avatar-floater-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></div>
+                <!-- Avatar wrapper to carry scattered pinned icons -->
+                <div class="profile-avatar-wrapper" id="pinned-gifts-container">
+                    <img src="" class="profile-avatar" id="user-avatar">
                 </div>
                 <div class="profile-name-status">
                     <h1 id="user-name">Loading...</h1>
@@ -630,8 +760,8 @@
             </div>
         </div>
         
-        <!-- Specialized Compact rounded Container Block (Reference Image 1) -->
-        <div class="profile-info-container">
+        <!-- Info elements wrapped inside single high contrast dark panel container -->
+        <div class="profile-info-block">
             <div class="info-item">
                 <span class="value" id="profile-phone">+888 0000 0000</span>
                 <span class="label">Mobile</span>
@@ -644,21 +774,13 @@
                 <span class="value" id="profile-username">@username</span>
                 <span class="label">Username</span>
             </div>
-            <div class="info-item">
-                <span class="value">May 13, 2004 (22 years old)</span>
-                <span class="label">Birthday</span>
-            </div>
         </div>
 
-        <!-- Pill layout Switcher tabs at the bottom -->
-        <div class="profile-tabs-wrapper">
-            <div class="pill-tabs">
-                <button class="pill-tab active" id="tab-inventory" onclick="switchProfileTab('inventory')">
-                    Gifts <span id="tab-inventory-gifts"></span>
-                </button>
-                <button class="pill-tab" id="tab-shop" onclick="switchProfileTab('shop')">
-                    Gift Shop
-                </button>
+        <!-- Pill Tab Switcher -->
+        <div class="profile-pill-wrapper" style="display: flex; justify-content: center; width: 100%; margin: 15px 0;">
+            <div class="profile-tabs-pill-container">
+                <button id="tab-pill-inventory" class="active" onclick="switchTab('inventory')">Gifts 🌸🧁🔎</button>
+                <button id="tab-pill-shop" onclick="switchTab('shop')">Gift Shop</button>
             </div>
         </div>
         
@@ -666,16 +788,15 @@
         <div class="gifts-grid" id="inventory-grid"></div>
     </div>
 
-    <!-- Shop Page (Page context switcher) -->
-    <div id="shop-page" class="page">
-        <!-- Shop/Customize Top Pill bar switcher instead of a separate page context -->
-        <div class="page-header" style="justify-content: center; padding-top: 15px; padding-bottom: 5px;">
-            <div class="pill-tabs" style="width: 90%;">
-                <button class="pill-tab active" id="shop-tab-shop" onclick="switchShopTab('shop')">Shop</button>
-                <button class="pill-tab" id="shop-tab-customize" onclick="openCustomizeModal()">Customize</button>
+    <!-- Redesigned Shop Page -->
+    <div id="shop-page" class="page" style="padding-top: 55px; background-color: #000000;">
+        <div class="shop-header-pill-container" style="display: flex; justify-content: center; width: 100%; margin-bottom: 20px;">
+            <div class="profile-tabs-pill-container">
+                <button class="active" style="pointer-events: none;">Shop</button>
+                <button onclick="openCustomizeModal()">Customize</button>
             </div>
         </div>
-        <div class="gifts-grid" id="shop-grid">
+        <div class="gifts-grid" id="shop-grid" style="background-color: #000000 !important;">
             <div class="spinner"></div>
         </div>
     </div>
@@ -746,8 +867,9 @@
 <!-- REDESIGNED COLLECTIBLE / ROULETTE MODAL -->
 <div id="collectible-modal" class="modal-overlay">
     <div class="modal-content" style="background-color: var(--tg-theme-bg-color);">
+        <!-- Top Gradient Section with ellipse button and action row button layout -->
         <div id="collectible-header" class="collectible-header">
-            <!-- Settings button trigger (3 dots) in the card's top corner -->
+            <!-- Context Menu Ellipsis button in colored card header -->
             <div id="collectible-context-btn" class="collectible-context-btn" onclick="openCollectibleContextMenu(event)">⋮</div>
             
             <div id="collectible-pattern-container" class="dynamic-pattern-container"></div>
@@ -760,7 +882,7 @@
                 <h3 id="collectible-title">Gift Name #000</h3>
                 <div class="sub-header" id="collectible-model-name">Model Name</div>
 
-                <!-- Three action columns buttons row inside header backdrop container -->
+                <!-- 3 Action Button Row -->
                 <div class="modal-action-row" id="modal-action-row">
                     <button class="action-row-btn" id="btn-col-transfer" onclick="handleTransferClick()">
                         <img class="action-btn-icon" src="https://github.com/Vasiliy-katsyka/upgrade/blob/main/transfer-gift.png?raw=true" alt="Transfer">
@@ -778,6 +900,7 @@
             </div>
         </div>
 
+        <!-- Scrollable Content with Table -->
         <div class="modal-scrollable-content" style="padding: 16px;">
             <div class="stats-table">
                 <!-- Owner -->
@@ -817,16 +940,24 @@
                     <div class="stat-label">Quantity</div>
                     <div class="stat-value" id="col-quantity">100/1000 issued</div>
                 </div>
+                <!-- Value -->
+                <div class="stat-row">
+                    <div class="stat-label">Value</div>
+                    <div class="stat-value" style="color: var(--tg-theme-link-color);">
+                        <span id="col-value">~10 TON</span> 
+                        <span class="learn-more">learn more</span>
+                    </div>
+                </div>
             </div>
 
-            <!-- Visible helper context switch button -->
+            <!-- Context Helper Text Visibility Bar -->
             <div id="col-visibility-bar" class="col-visibility-bar" onclick="toggleCollectibleVisibility()">
                 <span id="col-visibility-text" class="col-visibility-text">This gift is visible. </span>
                 <span id="col-visibility-action" class="col-visibility-action">Hide from profile &gt;</span>
             </div>
         </div>
 
-        <!-- Spaced Floating CTA OK buttons footer -->
+        <!-- Spaced Floating layout OK Button Footer -->
         <div class="collectible-footer-container">
             <button id="btn-collectible-action" class="big-rounded-btn" onclick="closeModal('collectible-modal')">OK</button>
         </div>
@@ -1059,8 +1190,9 @@
         <li id="menu-pin" onclick="togglePin()">Pin to Profile</li>
         <li id="menu-wear" onclick="toggleWear()">Wear Gift</li>
         <li id="menu-reorder" class="hidden" onclick="startReorderMode()">Reorder Pins</li>
-        <li id="menu-craft" onclick="triggerMenuCraft()">Craft Gift</li>
         <li id="menu-hide" onclick="toggleHide()">Hide Gift</li>
+        <!-- Craft Option integrated perfectly directly inside ellipsis menus -->
+        <li id="menu-craft" onclick="handleMenuCraft()" style="display:none;">Craft Gift</li>
         <li class="danger" onclick="deleteGift()">Delete</li>
     </ul>
 </div>
@@ -1072,9 +1204,17 @@
     const tg = window.Telegram.WebApp;
     tg.ready(); tg.expand(); tg.enableClosingConfirmation();
 
+    // Fullscreen support Bot API 8.0+
+    try {
+        if (typeof tg.requestFullscreen === 'function') {
+            tg.requestFullscreen();
+        }
+    } catch(err) {
+        console.warn("Fullscreen request error", err);
+    }
+
     const CDN_BASE = "https://cdn.changes.tg/gifts/";
     const LS_KEY = "telegram_gift_simulator_data_v2"; 
-    const RANDOM_PRICES = [15, 25, 50, 100, 250];
     
     const MY_CUSTOM_ADDITIONS = {
         "Heart Locket": [{name: "Midnight Club", rarityPermille: 10, isCustom: true, imageUrl: "https://raw.githubusercontent.com/Vasiliy-katsyka/upgradeEmpty/main/MidnightClubEmoji_AgADoJIAAkOhuEs.png", lottieUrl: "https://raw.githubusercontent.com/Vasiliy-katsyka/upgradeEmpty/main/MidnightClubEmoji_AgADoJIAAkOhuEs.json"}],
@@ -1087,7 +1227,7 @@
     };
     
     const PIN_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z" /></svg>`;
-    const WEAR_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>`;
+    const RANDOM_PRICES = ["15", "25", "50", "100", "250", "50+", "100+", "250+"];
 
     let state = { inventory: [], giftDefinitions: {}, lastCollectibleNumber: 100, userBio: "Hello world", userPhone: "", settings: { animations: true, showHidden: false } };
     let customizationQueue = []; let editingIndex = 0; let cachedParts = {};
@@ -1097,16 +1237,6 @@
     window.addEventListener('DOMContentLoaded', async () => {
         const loadingScreen = document.getElementById('loading-overlay');
         lottie.loadAnimation({ container: document.getElementById('loading-anim'), renderer: 'svg', loop: true, autoplay: true, path: 'https://cdn.changes.tg/gifts/models/Artisan%20Brick/lottie/Ice%20Mammoth.json' });
-        
-        // request Telegram WebApp fullscreen mode
-        if (tg.requestFullscreen) {
-            try {
-                tg.requestFullscreen();
-            } catch (e) {
-                console.log("Fullscreen request failed", e);
-            }
-        }
-
         setTimeout(() => { loadingScreen.style.opacity = '0'; document.getElementById('profile-page').classList.add('active'); setTimeout(() => { loadingScreen.classList.remove('active'); }, 200); }, Math.random() * 3000 + 2000);
 
         applyTelegramTheme(); tg.onEvent('themeChanged', applyTelegramTheme);
@@ -1189,19 +1319,48 @@
         const grid = document.getElementById('shop-grid'); grid.innerHTML = '';
         Object.entries(state.giftDefinitions).forEach(([id, name]) => {
             if (['custom_skebob', 'custom_baggin_cat'].includes(id)) return;
-            const rndPrice = RANDOM_PRICES[Math.floor(Math.random() * RANDOM_PRICES.length)];
+            
+            // Consistent pseudo-random price calculations based on characters code
+            const index = Math.abs(id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % RANDOM_PRICES.length;
+            const price = RANDOM_PRICES[index];
+
             const el = document.createElement('div'); el.className = 'buy-gift-item';
             el.innerHTML = `
                 <div class="image-container">
                     <img src="${CDN_BASE}originals/${id}/Original.png" loading="lazy" onerror="this.style.display='none'">
                 </div>
                 <div class="gift-name">${name}</div>
-                <div class="shop-price-pill">⭐ ${rndPrice}</div>
+                <div class="gold-price-badge">⭐ ${price}</div>
             `;
             el.onclick = () => buyGift(id, name);
             el.addEventListener('touchstart', (e) => startShopLongPress(e, id, name), {passive:false}); el.addEventListener('touchend', cancelLongPress);
             el.addEventListener('contextmenu', (e) => { e.preventDefault(); openQtyModal(id, name); });
             grid.appendChild(el);
+        });
+    }
+
+    // Dynamic Render of pinned gifts floating around Profile Avatar without background
+    function renderPinnedGiftsAroundAvatar() {
+        const container = document.getElementById('pinned-gifts-container');
+        if (!container) return;
+        
+        container.querySelectorAll('.pinned-floating-gift').forEach(el => el.remove());
+        const pinned = state.inventory.filter(g => g.pinned).slice(0, 6);
+        
+        pinned.forEach((gift, idx) => {
+            const el = document.createElement('div');
+            el.className = `pinned-floating-gift pos-${idx}`;
+            
+            let imgUrl = "";
+            if (gift.isCollectible) {
+                const cd = gift.collectibleData;
+                imgUrl = cd.model.isCustom ? cd.model.imageUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/png/${encodeURIComponent(cd.model.name)}.png`;
+            } else {
+                imgUrl = `${CDN_BASE}originals/${gift.originalId}/Original.png`;
+            }
+            
+            el.innerHTML = `<img src="${imgUrl}" alt="">`;
+            container.appendChild(el);
         });
     }
     
@@ -1211,7 +1370,10 @@
         grid.innerHTML = '';
         let displayList = state.settings.showHidden ? state.inventory : state.inventory.filter(g => !g.hidden);
         document.getElementById('gift-count-display').innerText = `${state.inventory.length} gifts`;
+        
+        renderPinnedGiftsAroundAvatar();
         updateActionToolbar();
+        
         if (displayList.length === 0) { grid.innerHTML = `<div style="grid-column:span 3; text-align:center; padding:40px 20px; color:var(--tg-theme-hint-color);">${state.inventory.length>0?"All hidden.":"Empty."}</div>`; return; }
         
         displayList.sort((a, b) => {
@@ -1251,10 +1413,6 @@
             }
             grid.appendChild(el);
         });
-
-        // Float pinned gifts around avatar dynamically
-        renderPinnedGiftsAroundAvatar();
-        updateTabGiftsEmojis();
     }
     
     function updateActionToolbar() {
@@ -1264,7 +1422,7 @@
     }
 
     // --- Actions ---
-    function buyGift(id, name, qty = 1) { for(let i=0; i<qty; i++) state.inventory.unshift({ uniqueId: Date.now()+Math.random()+i, originalId: id, name: name, isCollectible: false, timestamp: Date.now()+i }); saveState(); renderInventory(); if(qty===1) switchProfileTab('inventory'); hapticNotify('success'); }
+    function buyGift(id, name, qty = 1) { for(let i=0; i<qty; i++) state.inventory.unshift({ uniqueId: Date.now()+Math.random()+i, originalId: id, name: name, isCollectible: false, timestamp: Date.now()+i }); saveState(); renderInventory(); if(qty===1) switchTab('inventory'); hapticNotify('success'); }
     function startShopLongPress(e, id, name) { appRuntime.longPressTimer = setTimeout(() => { haptic('medium'); openQtyModal(id, name); }, 500); }
     function startInventoryLongPress(e, gift) { appRuntime.longPressTimer = setTimeout(() => { haptic('medium'); openMenu(e.touches[0], gift); }, 500); }
     function cancelLongPress() { clearTimeout(appRuntime.longPressTimer); }
@@ -1343,18 +1501,22 @@
         const rouletteStrip = document.getElementById('roulette-strip');
         const btn = document.getElementById('btn-collectible-action');
 
+        // Render card backdrop style
         header.style.background = getBackdropStyle(cd.backdrop);
         document.getElementById('collectible-pattern-container').innerHTML = '';
         generatePattern('collectible-pattern-container', cd.pattern, gift.name, false, cd.backdrop.hex.patternColor);
 
+        // Name and Status
         document.getElementById('collectible-title').innerText = `${gift.name} #${gift.collectibleNumber.toLocaleString()}`;
         document.getElementById('collectible-model-name').innerText = cd.model.name;
 
+        // Owner Chip
         const user = tg.initDataUnsafe.user;
         const ownerImg = document.getElementById('col-owner-img');
         ownerImg.src = user?.photo_url || "https://i.pravatar.cc/150?u=user";
         document.getElementById('col-owner-name').innerText = user?.first_name || 'You';
 
+        // Stats (Final Values)
         const setTextAndPct = (idSlot, idPct, val, permille) => {
             const slotEl = document.getElementById(idSlot);
             if(!isUpgrading && slotEl) {
@@ -1378,9 +1540,12 @@
         setTextAndPct('slot-symbol', 'col-symbol-pct', cd.pattern.name, cd.pattern.rarityPermille);
         setTextAndPct('slot-backdrop', 'col-backdrop-pct', cd.backdrop.name, cd.backdrop.rarityPermille);
 
+        // Secondary stats data
         const issued = Math.floor(Math.random() * 500000) + 10000;
         document.getElementById('col-quantity').innerText = `${Math.floor(Math.random()*issued).toLocaleString()} / ${issued.toLocaleString()} issued`;
+        document.getElementById('col-value').innerText = `~${Math.floor(Math.random()*100)+5} TON`;
 
+        // Load 3 Action buttons states
         updateWearButtonState(gift);
         updateVisibilityContextText(gift);
 
@@ -1467,7 +1632,7 @@
             rouletteStrip.style.display = 'none';
             
             const lottiePath = cd.model.isCustom ? cd.model.lottieUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/lottie/${encodeURIComponent(cd.model.name)}.json`;
-            const imgPath = cd.model.isCustom ? cd.model.imageUrl : `${CDN_BASE}models/${encodeURIComponent(giftName)}/png/${encodeURIComponent(cd.model.name)}.png`;
+            const imgPath = cd.model.isCustom ? cd.model.imageUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/png/${encodeURIComponent(cd.model.name)}.png`;
             
             if (state.settings.animations) {
                 lottieEl.style.display = 'block'; imgEl.style.display = 'none';
@@ -1531,14 +1696,7 @@
         openMenu(event, gift);
     }
 
-    // --- Settings menu trigger ---
-    function openProfileSettingsMenu(event) {
-        event.stopPropagation();
-        haptic('light');
-        openSettingsModal();
-    }
-
-    // --- Visibility context toggles ---
+    // --- Context Visibility Context Toggles ---
     function updateVisibilityContextText(gift) {
         const textEl = document.getElementById('col-visibility-text');
         const actionEl = document.getElementById('col-visibility-action');
@@ -1568,7 +1726,7 @@
         updateVisibilityContextText(gift);
     }
 
-    // --- Profile Miniature Icon & Pinned floaters ---
+    // --- Profile Miniature Icon Logic ---
     function appendWornGiftToName() {
         const nameEl = document.getElementById('user-name');
         if (!nameEl) return;
@@ -1587,71 +1745,6 @@
             badge.style.cssText = "width: 24px; height: 24px; vertical-align: middle; margin-left: 6px; object-fit: contain; animation: bounceWorn 2s ease infinite;";
             nameEl.appendChild(badge);
         }
-    }
-
-    // Floating gifts renderer
-    function renderPinnedGiftsAroundAvatar() {
-        const wrapper = document.getElementById('avatar-floater-container');
-        if (!wrapper) return;
-        wrapper.innerHTML = '';
-        
-        const pinnedGifts = state.inventory.filter(g => g.pinned);
-        const positions = [
-            { top: '-25px', left: '-25px' },   
-            { top: '-25px', right: '-25px' },  
-            { top: '40px', left: '-45px' },    
-            { top: '40px', right: '-45px' },   
-            { bottom: '-25px', left: '15px' }  
-        ];
-        
-        pinnedGifts.forEach((gift, idx) => {
-            if (idx >= positions.length) return; 
-            const pos = positions[idx];
-            
-            const el = document.createElement('div');
-            el.className = 'avatar-floater';
-            Object.assign(el.style, pos);
-            
-            let imgUrl = "";
-            if (gift.isCollectible) {
-                const cd = gift.collectibleData;
-                imgUrl = cd.model.isCustom ? cd.model.imageUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/png/${encodeURIComponent(cd.model.name)}.png`;
-            } else {
-                imgUrl = `${CDN_BASE}originals/${gift.originalId}/Original.png`;
-            }
-            
-            el.innerHTML = `<img src="${imgUrl}" style="width: 32px; height: 32px; object-fit: contain;">`;
-            wrapper.appendChild(el);
-        });
-    }
-
-    // Tab gifts mapper
-    function updateTabGiftsEmojis() {
-        const tabGiftsSpan = document.getElementById('tab-inventory-gifts');
-        if (!tabGiftsSpan) return;
-        
-        const firstGifts = state.inventory.slice(0, 3);
-        if (firstGifts.length === 0) {
-            tabGiftsSpan.innerText = "";
-            return;
-        }
-        
-        const emojiMap = {
-            "Heart Locket": "🔒",
-            "Jolly Chimp": "🐒",
-            "Khabib's Papakha": "💂",
-            "Desk Calendar": "📅",
-            "Winter Wreath": "🎄",
-            "Loot Bag": "🛍️",
-            "Victory Medal": "🏅",
-            "Sakura Flower": "🌸"
-        };
-        
-        let emojis = "";
-        firstGifts.forEach(g => {
-            emojis += emojiMap[g.name] || "🎁";
-        });
-        tabGiftsSpan.innerText = emojis;
     }
 
     // --- Customization Queue Fixes ---
@@ -1747,19 +1840,6 @@
         maxSlots: 4
     };
 
-    function initCraftingButton() {
-        // Overlay button no longer generated on header. Crafting triggers inside menu options dropdown.
-    }
-
-    function triggerMenuCraft() {
-        document.getElementById('long-press-menu').classList.add('hidden');
-        const gift = state.inventory.find(g => g.uniqueId === appRuntime.activeGiftId);
-        if (gift) {
-            closeModal('collectible-modal');
-            openCraftModal(gift);
-        }
-    }
-
     function getBackdropStyle(backdrop) {
         if (backdrop.customGradient) {
             return backdrop.customGradient;
@@ -1830,7 +1910,7 @@
         const mixContainer = document.getElementById('craft-mix-container');
         const mixCheckbox = document.getElementById('cb-mix-backdrop');
         if(mixContainer && mixCheckbox) {
-            const uniqueBackdrops = [...new Set(gifts.filter(g => g).map(g => g.collectibleData.backdrop.name))];
+            const uniqueBackdrops =[...new Set(gifts.filter(g => g).map(g => g.collectibleData.backdrop.name))];
             
             if(uniqueBackdrops.length >= 2) {
                 mixContainer.style.opacity = '1';
@@ -2270,49 +2350,29 @@
             if(appRuntime.detailInterval) { clearInterval(appRuntime.detailInterval); appRuntime.detailInterval = null; }
         }
         if(id==='collectible-modal') { document.getElementById('collectible-lottie').innerHTML=''; document.getElementById('roulette-strip').innerHTML=''; if(appRuntime.animationState) skipAnimation(); }
+        if (document.getElementById('shop-page').classList.contains('active')) { tg.BackButton.show(); tg.BackButton.onClick(() => switchTab('inventory')); }
     }
     
-    // Switch tabs on bottom profile switcher pill
-    function switchProfileTab(tab) {
-        haptic('light');
-        document.querySelectorAll('.pill-tab').forEach(btn => btn.classList.remove('active'));
-        
-        if (tab === 'inventory') {
-            document.getElementById('tab-inventory').classList.add('active');
-            switchTab('inventory'); 
-        } else {
-            document.getElementById('tab-shop').classList.add('active');
-            switchTab('shop'); 
-        }
-    }
-
-    function switchShopTab(tab) {
-        haptic('light');
-        if (tab === 'shop') {
-            document.getElementById('shop-tab-shop').classList.add('active');
-            document.getElementById('shop-tab-customize').classList.remove('active');
-        }
-    }
-
     function switchTab(tab) {
         haptic('light'); 
         document.getElementById('profile-page').classList.remove('active'); 
-        document.getElementById('shop-page').classList.remove('active');
+        document.getElementById('shop-page').classList.remove('active'); 
+        
+        document.getElementById('tab-pill-inventory').classList.remove('active');
+        document.getElementById('tab-pill-shop').classList.remove('active');
         
         if (tab === 'inventory') { 
             document.getElementById('profile-page').classList.add('active'); 
-            document.getElementById('tab-inventory').classList.add('active');
-            document.getElementById('tab-shop').classList.remove('active');
+            document.getElementById('tab-pill-inventory').classList.add('active'); 
             tg.BackButton.hide(); 
         } else { 
             document.getElementById('shop-page').classList.add('active'); 
-            document.getElementById('tab-shop').classList.add('active');
-            document.getElementById('tab-inventory').classList.remove('active');
+            document.getElementById('tab-pill-shop').classList.add('active'); 
             tg.BackButton.show(); 
             tg.BackButton.onClick(() => switchTab('inventory')); 
         }
     }
-
+    
     function playLottie(id, path) { const container = document.getElementById(id); container.innerHTML = ''; lottie.loadAnimation({ container, renderer:'svg', loop:true, autoplay:true, path }); }
     function generatePattern(containerId, patternObj, giftName, isSmall, colorHex, isHeader=false) {
         const container = document.getElementById(containerId); if (!container) return; const url = `${CDN_BASE}patterns/${encodeURIComponent(giftName)}/png/${encodeURIComponent(patternObj.name)}.png`;
@@ -2336,9 +2396,13 @@
         document.getElementById('menu-reorder').style.display = (gift.isCollectible&&gift.pinned&&state.inventory.filter(g=>g.pinned).length>1)?'block':'none'; 
         document.getElementById('menu-hide').innerText = gift.hidden?"Unhide":"Hide"; 
         
+        // Dynamically toggle Craft option visibility directly inside ellipsis context menus
+        const menuCraft = document.getElementById('menu-craft');
         const ALLOWED_CRAFT_GIFTS = ["Jingle Bells", "Desk Calendar"];
-        const canCraft = gift && ALLOWED_CRAFT_GIFTS.includes(gift.name) && !(gift.collectibleData && gift.collectibleData.model.crafted);
-        document.getElementById('menu-craft').style.display = canCraft ? 'flex' : 'none';
+        const isCraftable = ALLOWED_CRAFT_GIFTS.includes(gift.name) && gift.collectibleData && !gift.collectibleData.model.crafted;
+        if(menuCraft) {
+            menuCraft.style.display = isCraftable ? 'block' : 'none';
+        }
 
         let x = e.clientX, y = e.clientY; 
         if (x === undefined || y === undefined) {
@@ -2354,7 +2418,16 @@
         menu.classList.remove('hidden'); 
     }
 
-    function togglePin() { const g = state.inventory.find(x=>x.uniqueId===appRuntime.activeGiftId); if(g.pinned) {g.pinned=false;g.pinOrder=null;} else {if(state.inventory.filter(x=>x.pinned).length>=5) return alert("Max 5 pinned elements around photo"); g.pinned=true;g.pinOrder=999;} document.getElementById('long-press-menu').classList.add('hidden'); haptic('light'); saveState(); renderInventory(); }
+    function handleMenuCraft() {
+        document.getElementById('long-press-menu').classList.add('hidden');
+        const gift = state.inventory.find(g => g.uniqueId === appRuntime.activeGiftId);
+        if(gift) {
+            closeModal('collectible-modal');
+            openCraftModal(gift);
+        }
+    }
+
+    function togglePin() { const g = state.inventory.find(x=>x.uniqueId===appRuntime.activeGiftId); if(g.pinned) {g.pinned=false;g.pinOrder=null;} else {if(state.inventory.filter(x=>x.pinned).length>=6) return alert("Max 6"); g.pinned=true;g.pinOrder=999;} document.getElementById('long-press-menu').classList.add('hidden'); haptic('light'); saveState(); renderInventory(); }
     function toggleWear() { const g = state.inventory.find(x=>x.uniqueId===appRuntime.activeGiftId); if(g.worn) g.worn=false; else {state.inventory.forEach(x=>x.worn=false); g.worn=true;} document.getElementById('long-press-menu').classList.add('hidden'); hapticNotify('success'); saveState(); renderInventory(); applyWornGiftVisuals(); }
     
     function applyWornGiftVisuals() { 
@@ -2386,55 +2459,8 @@
     function selectQueueItem(index) { editingIndex = index; renderQueueBar(); const curr = customizationQueue[editingIndex]; if(curr.id) loadBaseConfig(curr.id, curr.name, false); else { const baseGrid = document.getElementById('cust-base-grid'); Array.from(baseGrid.children).forEach(c => c.classList.remove('selected')); document.getElementById('cust-parts-container').classList.add('hidden'); updateCreateButton(); } }
     function renderQueueBar() { const bar = document.getElementById('cust-queue-bar'); bar.innerHTML = ''; customizationQueue.forEach((q, idx) => { const el = document.createElement('div'); el.className = `queue-chip ${idx === editingIndex ? 'active' : ''}`; el.innerHTML = `<span>${q.name || `Gift ${idx+1}`}</span> ${customizationQueue.length > 1 ? `<span class="close-x">×</span>` : ''}`; el.onclick = (e) => { if (e.target.classList.contains('close-x')) { e.stopPropagation(); customizationQueue.splice(idx, 1); if(editingIndex >= customizationQueue.length) editingIndex = customizationQueue.length - 1; if(customizationQueue.length === 0) addGiftToQueue(); else selectQueueItem(editingIndex); } else selectQueueItem(idx); }; bar.appendChild(el); }); const addBtn = document.createElement('div'); addBtn.className = 'queue-chip add-gift-chip'; addBtn.innerHTML = '<span>+ Add Gift</span>'; addBtn.onclick = addGiftToQueue; bar.appendChild(addBtn); }
     async function openCustomizeModal() { document.getElementById('customize-modal').classList.add('active'); tg.BackButton.show(); tg.BackButton.onClick(() => closeModal('customize-modal')); initCustomizationQueue(); const grid = document.getElementById('cust-base-grid'); grid.innerHTML = ''; Object.entries(state.giftDefinitions).forEach(([id, name]) => { if (['custom_skebob', 'custom_baggin_cat'].includes(id)) return; const el = document.createElement('div'); el.className = 'filter-option'; el.innerHTML = `<img src="${CDN_BASE}originals/${id}/Original.png"><div class="label">${name}</div>`; el.onclick = () => loadBaseConfig(id, name, true); grid.appendChild(el); }); }
-    async function loadBaseConfig(id, name, resetParts) { 
-        haptic('light'); 
-        const curr = customizationQueue[editingIndex]; 
-        
-        if(curr.id !== id || resetParts) { 
-            curr.id = id; 
-            curr.name = name; 
-            curr.parts = { model:null, backdrop:null, pattern:null }; 
-        } 
-        
-        renderQueueBar(); 
-        
-        const baseGrid = document.getElementById('cust-base-grid'); 
-        Array.from(baseGrid.children).forEach(c => { 
-            c.classList.remove('selected'); 
-            if(c.innerText === name) c.classList.add('selected'); 
-        }); 
-        
-        if(!cachedParts[id]) cachedParts[id] = await fetchGiftParts(name); 
-        const parts = cachedParts[id]; 
-        
-        renderPartGrid('cust-model-grid', parts.models, 'model', name); 
-        renderPartGrid('cust-backdrop-grid', parts.backdrops, 'backdrop', name); 
-        renderPartGrid('cust-pattern-grid', parts.patterns, 'pattern', name); 
-        
-        document.getElementById('cust-parts-container').classList.remove('hidden'); 
-        
-        const bulkDiv = document.getElementById('cust-bulk-controls');
-        if (customizationQueue.length === 1) {
-            bulkDiv.classList.remove('hidden');
-            if(resetParts) resetBulkControls(); 
-            else {
-                toggleRandomPart('model');
-                toggleRandomPart('backdrop');
-                toggleRandomPart('pattern');
-            }
-        } else {
-            bulkDiv.classList.add('hidden');
-            document.getElementById('cb-rnd-model').checked = false;
-            document.getElementById('cb-rnd-backdrop').checked = false;
-            document.getElementById('cb-rnd-pattern').checked = false;
-            toggleRandomPart('model');
-            toggleRandomPart('backdrop');
-            toggleRandomPart('pattern');
-        }
-
-        updateCreateButton(); 
-    }
     function renderPartGrid(elemId, items, type, giftName) { const grid = document.getElementById(elemId); grid.innerHTML = ''; const curr = customizationQueue[editingIndex]; items.forEach(item => { const el = document.createElement('div'); el.className = 'filter-option'; let content = ''; if (type === 'model') content = `<img src="${item.isCustom?item.imageUrl:`${CDN_BASE}models/${encodeURIComponent(giftName)}/png/${encodeURIComponent(item.name)}.png`}">`; else if (type === 'backdrop') content = `<div class="gradient-square" style="background: radial-gradient(circle, ${item.hex.centerColor}, ${item.hex.edgeColor})"></div>`; else content = `<img src="${CDN_BASE}patterns/${encodeURIComponent(giftName)}/png/${encodeURIComponent(item.name)}.png">`; el.innerHTML = `${content}<div class="label">${item.name}</div>`; if (curr.parts[type] && curr.parts[type].name === item.name) el.classList.add('selected'); el.onclick = () => { haptic('light'); Array.from(grid.children).forEach(c => c.classList.remove('selected')); el.classList.add('selected'); curr.parts[type] = item; updateCreateButton(); }; grid.appendChild(el); }); }
+    
     function updateCreateButton() { 
         const btn = document.getElementById('btn-create-custom'); 
         
@@ -2464,6 +2490,7 @@
             btn.innerText = customizationQueue.length > 1 ? `Create All (${customizationQueue.length})` : 'Create'; 
         }
     }
+    
     async function handleCreateQueue() { 
         const btn = document.getElementById('btn-create-custom');
         btn.disabled = true;
@@ -2528,7 +2555,7 @@
         saveState(); 
         renderInventory(); 
         closeModal('customize-modal'); 
-        switchProfileTab('inventory'); 
+        switchTab('inventory'); 
     }
 </script>
 </body>
