@@ -8,7 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <style>
+<style>
         :root {
             --tg-theme-bg-color: #0e1621;
             --tg-theme-text-color: #ffffff;
@@ -179,14 +179,32 @@
         }
         .modal-button.secondary { background-color: var(--tg-theme-bg-color); color: var(--tg-theme-link-color); }
         
-        /* New Collectible Modal Styles */
-        .collectible-header {
-            position: relative; padding: 40px 16px 24px; text-align: center; overflow: hidden;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: #ffffff;
+        /* Compact Collectible Modal Configurations */
+        #collectible-modal .modal-content {
+            background-color: #121214 !important;
         }
-        .collectible-header h3 { margin-top: 15px; position: relative; z-index: 2; font-size: 1.5em; margin-bottom: 6px; font-weight: 700; }
-        .collectible-header .sub-header { position: relative; z-index: 2; font-size: 1em; opacity: 0.9; }
+        #collectible-modal .modal-scrollable-content {
+            background: transparent !important;
+            padding: 12px 16px 4px 16px;
+        }
+
+        .collectible-header {
+            position: relative; 
+            padding: 24px 16px 16px; 
+            text-align: center; 
+            overflow: hidden;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            color: #ffffff;
+            border-top-left-radius: 28px;
+            border-top-right-radius: 28px;
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+        }
+        .collectible-header h3 { margin-top: 10px; position: relative; z-index: 2; font-size: 1.4em; margin-bottom: 4px; font-weight: 700; }
+        .collectible-header .sub-header { position: relative; z-index: 2; font-size: 0.9em; opacity: 0.8; }
 
         /* Navigation Context Button (Three-dot Ellipsis) */
         .collectible-context-btn {
@@ -210,13 +228,13 @@
             background: rgba(255, 255, 255, 0.1);
         }
 
-        /* Action Buttons Row */
+        /* Compact Action Buttons Row */
         .modal-action-row {
             display: flex;
             justify-content: space-between;
-            gap: 12px;
-            width: 90%;
-            margin: 20px auto 0 auto;
+            gap: 10px;
+            width: 92%;
+            margin: 16px auto 0 auto;
             position: relative;
             z-index: 2;
         }
@@ -224,8 +242,8 @@
             flex: 1;
             background: rgba(0, 0, 0, 0.35);
             border: none;
-            border-radius: 14px;
-            padding: 12px 6px;
+            border-radius: 12px;
+            padding: 10px 4px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -240,7 +258,7 @@
             transform: scale(0.97);
         }
         .action-row-btn.disabled {
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: not-allowed;
         }
         .action-row-btn.disabled:active {
@@ -248,41 +266,41 @@
             background: rgba(0, 0, 0, 0.35);
         }
         .action-btn-icon {
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             object-fit: contain;
         }
         .action-btn-text {
-            font-size: 0.85em;
+            font-size: 0.75em;
             font-weight: 600;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.2px;
         }
 
         /* Bordered Grid Details Table Style */
         .stats-table {
-            background-color: rgba(255, 255, 255, 0.03); 
+            background-color: #1c1c1e; 
             border-radius: 14px; 
             overflow: hidden; 
             margin-top: 0; 
-            margin-bottom: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
         .stat-row { 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            padding: 14px 16px; 
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08); 
+            padding: 10px 14px; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05); 
         }
         .stat-row:last-child { border-bottom: none; }
-        .stat-label { font-weight: bold; color: var(--tg-theme-text-color); font-size: 0.95em; }
-        .stat-value { display: flex; align-items: center; gap: 8px; font-size: 0.95em; color: var(--tg-theme-text-color); }
+        .stat-label { font-weight: bold; color: var(--tg-theme-text-color); font-size: 0.9em; }
+        .stat-value { display: flex; align-items: center; gap: 8px; font-size: 0.9em; color: var(--tg-theme-text-color); }
         
         .owner-chip { display: flex; align-items: center; gap: 6px; }
         .owner-chip img { width: 20px; height: 20px; border-radius: 50%; }
         .owner-chip span { color: var(--tg-theme-link-color); }
         
-        /* Desaturated semi-transparent purple badge */
+        /* Lavender desaturated purple badge */
         .percentage-pill { 
             background-color: rgba(157, 141, 242, 0.15); 
             color: #9d8df2; 
@@ -299,9 +317,9 @@
             background-color: #8e5af6; 
             color: #ffffff;
             border: none; 
-            padding: 14px; 
-            border-radius: 30px; 
-            font-size: 1.1em; 
+            padding: 12px; 
+            border-radius: 24px; 
+            font-size: 1em; 
             font-weight: 600; 
             cursor: pointer;
             transition: background 0.2s;
@@ -311,15 +329,15 @@
         }
 
         .collectible-footer-container {
-            padding: 15px 20px 42px 20px;
+            padding: 10px 20px 30px 20px;
             background: var(--tg-theme-bg-color);
         }
 
         /* Visibility context styles */
         .col-visibility-bar {
             text-align: center;
-            margin: 15px auto 25px auto;
-            font-size: 0.9em;
+            margin: 10px auto 20px auto;
+            font-size: 0.85em;
             cursor: pointer;
             user-select: none;
         }
@@ -340,16 +358,20 @@
             50% { transform: translateY(-4px); }
         }
 
-        /* Roulette Animations */
+        /* Scaled Down Roulette Sizing */
         .roulette-image-wrapper {
-            width: 100%; height: 160px; position: relative; overflow: hidden; display: flex;
+            width: 100%; height: 130px; position: relative; overflow: hidden; display: flex;
             align-items: center; justify-content: center;
         }
         .roulette-strip {
             display: flex; height: 100%; position: absolute; left: 0; top: 0;
         }
         .roulette-strip img {
-            width: 160px; height: 160px; object-fit: contain; flex-shrink: 0;
+            width: 130px; height: 130px; object-fit: contain; flex-shrink: 0;
+        }
+        #collectible-image, #collectible-lottie {
+            width: 130px !important;
+            height: 130px !important;
         }
         
         /* Vertical Text Slot */
