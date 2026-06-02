@@ -23,12 +23,8 @@
             --app-rarity-chip-bg: rgba(62, 188, 249, 0.15);
             --app-rarity-text: #62bcf9;
             --app-profile-gradient-fallback: var(--tg-theme-secondary-bg-color);
-            --panel-bg: #121214;
-            --card-bg: #1a1a1c;
             --accent-purple: #af9bf5;
             --accent-purple-dim: rgba(175, 155, 245, 0.15);
-            --border-color: rgba(255, 255, 255, 0.06);
-            --gold: #ffd700;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -54,11 +50,11 @@
         .page-header h2 { font-size: 1.15em; font-weight: 500; margin: 0; }
         
         #profile-page {
-            padding-top: 0px; /* Starts directly at the top of the mobile safe area */
+            padding-top: 0px !important; /* Extend fully under status area */
         }
 
         .profile-top-section {
-            padding-top: 75px; /* Safely offsets name and avatar below Telegram's header UI */
+            padding-top: 85px !important; /* safe area offset */
             padding-bottom: 25px;
             background: var(--app-profile-gradient-fallback);
             display: flex; justify-content: center; position: relative;
@@ -143,7 +139,7 @@
         .info-item .label { color: var(--tg-theme-hint-color); font-size: 0.85em; }
         .info-item .clickable { cursor: pointer; }
 
-        /* Capsule Tab Switcher */
+        /* Capsule Tab Switchers */
         .profile-tabs-pill-container {
             display: inline-flex;
             background-color: #1a1a1c;
@@ -286,6 +282,7 @@
             max-height: 90vh;
             pointer-events: auto; 
         }
+        #customize-modal .modal-content { height: 90vh; }
 
         .modal-header-bar { padding: 16px; text-align: center; font-weight: 600; font-size: 1.1em; background: var(--tg-theme-secondary-bg-color); position: relative; z-index: 10; }
         .modal-scrollable-content { overflow-y: auto; padding: 0; flex-grow: 1; }
@@ -494,25 +491,242 @@
         #long-press-menu li:hover { background: rgba(255,255,255,0.05); }
         #long-press-menu li.danger { color: #ff595a; }
 
-        /* --- MODERN DASHBOARD STYLES --- */
+        /* Queue Bar */
+        .queue-bar { display: flex; overflow-x: auto; padding: 12px 15px; gap: 8px; background: var(--tg-theme-bg-color); white-space: nowrap; scrollbar-width: none; }
+        .queue-bar::-webkit-scrollbar { display: none; }
+        .queue-chip { 
+            padding: 8px 14px; background: var(--tg-theme-secondary-bg-color); border-radius: 20px; font-size: 0.9em; cursor: pointer; border: 1px solid transparent; 
+            display: flex; align-items: center; gap: 8px; font-weight: 500;
+        }
+        .queue-chip.active { border-color: var(--tg-theme-link-color); background: rgba(98, 188, 249, 0.1); color: var(--tg-theme-link-color); }
+        .queue-chip .close-x { opacity: 0.6; font-size: 1.2em; font-weight: 300; }
+        .add-gift-chip { background: var(--tg-theme-button-color); color: var(--tg-theme-button-text-color); }
+
+        .filter-section { padding: 0 15px; margin-bottom: 20px; }
+        .filter-section h4 { margin: 15px 0 8px; color: var(--tg-theme-hint-color); font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; padding-left: 4px; }
+        
+        .filter-options-grid { 
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; 
+            overflow-y: auto; padding: 4px; max-height: 220px; border-radius: 8px;
+        }
+        .filter-option {
+            background: var(--tg-theme-secondary-bg-color); border-radius: 12px; padding: 10px;
+            cursor: pointer; border: 2px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 100px;
+        }
+        .filter-option.selected { border-color: var(--tg-theme-link-color); background: rgba(98, 188, 249, 0.05); }
+        .filter-option img { width: 55px; height: 55px; object-fit: contain; margin-bottom: 5px; }
+        .filter-option .label { font-size: 0.75em; text-align: center; overflow: hidden; white-space: nowrap; width: 100%; text-overflow: ellipsis;}
+        .gradient-square { width: 55px; height: 55px; border-radius: 50%; margin-bottom: 5px; }
+
+        .switch-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid rgba(0,0,0,0.1); font-weight: 500; }
+        .switch { position: relative; display: inline-block; width: 50px; height: 30px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--tg-theme-hint-color); transition: .4s; border-radius: 34px; opacity: 0.3; }
+        .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        input:checked + .slider { background-color: var(--tg-theme-button-color); opacity: 1; }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        .spinner { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--tg-theme-link-color); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .hidden { display: none !important; }
+        .reordering .gift-card { opacity: 0.5; }
+        .reordering .gift-card[data-pinned="true"] { opacity: 1; cursor: grab; box-shadow: 0 0 0 2px var(--tg-theme-link-color); }
+        
+        #qty-modal input { background: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); border: none; padding: 12px; border-radius: 12px; width: 100%; font-size: 1.4em; text-align: center; margin-bottom: 15px; outline: none; font-weight: bold; }
+
+        /* Loading */
+        .glass-panel { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; animation: glassFloat 4s ease-in-out infinite; }
+        .liquid-blob { position: absolute; border-radius: 50%; filter: blur(50px); opacity: 0.5; z-index: 1; animation: blobFloat 10s infinite alternate; }
+        .blob-1 { width: 200px; height: 200px; background: #007AFF; top: 20%; left: 15%; }
+        .blob-2 { width: 250px; height: 250px; background: #5ac8fa; bottom: 20%; right: 10%; animation-delay: -2s; }
+        @keyframes blobFloat { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(20px, -20px) scale(1.1); } 100% { transform: translate(-20px, 20px) scale(0.9); } }
+        @keyframes glassFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        /* --- CRAFTING MODAL STYLES --- */
+        .craft-header-btn {
+            position: absolute; top: 16px; right: 16px; width: 32px; height: 32px;
+            background-color: rgba(0,0,0,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 10; backdrop-filter: blur(4px);
+        }
+        .craft-icon {
+            width: 20px; height: 20px;
+            -webkit-mask-image: url('https://raw.githubusercontent.com/Vasiliy-katsyka/upgradeEmpty/8e8c2524c119384132502547e562a1d128661cd9/telelakel_tgb_AgADOZMAAsCtWEs.svg');
+            mask-image: url('https://raw.githubusercontent.com/Vasiliy-katsyka/upgradeEmpty/8e8c2524c119384132502547e562a1d128661cd9/telelakel_tgb_AgADOZMAAsCtWEs.svg');
+            -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+            background-color: #ffffff;
+        }
+
+        .craft-container {
+            background: transparent; 
+            padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 100%;
+            position: relative;
+        }
+
+        #btn-craft-action {
+            width: 90%; 
+            height: auto;
+            min-height: 56px;
+            margin: 0 auto 10px auto;
+            background: linear-gradient(90deg, #4cd964 0%, #29b6f6 100%);
+            border-radius: 30px; 
+            border: none;
+            color: #ffffff;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(46, 204, 113, 0.4);
+            font-size: 1.1em; 
+            font-weight: 700;
+            line-height: 1.2;
+            padding: 12px 20px;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        }
+
+        #btn-craft-action:disabled {
+            background: #2c3e50;
+            color: #7f8c8d;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .craft-btn-subtext {
+            font-size: 0.75em; 
+            font-weight: 500; 
+            opacity: 0.9; 
+            margin-top: 2px;
+        }
+
+        #craft-modal .modal-content {
+            background: #094d4f;
+            background: radial-gradient(circle,rgba(9, 77, 79, 1) 0%, rgba(0, 20, 16, 1) 100%);
+            height: 90vh;
+        }
+
+        .craft-slots-area { position: relative; width: 300px; height: 300px; margin-top: 20px; }
+        .craft-center-progress {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 120px; height: 120px; display: flex; align-items: center; justify-content: center;
+            flex-direction: column;
+        }
+        .craft-svg-circle { transform: rotate(-90deg); width: 100%; height: 100%; }
+        .craft-svg-circle circle { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
+        .craft-bg-circle { stroke: rgba(255,255,255,0.1); }
+        .craft-fg-circle { stroke: #ffffff; }
+
+        .craft-anvil-icon {
+            position: absolute; width: 50px; height: 50px;
+            -webkit-mask-image: url('https://raw.githubusercontent.com/Vasiliy-katsyka/upgradeEmpty/8e8c2524c119384132502547e562a1d128661cd9/telelakel_tgb_AgADOZMAAsCtWEs.svg');
+            mask-image: url('https://raw.githubusercontent.com/Vasiliy-katsyka/upgradeEmpty/8e8c2524c119384132502547e562a1d128661cd9/telelakel_tgb_AgADOZMAAsCtWEs.svg');
+            -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+            background-color: #ffffff;
+        }
+        .craft-pct-text { position: absolute; bottom: 25px; color: #fff; font-size: 0.9em; font-weight: 700; }
+
+        .craft-slot {
+            position: absolute; width: 70px; height: 70px;
+            background: rgba(255,255,255,0.1); border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; overflow: hidden; border: 2px solid transparent;
+            transition: transform 0.1s;
+        }
+        .craft-slot.top-left { top: 0; left: 0; }
+        .craft-slot.top-right { top: 0; right: 0; }
+        .craft-slot.bottom-left { bottom: 0; left: 0; }
+        .craft-slot.bottom-right { bottom: 0; right: 0; }
+        .craft-slot img { width: 100%; height: 100%; object-fit: contain; }
+        .craft-slot .add-icon { font-size: 24px; color: rgba(255,255,255,0.5); }
+        .craft-slot .remove-btn {
+            position: absolute; top: 2px; right: 2px; width: 16px; height: 16px; background: rgba(0,0,0,0.6);
+            border-radius: 50%; color: #fff; font-size: 10px; display: flex; align-items: center; justify-content: center;
+        }
+
+        .craft-probability-row { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; justify-content: center; }
+        .prob-pill { display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 20px; color: #fff; font-size: 0.85em; }
+        .prob-dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); }
+
+        /* Selection Grid */
+        .craft-select-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
+        .craft-select-item { position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 1/1; background: var(--tg-theme-secondary-bg-color); border: 2px solid transparent; }
+        .craft-select-item.selected { border-color: #3e97f0; background: rgba(62, 151, 240, 0.2); }
+        .craft-select-item img { width: 100%; height: 100%; object-fit: contain; }
+        .rarity-badge { position: absolute; top: 4px; left: 4px; background: rgba(0,0,0,0.6); color: #fff; font-size: 0.7em; padding: 2px 6px; border-radius: 4px; }
+
+        /* CUBE & BURNING ANIMATION */
+        .cube-wrapper { width: 150px; height: 150px; perspective: 600px; margin: 0 auto; position: relative; }
+        .cube { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transform: translateZ(-75px); }
+        .cube.spinning { animation: spinCube 3s cubic-bezier(0.1, 0.7, 0.1, 1) forwards; }
+        .cube.burning { animation: burnToAsh 1.5s ease-in forwards; }
+
+        #craft-anim-modal .modal-content {
+            background: linear-gradient(180deg, #18222d 0%, #0e1621 100%) !important;
+            height: 90vh !important;
+            max-height: 90vh !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: none !important;
+            border-top-left-radius: 28px;
+            border-top-right-radius: 28px;
+        }
+
+        #craft-anim-modal .cube-wrapper {
+            margin-bottom: 30px;
+            flex-shrink: 0;
+        }
+
+        .cube-face {
+            position: absolute; width: 150px; height: 150px;
+            background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2);
+            display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(5px); border-radius: 12px; overflow: hidden;
+        }
+        .cube-face img { width: 80%; height: 80%; object-fit: contain; }
+        .cube-face.front  { transform: rotateY(  0deg) translateZ(75px); }
+        .cube-face.right  { transform: rotateY( 90deg) translateZ(75px); }
+        .cube-face.back   { transform: rotateY(180deg) translateZ(75px); }
+        .cube-face.left   { transform: rotateY(-90deg) translateZ(75px); }
+        .cube-face.top    { transform: rotateX( 90deg) translateZ(75px); }
+        .cube-face.bottom { transform: rotateX(-90deg) translateZ(75px); }
+
+        @keyframes spinCube {
+            0% { transform: translateZ(-75px) rotateX(0deg) rotateY(0deg); }
+            20% { transform: translateZ(-75px) rotateX(-180deg) rotateY(-90deg); }
+            60% { transform: translateZ(-75px) rotateX(360deg) rotateY(720deg); }
+            100% { transform: translateZ(-75px) rotateX(1440deg) rotateY(1800deg); }
+        }
+
+        @keyframes burnToAsh {
+            0% { filter: brightness(1); opacity: 1; transform: scale(1) translateZ(-75px); }
+            50% { filter: brightness(3) sepia(1) hue-rotate(-30deg) blur(2px); opacity: 0.8; }
+            100% { filter: grayscale(1) brightness(0.2) blur(10px); opacity: 0; transform: scale(0.5) translateZ(-75px) translateY(50px); }
+        }
+
+        /* Redesigned Collectible Sheet Height */
+        #collectible-modal .modal-content {
+            background-color: var(--tg-theme-bg-color);
+            border-top-left-radius: 28px; border-top-right-radius: 28px;
+            width: 100%; max-width: 600px; display: flex; flex-direction: column; 
+            height: 95vh; max-height: 95vh; overflow-y: auto;
+        }
+
+        /* Customize Tab Dashboard Layout Styles */
         .subnav-pills {
             display: flex;
-            background-color: #121214;
+            background-color: #1a1a1c;
             border-radius: 14px;
             padding: 4px;
             margin: 10px 15px;
             gap: 4px;
             border: 1px solid rgba(255, 255, 255, 0.05);
-            z-index: 10;
-            position: relative;
         }
         .subnav-pills button {
             flex: 1;
             background: none;
             border: none;
             color: var(--tg-theme-hint-color, #708499);
-            padding: 8px 2px;
-            font-size: 0.75em;
+            padding: 10px 2px;
+            font-size: 0.8em;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -521,26 +735,13 @@
             transition: all 0.2s ease;
         }
         .subnav-pills button.active {
-            background-color: #1a1a1c;
+            background-color: #121214;
             color: var(--tg-theme-text-color, #ffffff);
             box-shadow: 0 2px 8px rgba(0,0,0,0.4);
         }
-
-        .tab-section {
-            display: none;
-        }
-        .tab-section.active {
-            display: block;
-        }
-
-        .models-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
         .model-card {
-            background-color: #121214;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background-color: var(--panel-bg, #121214);
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.05));
             border-radius: 16px;
             padding: 14px;
             display: flex;
@@ -551,67 +752,22 @@
             transition: all 0.2s ease;
         }
         .model-card.selected {
-            border-color: #af9bf5;
-            background-color: rgba(175, 155, 245, 0.15);
+            border-color: var(--accent-purple, #af9bf5) !important;
+            background-color: var(--accent-purple-dim, rgba(175, 155, 245, 0.15)) !important;
             box-shadow: 0 0 12px rgba(175, 155, 245, 0.2);
         }
-        .model-card img {
-            width: 70px;
-            height: 70px;
-            object-fit: contain;
-            margin-bottom: 8px;
-        }
-        .model-card .name {
-            font-size: 0.85em;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 4px;
-        }
-        .model-card .rarity-tag {
+        .rarity-tag {
             font-size: 0.75em;
             color: #af9bf5;
             background: rgba(175, 155, 245, 0.1);
             padding: 2px 8px;
             border-radius: 6px;
             font-weight: bold;
+            margin-top: 4px;
         }
-        .model-card .rarity-tag.epic {
+        .rarity-tag.epic {
             color: #ffd700;
             background: rgba(255, 215, 0, 0.1);
-        }
-
-        .backdrops-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-        .backdrop-card {
-            background-color: #121214;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            padding: 14px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            position: relative;
-            transition: all 0.2s ease;
-        }
-        .backdrop-card.selected {
-            border-color: #af9bf5;
-            background-color: rgba(175, 155, 245, 0.15);
-        }
-        .backdrop-circle {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            margin-bottom: 10px;
-            border: 2px solid rgba(255,255,255,0.1);
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.6);
-        }
-        .backdrop-card .name {
-            font-size: 0.85em;
-            font-weight: 600;
         }
         .pin-label {
             position: absolute;
@@ -625,152 +781,7 @@
             border-radius: 4px;
             letter-spacing: 0.2px;
             text-transform: uppercase;
-        }
-
-        .symbols-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
-        .symbol-card {
-            background-color: #121214;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 14px;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .symbol-card.selected {
-            border-color: #af9bf5;
-            background-color: rgba(175, 155, 245, 0.15);
-        }
-        .symbol-mask-preview {
-            width: 40px;
-            height: 40px;
-            background-color: #ffffff;
-            opacity: 0.7;
-            margin-bottom: 8px;
-            -webkit-mask-size: contain;
-            mask-size: contain;
-            -webkit-mask-repeat: no-repeat;
-            mask-repeat: no-repeat;
-        }
-        .symbol-card .name {
-            font-size: 0.8em;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 2px;
-            width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .symbol-card .pct {
-            font-size: 0.7em;
-            color: var(--tg-theme-hint-color, #708499);
-        }
-
-        .control-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .qty-input-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .qty-btn {
-            background: #1a1a1c;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            color: #fff;
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .qty-display {
-            font-size: 1.1em;
-            font-weight: 700;
-            width: 30px;
-            text-align: center;
-        }
-
-        /* Dynamic Capsule Queue display */
-        .queue-bar { display: flex; overflow-x: auto; padding: 12px 15px; gap: 8px; background: var(--tg-theme-bg-color); white-space: nowrap; scrollbar-width: none; }
-        .queue-bar::-webkit-scrollbar { display: none; }
-        
-        .queue-capsule {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background-color: #121214;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 8px 14px;
-            border-radius: 40px;
-            font-size: 0.85em;
-            font-weight: 600;
-            white-space: nowrap;
-            cursor: pointer;
-        }
-        .queue-capsule.active {
-            background-color: rgba(175, 155, 245, 0.15);
-            border-color: #af9bf5;
-            color: #af9bf5;
-        }
-        .queue-capsule .close-x {
-            font-size: 1.1em;
-            opacity: 0.6;
-            margin-left: 4px;
-            font-weight: 300;
-        }
-        .add-queue-btn {
-            background-color: #8e5af6;
-            color: #ffffff;
-            border: none;
-        }
-
-        .action-submit-btn {
-            width: 100%;
-            background-color: #8e5af6;
-            color: #ffffff;
-            border: none;
-            padding: 15px;
-            border-radius: 30px;
-            font-size: 1.05em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .action-submit-btn:active {
-            background-color: #7944de;
-        }
-        .action-submit-btn:disabled {
-            background-color: #2c3e50;
-            color: #7f8c8d;
-            cursor: not-allowed;
-        }
-
-        /* Liquid Loading panel setup */
-        .glass-panel { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; animation: glassFloat 4s ease-in-out infinite; }
-        .liquid-blob { position: absolute; border-radius: 50%; filter: blur(50px); opacity: 0.5; z-index: 1; animation: blobFloat 10s infinite alternate; }
-        .blob-1 { width: 200px; height: 200px; background: #007AFF; top: 20%; left: 15%; }
-        .blob-2 { width: 250px; height: 250px; background: #5ac8fa; bottom: 20%; right: 10%; animation-delay: -2s; }
-        @keyframes blobFloat { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(20px, -20px) scale(1.1); } 100% { transform: translate(-20px, 20px) scale(0.9); } }
-        @keyframes glassFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
-        /* Redesigned Collectible Sheet Height */
-        #collectible-modal .modal-content {
-            background-color: var(--tg-theme-bg-color);
-            border-top-left-radius: 28px; border-top-right-radius: 28px;
-            width: 100%; max-width: 600px; display: flex; flex-direction: column; 
-            height: 95vh; max-height: 95vh; overflow-y: auto;
+            z-index: 5;
         }
     </style>
 </head>
@@ -788,10 +799,12 @@
 <div class="app-container">
     <!-- Profile Page -->
     <div id="profile-page" class="page">
+        <!-- Native SettingsButton used in JS instead of custom DOM profile setting controls -->
+
         <div class="profile-top-section" id="profile-bg">
             <div id="profile-pattern-overlay"></div>
             <div class="profile-main-info">
-                <!-- Avatar wrapper carrying dynamic floating pinned items -->
+                <!-- Avatar wrapper to carry scattered pinned icons -->
                 <div class="profile-avatar-wrapper" id="pinned-gifts-container">
                     <img src="" class="profile-avatar" id="user-avatar">
                 </div>
@@ -802,7 +815,7 @@
             </div>
         </div>
         
-        <!-- Info elements in a clean, unified container card -->
+        <!-- Info elements wrapped inside single high contrast dark panel container -->
         <div class="profile-info-block">
             <div class="info-item">
                 <span class="value" id="profile-phone">+888 0000 0000</span>
@@ -909,7 +922,7 @@
 <!-- REDESIGNED COLLECTIBLE / ROULETTE MODAL -->
 <div id="collectible-modal" class="modal-overlay">
     <div class="modal-content" style="background-color: var(--tg-theme-bg-color);">
-        <!-- Top Gradient Section with ellipse button and action row button layout -->
+        <!-- Top Gradient Section with ellipsis button and action row button layout -->
         <div id="collectible-header" class="collectible-header">
             <!-- Context Menu Ellipsis button in colored card header -->
             <div id="collectible-context-btn" class="collectible-context-btn" onclick="openCollectibleContextMenu(event)">⋮</div>
@@ -1006,85 +1019,82 @@
     </div>
 </div>
 
-<!-- INTEGRATED PREMIUM CUSTOMIZATION MODAL -->
+<!-- REDESIGNED CUSTOMIZATION TABBED MODAL -->
 <div id="customize-modal" class="modal-overlay">
-    <div class="modal-content" style="height: 95vh; max-height: 95vh; background-color: #000000;">
-        <div class="modal-header-bar" style="background:transparent; border:none; color:white; display:flex; justify-content:space-between; align-items:center; padding: 16px;">
-            <span style="font-weight: 700;">Customize Upgrade</span>
-            <div style="cursor:pointer; background:rgba(255,255,255,0.08); width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center;" onclick="closeModal('customize-modal')">✕</div>
+    <div class="modal-content">
+        <div class="modal-header-bar" style="display:flex; justify-content:space-between; align-items:center; padding: 16px;">
+            <span>Customize Upgrade</span>
+            <div onclick="closeModal('customize-modal')" style="cursor:pointer; background:rgba(255,255,255,0.1); width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center;">✕</div>
         </div>
         
-        <!-- Dynamic Queue Bar capsules -->
+        <!-- Queue Bar -->
         <div class="queue-bar" id="cust-queue-bar"></div>
         
-        <!-- Sub-Navigation Switcher pills -->
-        <div class="subnav-pills" id="cust-tabs-pills">
-            <button id="btn-tab-models" class="active" onclick="switchModalTab('models-tab', this)">1. Models</button>
-            <button id="btn-tab-backdrops" onclick="switchModalTab('backdrops-tab', this)">2. Backdrops</button>
-            <button id="btn-tab-symbols" onclick="switchModalTab('symbols-tab', this)">3. Symbols</button>
-            <button id="btn-tab-random" onclick="switchModalTab('random-tab', this)">4. Options</button>
+        <!-- Modal Inner Capsule Tabs -->
+        <div class="subnav-pills">
+            <button id="btn-tab-base" class="active" onclick="switchCustTab('base')">1. Base</button>
+            <button id="btn-tab-models" onclick="switchCustTab('models')">2. Models</button>
+            <button id="btn-tab-backdrops" onclick="switchCustTab('backdrops')">3. Backdrops</button>
+            <button id="btn-tab-symbols" onclick="switchCustTab('symbols')">4. Symbols</button>
+            <button id="btn-tab-options" onclick="switchCustTab('options')">5. Options</button>
         </div>
-
-        <div class="modal-scrollable-content" style="padding: 10px 20px; background: transparent; flex-grow: 1;">
+        
+        <div class="modal-scrollable-content" style="padding: 0; background: var(--tg-theme-secondary-bg-color); flex-grow:1; display:flex; flex-direction:column;">
             
-            <!-- Base Gift Selection (Only shown if active queue slot has no base gift yet) -->
-            <div class="filter-section" id="cust-base-section">
-                <h4>Select Base Gift</h4>
+            <!-- Tab Content: Base Selection -->
+            <div id="panel-tab-base" class="cust-tab-panel active" style="padding:15px;">
                 <div class="filter-options-grid" id="cust-base-grid"></div>
             </div>
 
-            <!-- Customized Parts Dashboard Panels -->
-            <div id="cust-parts-container" class="hidden">
-                <!-- Models tab -->
-                <div id="models-tab" class="tab-section active">
-                    <div class="models-grid" id="cust-model-grid"></div>
+            <!-- Parts Selection Container -->
+            <div id="cust-parts-container" style="display:contents;">
+                
+                <!-- Tab Content: Models Grid -->
+                <div id="panel-tab-models" class="cust-tab-panel" style="padding:15px; display:none;">
+                    <div class="filter-options-grid" id="cust-model-grid"></div>
                 </div>
 
-                <!-- Backdrops tab -->
-                <div id="backdrops-tab" class="tab-section">
-                    <div class="backdrops-grid" id="cust-backdrop-grid"></div>
+                <!-- Tab Content: Backdrops Grid -->
+                <div id="panel-tab-backdrops" class="cust-tab-panel" style="padding:15px; display:none;">
+                    <div class="filter-options-grid" id="cust-backdrop-grid"></div>
                 </div>
 
-                <!-- Symbols tab -->
-                <div id="symbols-tab" class="tab-section">
-                    <div class="symbols-grid" id="cust-pattern-grid"></div>
+                <!-- Tab Content: Symbols Grid -->
+                <div id="panel-tab-symbols" class="cust-tab-panel" style="padding:15px; display:none;">
+                    <div class="filter-options-grid" id="cust-pattern-grid"></div>
                 </div>
 
-                <!-- Options & Bulk Settings tab -->
-                <div id="random-tab" class="tab-section">
-                    <div id="cust-bulk-controls" style="background: #121214; border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.05); overflow: hidden; margin-bottom: 15px;">
-                        
-                        <!-- Quantity row -->
-                        <div class="control-row">
-                            <span>Quantity to upgrade</span>
-                            <div class="qty-input-wrapper">
-                                <button class="qty-btn" onclick="updateCustQty(-1)">-</button>
-                                <span id="cust-qty-val" class="qty-display">1</span>
-                                <button class="qty-btn" onclick="updateCustQty(1)">+</button>
+                <!-- Tab Content: Options / Bulk / Randomizer Controls -->
+                <div id="panel-tab-options" class="cust-tab-panel" style="padding:15px; display:none;">
+                    <div id="cust-bulk-controls" style="background: var(--tg-theme-bg-color); border-radius: 12px; overflow: hidden; border:1px solid rgba(255,255,255,0.05);">
+                        <!-- Quantity Row -->
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 16px; border-bottom:1px solid rgba(255,255,255,0.05);">
+                            <span style="font-weight:500; font-size: 0.95em;">Quantity to upgrade</span>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <button onclick="updateBulkQty(-1)" style="background:var(--tg-theme-secondary-bg-color); border:1px solid rgba(255,255,255,0.1); color:#fff; width:32px; height:32px; border-radius:8px; cursor:pointer; font-weight:bold;">-</button>
+                                <input type="number" id="cust-qty" value="1" min="1" max="1000" oninput="updateCreateButton()" style="width:50px; border:none; background:transparent; color:#fff; text-align:center; font-weight:bold; font-size:1.1em; outline:none; -webkit-appearance:none; margin:0;">
+                                <button onclick="updateBulkQty(1)" style="background:var(--tg-theme-secondary-bg-color); border:1px solid rgba(255,255,255,0.1); color:#fff; width:32px; height:32px; border-radius:8px; cursor:pointer; font-weight:bold;">+</button>
                             </div>
                         </div>
-                        
-                        <!-- Random Model toggle -->
-                        <div class="control-row">
-                            <span>Randomize Model</span>
+                        <!-- Random Model Switch -->
+                        <div class="switch-row" style="border-bottom:1px solid rgba(255,255,255,0.05); padding: 12px 16px;">
+                            <span style="font-size: 0.95em;">Randomize Model</span>
                             <label class="switch">
                                 <input type="checkbox" id="cb-rnd-model" onchange="toggleRandomPart('model'); updateCreateButton()">
                                 <span class="slider"></span>
                             </label>
                         </div>
-                        
-                        <!-- Random Backdrop toggle -->
-                        <div class="control-row">
-                            <span>Randomize Backdrop</span>
+                        <!-- Random Backdrop Switch -->
+                        <div class="switch-row" style="border-bottom:1px solid rgba(255,255,255,0.05); padding: 12px 16px;">
+                            <span style="font-size: 0.95em;">Randomize Backdrop</span>
                             <label class="switch">
                                 <input type="checkbox" id="cb-rnd-backdrop" onchange="toggleRandomPart('backdrop'); updateCreateButton()">
                                 <span class="slider"></span>
                             </label>
                         </div>
-                        
-                        <!-- Random Symbol toggle -->
-                        <div class="control-row" style="border:none;">
-                            <span>Randomize Symbol</span>
+                        <!-- Random Pattern Switch -->
+                        <div class="switch-row" style="border:none; padding: 12px 16px;">
+                            <span style="font-size: 0.95em;">Randomize Symbol</span>
                             <label class="switch">
                                 <input type="checkbox" id="cb-rnd-pattern" checked onchange="toggleRandomPart('pattern'); updateCreateButton()">
                                 <span class="slider"></span>
@@ -1092,11 +1102,12 @@
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
         
-        <div class="modal-buttons-footer" style="background-color: #000000; padding: 15px 20px 25px;">
-            <button class="action-submit-btn" id="btn-create-custom" disabled onclick="handleCreateQueue()">Create Upgraded Gift</button>
+        <div class="modal-buttons-footer">
+            <button class="modal-button" id="btn-create-custom" disabled onclick="handleCreateQueue()">Create Upgraded Gift</button>
         </div>
     </div>
 </div>
@@ -1237,7 +1248,7 @@
         <li id="menu-wear" onclick="toggleWear()">Wear Gift</li>
         <li id="menu-reorder" class="hidden" onclick="startReorderMode()">Reorder Pins</li>
         <li id="menu-hide" onclick="toggleHide()">Hide Gift</li>
-        <!-- Craft Option integrated inside ellipsis menus -->
+        <!-- Craft Option integrated perfectly directly inside ellipsis menus -->
         <li id="menu-craft" onclick="handleMenuCraft()" style="display:none;">Craft Gift</li>
         <li class="danger" onclick="deleteGift()">Delete</li>
     </ul>
@@ -1257,6 +1268,14 @@
         }
     } catch(err) {
         console.warn("Fullscreen request error", err);
+    }
+
+    // Bind Native Context Settings Item
+    if (tg.SettingsButton) {
+        tg.SettingsButton.show();
+        tg.SettingsButton.onClick(() => {
+            openSettingsModal();
+        });
     }
 
     const CDN_BASE = "https://cdn.changes.tg/gifts/";
@@ -1290,14 +1309,6 @@
         if (!state.userPhone) state.userPhone = `+888 ${Math.floor(Math.random()*9000+1000)} ${Math.floor(Math.random()*9000+1000)}`;
         updateUserProfile(); applyWornGiftVisuals(); await fetchGiftDefinitions(); renderShop(); renderInventory();
         
-        // Natively bind SettingsButton in Telegram Mini App controls
-        if (tg.SettingsButton) {
-            tg.SettingsButton.show();
-            tg.SettingsButton.onClick(() => {
-                openSettingsModal();
-            });
-        }
-
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal-overlay')) {
                 closeModal(e.target.id);
@@ -1374,6 +1385,7 @@
         Object.entries(state.giftDefinitions).forEach(([id, name]) => {
             if (['custom_skebob', 'custom_baggin_cat'].includes(id)) return;
             
+            // Consistent pseudo-random price calculations based on characters code
             const index = Math.abs(id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % RANDOM_PRICES.length;
             const price = RANDOM_PRICES[index];
 
@@ -1800,30 +1812,9 @@
         }
     }
 
-    // --- Customization Dashboard Logic ---
-    function switchModalTab(tabId, buttonEl) {
-        haptic('light');
-        document.querySelectorAll('#cust-tabs-pills button').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('#cust-parts-container .tab-section').forEach(section => section.classList.remove('active'));
-        
-        buttonEl.classList.add('active');
-        document.getElementById(tabId).classList.add('active');
-    }
-
-    function updateCustQty(step) {
-        const display = document.getElementById('cust-qty-val');
-        let val = parseInt(display.innerText) || 1;
-        val += step;
-        if (val < 1) val = 1;
-        if (val > 100) val = 100;
-        display.innerText = val;
-        updateCreateButton();
-    }
-
+    // --- Customization Queue Fixes ---
     function resetBulkControls() {
-        const qtyDisplay = document.getElementById('cust-qty-val');
-        if (qtyDisplay) qtyDisplay.innerText = 1;
-        
+        document.getElementById('cust-qty').value = 1;
         document.getElementById('cb-rnd-model').checked = false;
         document.getElementById('cb-rnd-backdrop').checked = false;
         document.getElementById('cb-rnd-pattern').checked = true; 
@@ -1841,7 +1832,7 @@
         
         if (isChecked) {
             if(grid) {
-                grid.style.opacity = '0.35';
+                grid.style.opacity = '0.3';
                 grid.style.pointerEvents = 'none';
             }
         } else {
@@ -1868,20 +1859,22 @@
         const baseGrid = document.getElementById('cust-base-grid'); 
         Array.from(baseGrid.children).forEach(c => { 
             c.classList.remove('selected'); 
-            if(c.innerText === name) c.classList.add('selected'); 
+            if(c.dataset.id === id) c.classList.add('selected'); 
         }); 
         
         if(!cachedParts[id]) cachedParts[id] = await fetchGiftParts(name); 
         const parts = cachedParts[id]; 
         
+        // Auto-populate default configurations to guarantee valid customization states
+        if (!curr.parts.model && parts.models.length > 0) curr.parts.model = parts.models[0];
+        if (!curr.parts.backdrop && parts.backdrops.length > 0) curr.parts.backdrop = parts.backdrops[0];
+        if (!curr.parts.pattern && parts.patterns.length > 0) curr.parts.pattern = parts.patterns[0];
+
         renderPartGrid('cust-model-grid', parts.models, 'model', name); 
         renderPartGrid('cust-backdrop-grid', parts.backdrops, 'backdrop', name); 
         renderPartGrid('cust-pattern-grid', parts.patterns, 'pattern', name); 
         
-        // Toggle Customizer Views
-        document.getElementById('cust-base-section').classList.add('hidden');
         document.getElementById('cust-parts-container').classList.remove('hidden'); 
-        document.getElementById('cust-tabs-pills').classList.remove('hidden');
         
         const bulkDiv = document.getElementById('cust-bulk-controls');
         if (customizationQueue.length === 1) {
@@ -1894,16 +1887,8 @@
             }
         } else {
             bulkDiv.classList.add('hidden');
-            document.getElementById('cb-rnd-model').checked = false;
-            document.getElementById('cb-rnd-backdrop').checked = false;
-            document.getElementById('cb-rnd-pattern').checked = false;
-            toggleRandomPart('model');
-            toggleRandomPart('backdrop');
-            toggleRandomPart('pattern');
         }
 
-        // Reset default active tab view back to Models
-        switchModalTab('models-tab', document.getElementById('btn-tab-models'));
         updateCreateButton(); 
     }
 
@@ -2448,6 +2433,7 @@
             tg.BackButton.onClick(() => switchTab('inventory')); 
         }
     }
+    
     function playLottie(id, path) { const container = document.getElementById(id); container.innerHTML = ''; lottie.loadAnimation({ container, renderer:'svg', loop:true, autoplay:true, path }); }
     function generatePattern(containerId, patternObj, giftName, isSmall, colorHex, isHeader=false) {
         const container = document.getElementById(containerId); if (!container) return; const url = `${CDN_BASE}patterns/${encodeURIComponent(giftName)}/png/${encodeURIComponent(patternObj.name)}.png`;
@@ -2471,7 +2457,7 @@
         document.getElementById('menu-reorder').style.display = (gift.isCollectible&&gift.pinned&&state.inventory.filter(g=>g.pinned).length>1)?'block':'none'; 
         document.getElementById('menu-hide').innerText = gift.hidden?"Unhide":"Hide"; 
         
-        // Dynamically toggle Craft option visibility inside ellipsis context menus
+        // Dynamically toggle Craft option visibility directly inside ellipsis context menus
         const menuCraft = document.getElementById('menu-craft');
         const ALLOWED_CRAFT_GIFTS = ["Jingle Bells", "Desk Calendar"];
         const isCraftable = ALLOWED_CRAFT_GIFTS.includes(gift.name) && gift.collectibleData && !gift.collectibleData.model.crafted;
@@ -2525,12 +2511,10 @@
     function deleteGift() { tg.showConfirm("Delete?",(y)=>{if(y){state.inventory=state.inventory.filter(x=>x.uniqueId!==appRuntime.activeGiftId); haptic('heavy'); saveState(); renderInventory(); applyWornGiftVisuals();}}); document.getElementById('long-press-menu').classList.add('hidden'); }
     function startReorderMode() { document.getElementById('long-press-menu').classList.add('hidden'); appRuntime.reordering = true; document.getElementById('reorder-controls').classList.remove('hidden'); document.getElementById('inventory-grid').classList.add('reordering'); haptic('medium'); appRuntime.sortable = new Sortable(document.getElementById('inventory-grid'), { animation: 150, filter: ':not([data-pinned="true"])', draggable: '[data-pinned="true"]', onMove: (evt) => evt.related.hasAttribute('data-pinned') }); }
     function stopReorderMode() { appRuntime.reordering = false; document.getElementById('reorder-controls').classList.add('hidden'); document.getElementById('inventory-grid').classList.remove('reordering'); if (appRuntime.sortable) { appRuntime.sortable.toArray().forEach((id, index) => { const g = state.inventory.find(x => x.uniqueId == id); if(g && g.pinned) g.pinOrder = index; }); appRuntime.sortable.destroy(); haptic('light'); saveState(); renderInventory(); } }
-    
     function startSelectionMode(mode) { appRuntime.selectionMode = mode; appRuntime.selectedIds = new Set(); closeModal('settings-modal'); renderInventory(); }
     function cancelSelectionMode() { appRuntime.selectionMode = null; appRuntime.selectedIds = new Set(); renderInventory(); }
     function toggleSelection(id) { if(appRuntime.selectedIds.has(id)) appRuntime.selectedIds.delete(id); else appRuntime.selectedIds.add(id); haptic('light'); renderInventory(); }
     function confirmHideSelected() { const ids = Array.from(appRuntime.selectedIds); if(ids.length>0) { state.inventory.forEach(g => { if(ids.includes(g.uniqueId)) { g.hidden = true; g.pinned = false; g.worn = false; } }); hapticNotify('success'); saveState(); } cancelSelectionMode(); applyWornGiftVisuals(); }
-    
     function initCustomizationQueue() { customizationQueue = []; editingIndex = -1; addGiftToQueue(); }
     function addGiftToQueue() { document.querySelectorAll('.filter-option.selected').forEach(el => el.classList.remove('selected')); customizationQueue.push({ id:null, name:null, parts: { model:null, backdrop:null, pattern:null } }); selectQueueItem(customizationQueue.length - 1); document.getElementById('cust-base-grid').classList.remove('hidden'); document.getElementById('cust-parts-container').classList.add('hidden'); }
     
@@ -2540,45 +2524,21 @@
         const curr = customizationQueue[editingIndex]; 
         if(curr.id) {
             loadBaseConfig(curr.id, curr.name, false); 
-        } else { 
+            switchCustTab('models');
+        } else {
             const baseGrid = document.getElementById('cust-base-grid'); 
             Array.from(baseGrid.children).forEach(c => c.classList.remove('selected')); 
-            document.getElementById('cust-base-section').classList.remove('hidden');
-            document.getElementById('cust-parts-container').classList.add('hidden'); 
-            document.getElementById('cust-tabs-pills').classList.add('hidden');
+            switchCustTab('base');
             updateCreateButton(); 
-        } 
+        }
     }
     
-    function renderQueueBar() { 
-        const bar = document.getElementById('cust-queue-bar'); 
-        bar.innerHTML = ''; 
-        customizationQueue.forEach((q, idx) => { 
-            const el = document.createElement('div'); 
-            el.className = `queue-capsule ${idx === editingIndex ? 'active' : ''}`; 
-            el.innerHTML = `<span>${q.name || `Gift ${idx+1}`}</span> ${customizationQueue.length > 1 ? `<span class="close-x">×</span>` : ''}`; 
-            el.onclick = (e) => { 
-                if (e.target.classList.contains('close-x')) { 
-                    e.stopPropagation(); 
-                    customizationQueue.splice(idx, 1); 
-                    if(editingIndex >= customizationQueue.length) editingIndex = customizationQueue.length - 1; 
-                    if(customizationQueue.length === 0) addGiftToQueue(); 
-                    else selectQueueItem(editingIndex); 
-                } else selectQueueItem(idx); 
-            }; 
-            bar.appendChild(el); 
-        }); 
-        
-        const addBtn = document.createElement('div'); 
-        addBtn.className = 'queue-capsule add-queue-btn'; 
-        addBtn.innerHTML = '<span>+ Add Item</span>'; 
-        addBtn.onclick = addGiftToQueue; 
-        bar.appendChild(addBtn); 
-    }
+    function renderQueueBar() { const bar = document.getElementById('cust-queue-bar'); bar.innerHTML = ''; customizationQueue.forEach((q, idx) => { const el = document.createElement('div'); el.className = `queue-chip ${idx === editingIndex ? 'active' : ''}`; el.innerHTML = `<span>${q.name || `Gift ${idx+1}`}</span> ${customizationQueue.length > 1 ? `<span class="close-x">×</span>` : ''}`; el.onclick = (e) => { if (e.target.classList.contains('close-x')) { e.stopPropagation(); customizationQueue.splice(idx, 1); if(editingIndex >= customizationQueue.length) editingIndex = customizationQueue.length - 1; if(customizationQueue.length === 0) addGiftToQueue(); else selectQueueItem(editingIndex); } else selectQueueItem(idx); }; bar.appendChild(el); }); const addBtn = document.createElement('div'); addBtn.className = 'queue-chip add-gift-chip'; addBtn.innerHTML = '<span>+ Add Gift</span>'; addBtn.onclick = addGiftToQueue; bar.appendChild(addBtn); }
     
     async function openCustomizeModal() { 
         document.getElementById('customize-modal').classList.add('active'); 
-        tg.BackButton.show(); tg.BackButton.onClick(() => closeModal('customize-modal')); 
+        tg.BackButton.show(); 
+        tg.BackButton.onClick(() => closeModal('customize-modal')); 
         initCustomizationQueue(); 
         const grid = document.getElementById('cust-base-grid'); 
         grid.innerHTML = ''; 
@@ -2586,60 +2546,49 @@
             if (['custom_skebob', 'custom_baggin_cat'].includes(id)) return; 
             const el = document.createElement('div'); 
             el.className = 'filter-option'; 
+            el.dataset.id = id;
             el.innerHTML = `<img src="${CDN_BASE}originals/${id}/Original.png"><div class="label">${name}</div>`; 
             el.onclick = () => loadBaseConfig(id, name, true); 
             grid.appendChild(el); 
         }); 
+        switchCustTab('base');
     }
-    
+
     function renderPartGrid(elemId, items, type, giftName) { 
         const grid = document.getElementById(elemId); 
+        if(!grid) return;
         grid.innerHTML = ''; 
         const curr = customizationQueue[editingIndex]; 
-        
         items.forEach(item => { 
             const el = document.createElement('div'); 
+            el.className = 'filter-option'; 
             let content = ''; 
-            
             if (type === 'model') {
-                el.className = 'model-card';
-                if (curr.parts.model && curr.parts.model.name === item.name) el.classList.add('selected');
-                
-                const imgUrl = item.isCustom ? item.imageUrl : `${CDN_BASE}models/${encodeURIComponent(giftName)}/png/${encodeURIComponent(item.name)}.png`;
-                const rarityLabel = item.rarityPermille === 0 ? "Epic" : `${(item.rarityPermille/10).toFixed(1)}%`;
-                const isEpicClass = item.rarityPermille === 0 ? "rarity-tag epic" : "rarity-tag";
+                const isEpic = item.rarityPermille === 0;
+                const pctVal = isEpic ? "Epic" : `${(item.rarityPermille/10).toFixed(1)}%`;
+                const badgeClass = isEpic ? "rarity-tag epic" : "rarity-tag";
                 content = `
-                    <img src="${imgUrl}" alt="">
-                    <div class="name">${item.name}</div>
-                    <div class="${isEpicClass}">${rarityLabel}</div>
+                    <img src="${item.isCustom ? item.imageUrl : `${CDN_BASE}models/${encodeURIComponent(giftName)}/png/${encodeURIComponent(item.name)}.png`}">
+                    <div class="label" style="font-size:0.85em; font-weight:600; text-align:center; margin-bottom:4px;">${item.name}</div>
+                    <div class="${badgeClass}">${pctVal}</div>
                 `;
             } else if (type === 'backdrop') {
-                el.className = 'backdrop-card';
-                if (curr.parts.backdrop && curr.parts.backdrop.name === item.name) el.classList.add('selected');
-                
-                const pinnedBackdrops = ["Black", "Midnight Blue", "Electric Purple"];
-                const isPinned = pinnedBackdrops.includes(item.name);
+                const isPinned = ["Black", "Midnight Blue", "Electric Purple"].includes(item.name);
                 const pinBadge = isPinned ? `<div class="pin-label">📌 Pinned</div>` : '';
-                const radialBg = `radial-gradient(circle, ${item.hex.centerColor}, ${item.hex.edgeColor})`;
-                
                 content = `
                     ${pinBadge}
-                    <div class="backdrop-circle" style="background: ${radialBg}"></div>
-                    <div class="name">${item.name}</div>
+                    <div class="backdrop-circle" style="background: radial-gradient(circle, ${item.hex.centerColor}, ${item.hex.edgeColor}); width:60px; height:60px; border-radius:50%; margin-bottom:10px; border:2px solid rgba(255,255,255,0.1);"></div>
+                    <div class="label">${item.name}</div>
                 `;
             } else {
-                el.className = 'symbol-card';
-                if (curr.parts.pattern && curr.parts.pattern.name === item.name) el.classList.add('selected');
-                
-                const maskUrl = `${CDN_BASE}patterns/${encodeURIComponent(giftName)}/png/${encodeURIComponent(item.name)}.png`;
                 content = `
-                    <div class="symbol-mask-preview" style="-webkit-mask-image: url('${maskUrl}'); mask-image: url('${maskUrl}');"></div>
-                    <div class="name">${item.name}</div>
-                    <div class="pct">${(item.rarityPermille/10).toFixed(1)}%</div>
+                    <div class="symbol-mask-preview" style="-webkit-mask-image: url('${CDN_BASE}patterns/${encodeURIComponent(giftName)}/png/${encodeURIComponent(item.name)}.png'); mask-image: url('${CDN_BASE}patterns/${encodeURIComponent(giftName)}/png/${encodeURIComponent(item.name)}.png'); width:40px; height:40px; background-color:#ffffff; opacity:0.7; margin-bottom:8px; -webkit-mask-size:contain; mask-size:contain;"></div>
+                    <div class="label" style="font-size:0.8em; font-weight:600; text-align:center;">${item.name}</div>
+                    <div style="font-size:0.7em; color:var(--tg-theme-hint-color);">${(item.rarityPermille/10).toFixed(1)}%</div>
                 `;
-            }
-            
+            } 
             el.innerHTML = content; 
+            if (curr.parts[type] && curr.parts[type].name === item.name) el.classList.add('selected'); 
             el.onclick = () => { 
                 haptic('light'); 
                 Array.from(grid.children).forEach(c => c.classList.remove('selected')); 
@@ -2651,26 +2600,55 @@
         }); 
     }
     
+    function switchCustTab(tabName) {
+        haptic('light');
+        document.querySelectorAll('.subnav-pills button').forEach(b => b.classList.remove('active'));
+        document.getElementById(`btn-tab-${tabName}`).classList.add('active');
+
+        document.querySelectorAll('.cust-tab-panel').forEach(p => {
+            p.classList.remove('active');
+            p.style.display = 'none';
+        });
+        const targetPanel = document.getElementById(`panel-tab-${tabName}`);
+        if(targetPanel) {
+            targetPanel.classList.add('active');
+            targetPanel.style.display = 'block';
+        }
+    }
+
+    function updateBulkQty(step) {
+        haptic('light');
+        const input = document.getElementById('cust-qty');
+        if (input) {
+            let val = parseInt(input.value) || 1;
+            val += step;
+            if (val < 1) val = 1;
+            if (val > 1000) val = 1000;
+            input.value = val;
+            updateCreateButton();
+        }
+    }
+
     function updateCreateButton() { 
         const btn = document.getElementById('btn-create-custom'); 
+        if(!btn) return;
         
         const allReady = customizationQueue.every(q => {
             if (!q.id) return false;
 
-            const rndModel = document.getElementById('cb-rnd-model').checked && customizationQueue.length === 1;
+            const rndModel = document.getElementById('cb-rnd-model').checked;
             const hasModel = q.parts.model || rndModel;
 
-            const rndBackdrop = document.getElementById('cb-rnd-backdrop').checked && customizationQueue.length === 1;
+            const rndBackdrop = document.getElementById('cb-rnd-backdrop').checked;
             const hasBackdrop = q.parts.backdrop || rndBackdrop;
 
-            const rndPattern = document.getElementById('cb-rnd-pattern').checked && customizationQueue.length === 1;
+            const rndPattern = document.getElementById('cb-rnd-pattern').checked;
             const hasPattern = q.parts.pattern || rndPattern;
 
             return hasModel && hasBackdrop && hasPattern;
         });
 
-        const qtyVal = document.getElementById('cust-qty-val');
-        const qty = qtyVal ? (parseInt(qtyVal.innerText) || 1) : 1;
+        const qty = parseInt(document.getElementById('cust-qty').value) || 1;
         const isBulk = customizationQueue.length === 1 && qty > 1;
 
         btn.disabled = !allReady; 
@@ -2678,7 +2656,7 @@
         if (isBulk) {
             btn.innerText = `Create Upgraded Gifts (${qty})`;
         } else {
-            btn.innerText = customizationQueue.length > 1 ? `Create All Upgraded Gifts (${customizationQueue.length})` : 'Create Upgraded Gift'; 
+            btn.innerText = customizationQueue.length > 1 ? `Create All Upgrades (${customizationQueue.length})` : 'Create Upgraded Gift'; 
         }
     }
     
@@ -2687,8 +2665,7 @@
         btn.disabled = true;
         btn.innerText = "Creating...";
     
-        const qtyVal = document.getElementById('cust-qty-val');
-        const qtyInput = qtyVal ? (parseInt(qtyVal.innerText) || 1) : 1;
+        const qtyInput = parseInt(document.getElementById('cust-qty').value) || 1;
         const isRandomModel = document.getElementById('cb-rnd-model').checked;
         const isRandomBackdrop = document.getElementById('cb-rnd-backdrop').checked;
         const isRandomPattern = document.getElementById('cb-rnd-pattern').checked;
