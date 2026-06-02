@@ -26,7 +26,7 @@
             --accent-purple: #af9bf5;
             --accent-purple-dim: rgba(175, 155, 245, 0.15);
         }
-
+    
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -37,11 +37,11 @@
             overflow-x: hidden;
             user-select: none;
         }
-
+    
         .app-container { max-width: 600px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; position: relative; }
         .page { display: none; flex-direction: column; flex-grow: 1; background-color: var(--tg-theme-bg-color); }
         .page.active { display: flex; }
-
+    
         .page-header {
             display: flex; align-items: center; justify-content: space-between;
             padding: 10px 15px; background-color: var(--tg-theme-secondary-bg-color);
@@ -52,7 +52,7 @@
         #profile-page {
             padding-top: 0px !important; /* Extend fully under status area */
         }
-
+    
         .profile-top-section {
             padding-top: 85px !important; /* safe area offset */
             padding-bottom: 25px;
@@ -60,7 +60,7 @@
             display: flex; justify-content: center; position: relative;
             transition: background 0.5s ease;
         }
-
+    
         .profile-top-section.has-worn-gift .profile-name-status h1,
         .profile-top-section.has-worn-gift .profile-name-status p {
             color: #ffffff !important;
@@ -78,7 +78,7 @@
             background-color: currentColor; 
             -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
         }
-
+    
         .profile-main-info { display: flex; flex-direction: column; align-items: center; z-index: 2; position: relative; }
         
         /* Pinned Avatar Container */
@@ -116,15 +116,15 @@
         .pinned-floating-gift.pos-3 { bottom: 0px; left: -35px; animation-delay: 2.4s; }
         .pinned-floating-gift.pos-4 { bottom: 0px; right: -35px; animation-delay: 3.2s; }
         .pinned-floating-gift.pos-5 { bottom: -25px; left: 34px; animation-delay: 4.0s; }
-
+    
         @keyframes floatGently {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
             50% { transform: translateY(-5px) rotate(5deg); }
         }
-
+    
         .profile-name-status h1 { font-size: 1.4em; font-weight: 700; text-align: center; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; }
         .profile-name-status p { font-size: 0.9em; opacity: 0.7; text-align: center; margin: 0; color: var(--tg-theme-text-color); }
-
+    
         /* Unified Info Section Container */
         .profile-info-block { 
             background-color: #121214; 
@@ -138,7 +138,7 @@
         .info-item .value { color: var(--tg-theme-text-color); font-size: 1.05em; display: block; margin-bottom: 2px; line-height: 1.2;}
         .info-item .label { color: var(--tg-theme-hint-color); font-size: 0.85em; }
         .info-item .clickable { cursor: pointer; }
-
+    
         /* Capsule Tab Switchers */
         .profile-tabs-pill-container {
             display: inline-flex;
@@ -158,33 +158,38 @@
             background-color: rgba(142, 90, 246, 0.15);
             color: #af9bf5;
         }
-
+    
         .gifts-grid {
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px;
             flex-grow: 1; overflow-y: auto; align-content: start; 
             background: var(--tg-theme-bg-color);
         }
         
-        .gift-card, .buy-gift-item {
+        .gift-card {
             background-color: var(--tg-theme-secondary-bg-color);
             border-radius: 12px; padding: 6px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             cursor: pointer; position: relative; overflow: hidden;
             transition: transform 0.1s ease-out; border: none; 
+            aspect-ratio: 1 / 1;
         }
-        .gift-card { aspect-ratio: 1 / 1; }
-        
-        /* High-Contrast Card Style for Redesigned Shop */
+    
+        /* Redesigned Card Corner Radius & Styling for Shop */
         .buy-gift-item { 
             background-color: #121214; 
             border: 1px solid rgba(255, 255, 255, 0.05); 
-            border-radius: 16px; 
-            padding: 12px; 
-            aspect-ratio: 1 / 1.35; 
+            border-radius: 8px; /* Noticeably smaller, sharper, and squared-off */
+            padding: 8px; 
+            aspect-ratio: 1 / 1.15; /* Tightly proportioned gap spacing */
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            justify-content: space-between; 
+            justify-content: center; 
+            gap: 4px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.1s ease-out;
         }
         
         .gift-card.selected { box-shadow: inset 0 0 0 3px var(--tg-theme-link-color); background-color: rgba(98, 188, 249, 0.15); }
@@ -195,59 +200,48 @@
             width: 14px; height: 14px; display: flex; align-items: center; justify-content: center;
         }
         .status-icon svg { fill: #fff; width: 100%; height: 100%; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8)); }
-
+    
         .gift-card.is-hidden { opacity: 0.4; filter: grayscale(1); }
-
+    
         .image-container {
             width: 75%; height: 75%; display: flex; align-items: center; justify-content: center;
             position: relative; z-index: 2; margin-bottom: 0px; 
         }
-        .buy-gift-item .image-container { height: 55%; margin-bottom: 4px; margin-top: 8px; }
+        .buy-gift-item .image-container { height: 65%; margin-bottom: 2px; margin-top: 2px; }
         .image-container img, .image-container .lottie-wrapper { max-width: 100%; max-height: 100%; object-fit: contain; }
         .lottie-wrapper { width: 100%; height: 100%; }
         
         .gift-name { font-size: 0.85em; font-weight: 500; text-align: center; margin-top: 4px; z-index: 2; width: 100%; line-height: 1.2; padding: 0 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .buy-gift-item .gift-name { color: #ffffff; font-size: 0.9em; font-weight: 600; }
-
-        /* Sparkling Golden Star Price Badges */
+        
+        /* Completely remove text labels from the shop layout */
+        .buy-gift-item .gift-name { display: none !important; }
+    
+        /* Compact Translucent Sparkly Price Badges */
         .gold-price-badge {
-            background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
-            color: #000000;
+            background: rgba(252, 211, 77, 0.15) !important; /* Translucent background */
+            color: #fcd34d !important;
             font-weight: 700;
-            font-size: 0.85em;
-            padding: 6px 14px;
-            border-radius: 18px;
+            font-size: 0.75em; /* Significantly smaller card element */
+            padding: 3px 8px; /* Compact height and width sizing */
+            border-radius: 12px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 4px;
-            box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+            gap: 2px;
             position: relative;
             overflow: hidden;
-            letter-spacing: 0.5px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(252, 211, 77, 0.25);
         }
+        /* Sparkle/Glitter background details */
         .gold-price-badge::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                to right,
-                rgba(255, 255, 255, 0) 0%,
-                rgba(255, 255, 255, 0.4) 50%,
-                rgba(255, 255, 255, 0) 100%
-            );
-            transform: rotate(30deg);
-            animation: sparkleSweep 2s infinite linear;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23fcd34d' opacity='0.5'%3E%3Cpath d='M6 2L7.5 5.5L11 6L7.5 6.5L6 10L4.5 6.5L1 6L4.5 5.5L6 2M19 14L19.75 16.75L22.5 17L19.75 17.25L19 20L18.25 17.25L15.5 17L18.25 16.75L19 14'/%3E%3C/svg%3E") center/cover no-repeat;
+            pointer-events: none;
+            opacity: 0.45;
         }
-        @keyframes sparkleSweep {
-            0% { transform: translate(-40%, -40%) rotate(30deg); }
-            100% { transform: translate(40%, 40%) rotate(30deg); }
-        }
-
+    
         .gift-card-bg-pattern { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0; }
         .dynamic-pattern-container { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1; overflow: hidden; pointer-events: none; }
         .card-pattern-symbol { 
@@ -259,7 +253,7 @@
             position: absolute; top: 12px; right: -32px; transform: rotate(45deg);
             background: rgba(0,0,0,0.6); color: white; font-size: 0.6em; padding: 2px 35px; z-index: 4; font-weight: 600; letter-spacing: 0.5px;
         }
-
+    
         .action-button {
             background-color: var(--tg-theme-button-color); color: var(--tg-theme-button-text-color);
             border: none; padding: 6px 14px; border-radius: 16px; font-size: 0.9em; cursor: pointer; font-weight: 500;
@@ -267,7 +261,7 @@
         #action-toolbar {
             padding: 10px 15px; display: flex; justify-content: flex-end; gap: 10px; background-color: var(--tg-theme-bg-color);
         }
-
+    
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background-color: var(--app-modal-backdrop-color);
@@ -283,7 +277,7 @@
             pointer-events: auto; 
         }
         #customize-modal .modal-content { height: 90vh; }
-
+    
         .modal-header-bar { padding: 16px; text-align: center; font-weight: 600; font-size: 1.1em; background: var(--tg-theme-secondary-bg-color); position: relative; z-index: 10; }
         .modal-scrollable-content { overflow-y: auto; padding: 0; flex-grow: 1; }
         
@@ -294,7 +288,7 @@
         }
         .modal-button.secondary { background-color: var(--tg-theme-bg-color); color: var(--tg-theme-link-color); }
         
-        /* New Collectible Modal Styles */
+        /* Collectible Modal Styles */
         .collectible-header {
             position: relative; padding: 40px 16px 24px; text-align: center; overflow: hidden;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -302,7 +296,7 @@
         }
         .collectible-header h3 { margin-top: 15px; position: relative; z-index: 2; font-size: 1.5em; margin-bottom: 6px; font-weight: 700; }
         .collectible-header .sub-header { position: relative; z-index: 2; font-size: 1em; opacity: 0.9; }
-
+    
         /* Navigation Context Button (Three-dot Ellipsis) */
         .collectible-context-btn {
             position: absolute;
@@ -324,13 +318,13 @@
             color: #ffffff;
             background: rgba(255, 255, 255, 0.1);
         }
-
+    
         /* Action Buttons Row */
         .modal-action-row {
             display: flex;
             justify-content: space-between;
-            gap: 12px;
-            width: 90%;
+            gap: 6px; /* Tighter layout column spacing */
+            width: 95%; /* Maximize uniform width spacing */
             margin: 20px auto 0 auto;
             position: relative;
             z-index: 2;
@@ -339,8 +333,8 @@
             flex: 1;
             background: rgba(0, 0, 0, 0.35);
             border: none;
-            border-radius: 14px;
-            padding: 12px 6px;
+            border-radius: 6px; /* Sharp corner radius appearance */
+            padding: 10px 4px; /* Slightly tighter vertical cell padding */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -372,8 +366,8 @@
             font-weight: 600;
             letter-spacing: 0.3px;
         }
-
-        /* Bordered Grid Details Table Style */
+    
+        /* Edge-to-Edge Information Table Style */
         .stats-table {
             background-color: rgba(255, 255, 255, 0.03); 
             border-radius: 14px; 
@@ -383,40 +377,61 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
         .stat-row { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 14px 16px; 
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08); 
+            display: grid; 
+            grid-template-columns: 125px 1fr; /* Custom explicit grid split */
+            align-items: stretch; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08); /* Extend dividers all the way across edge */
+            padding: 0;
         }
         .stat-row:last-child { border-bottom: none; }
-        .stat-label { font-weight: bold; color: var(--tg-theme-text-color); font-size: 0.95em; }
-        .stat-value { display: flex; align-items: center; gap: 8px; font-size: 0.95em; color: var(--tg-theme-text-color); }
+        .stat-label { 
+            font-weight: bold; 
+            color: var(--tg-theme-text-color); 
+            font-size: 0.95em; 
+            padding: 14px 16px 14px 24px; /* Left Column Padding further inward */
+            border-right: 1px solid rgba(255, 255, 255, 0.08); /* Vertical grid line partition */
+            display: flex;
+            align-items: center;
+        }
+        .stat-value { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            font-size: 0.95em; 
+            color: var(--tg-theme-text-color); 
+            padding: 14px 16px;
+            font-weight: bold; /* Bold matching left-column bold labels */
+        }
         
         .owner-chip { display: flex; align-items: center; gap: 6px; }
         .owner-chip img { width: 20px; height: 20px; border-radius: 50%; }
         .owner-chip span { color: var(--tg-theme-link-color); }
         
-        /* Desaturated semi-transparent purple badge */
+        /* Smaller Tighter Percentage Badges */
         .percentage-pill { 
             background-color: rgba(157, 141, 242, 0.15); 
             color: #9d8df2; 
-            padding: 2px 8px; 
-            border-radius: 8px; 
-            font-size: 0.8em; 
-            font-weight: 600; 
+            padding: 1px 6px; /* Tighter layout block */
+            border-radius: 4px; /* Smaller corner radius style */
+            font-size: 0.75em; /* Smaller text size */
+            font-weight: bold; 
+            display: inline-flex;
+            align-items: center;
+            margin-left: 4px; /* Tightly integrated inline block */
+            height: 18px; /* Shorter pill height scale */
+            line-height: 1;
         }
-        .learn-more { font-size: 0.8em; color: var(--tg-theme-link-color); margin-left: 4px; opacity: 0.8; }
+        .learn-more { font-size: 0.8em; color: var(--tg-theme-link-color); margin-left: 4px; opacity: 0.8; font-weight: normal; }
         
-        /* Redesigned Collectible CTA */
+        /* Elongated Compressed OK Bottom Button */
         .big-rounded-btn {
             width: 100%; 
             background-color: #8e5af6; 
             color: #ffffff;
             border: none; 
-            padding: 14px; 
-            border-radius: 30px; 
-            font-size: 1.1em; 
+            padding: 10px 24px; /* Slightly more compressed vertically */
+            border-radius: 40px; /* Elongated pill shape structure */
+            font-size: 1.05em; 
             font-weight: 600; 
             cursor: pointer;
             transition: background 0.2s;
@@ -424,12 +439,12 @@
         .big-rounded-btn:active {
             background-color: #7944de;
         }
-
+    
         .collectible-footer-container {
             padding: 15px 20px 42px 20px;
             background: var(--tg-theme-bg-color);
         }
-
+    
         /* Visibility context styles */
         .col-visibility-bar {
             text-align: center;
@@ -449,12 +464,12 @@
         .col-visibility-action:active {
             opacity: 0.8;
         }
-
+    
         @keyframes bounceWorn {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-4px); }
         }
-
+    
         /* Roulette Animations */
         .roulette-image-wrapper {
             width: 100%; height: 160px; position: relative; overflow: hidden; display: flex;
@@ -480,7 +495,7 @@
             height: 1.2em; display: flex; align-items: center; justify-content: flex-end; width: 100%;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-
+    
         /* Menu */
         #long-press-menu {
             position: fixed; background: var(--tg-theme-secondary-bg-color);
@@ -490,7 +505,7 @@
         #long-press-menu li { padding: 14px 20px; list-style: none; cursor: pointer; color: var(--tg-theme-text-color); font-size: 1em; font-weight: 500; display:flex; align-items:center; gap: 10px; }
         #long-press-menu li:hover { background: rgba(255,255,255,0.05); }
         #long-press-menu li.danger { color: #ff595a; }
-
+    
         /* Queue Bar */
         .queue-bar { display: flex; overflow-x: auto; padding: 12px 15px; gap: 8px; background: var(--tg-theme-bg-color); white-space: nowrap; scrollbar-width: none; }
         .queue-bar::-webkit-scrollbar { display: none; }
@@ -501,7 +516,7 @@
         .queue-chip.active { border-color: var(--tg-theme-link-color); background: rgba(98, 188, 249, 0.1); color: var(--tg-theme-link-color); }
         .queue-chip .close-x { opacity: 0.6; font-size: 1.2em; font-weight: 300; }
         .add-gift-chip { background: var(--tg-theme-button-color); color: var(--tg-theme-button-text-color); }
-
+    
         .filter-section { padding: 0 15px; margin-bottom: 20px; }
         .filter-section h4 { margin: 15px 0 8px; color: var(--tg-theme-hint-color); font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; padding-left: 4px; }
         
@@ -509,8 +524,11 @@
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; 
             overflow-y: auto; padding: 4px; max-height: 220px; border-radius: 8px;
         }
+        
+        /* Lighter cards in customization dashboard */
         .filter-option {
-            background: var(--tg-theme-secondary-bg-color); border-radius: 12px; padding: 10px;
+            background: #242f3d !important; /* Lighter background panel colors */
+            border-radius: 12px; padding: 10px;
             cursor: pointer; border: 2px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center;
             min-height: 100px;
         }
@@ -518,15 +536,97 @@
         .filter-option img { width: 55px; height: 55px; object-fit: contain; margin-bottom: 5px; }
         .filter-option .label { font-size: 0.75em; text-align: center; overflow: hidden; white-space: nowrap; width: 100%; text-overflow: ellipsis;}
         .gradient-square { width: 55px; height: 55px; border-radius: 50%; margin-bottom: 5px; }
-
+    
         .switch-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid rgba(0,0,0,0.1); font-weight: 500; }
-        .switch { position: relative; display: inline-block; width: 50px; height: 30px; }
+    
+        /* Settings Modal and Switches (Beautiful Native Telegram Style) */
+        #settings-modal .modal-content {
+            background-color: #17212b; /* Native Telegram Dark bg */
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            max-height: 80vh;
+        }
+        #settings-modal .modal-header-bar {
+            background: #17212b;
+            color: #ffffff;
+            font-size: 1.15em;
+            font-weight: 600;
+            padding: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+        .settings-group {
+            background-color: #101921;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 16px;
+            margin-bottom: 16px;
+        }
+        .settings-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            font-weight: 500;
+            color: #ffffff;
+            font-size: 0.95em;
+        }
+        .settings-row:last-child {
+            border-bottom: none;
+        }
+        .settings-row-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .settings-row-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2f8cc9;
+        }
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--tg-theme-hint-color); transition: .4s; border-radius: 34px; opacity: 0.3; }
-        .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        input:checked + .slider { background-color: var(--tg-theme-button-color); opacity: 1; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #2b394a; transition: .3s; border-radius: 24px; opacity: 1; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        input:checked + .slider { background-color: #2f8cc9; opacity: 1; }
         input:checked + .slider:before { transform: translateX(20px); }
-
+    
+        .settings-button-group {
+            padding: 0 20px 20px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .settings-action-btn {
+            background-color: #2b394a;
+            color: #5288c1;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+        .settings-action-btn:active {
+            background-color: #35475c;
+        }
+        .settings-action-btn.danger {
+            color: #ff595a;
+            background-color: rgba(255, 89, 90, 0.1);
+        }
+        .settings-action-btn.danger:active {
+            background-color: rgba(255, 89, 90, 0.15);
+        }
+    
         .spinner { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--tg-theme-link-color); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .hidden { display: none !important; }
@@ -534,7 +634,7 @@
         .reordering .gift-card[data-pinned="true"] { opacity: 1; cursor: grab; box-shadow: 0 0 0 2px var(--tg-theme-link-color); }
         
         #qty-modal input { background: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); border: none; padding: 12px; border-radius: 12px; width: 100%; font-size: 1.4em; text-align: center; margin-bottom: 15px; outline: none; font-weight: bold; }
-
+    
         /* Loading */
         .glass-panel { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; animation: glassFloat 4s ease-in-out infinite; }
         .liquid-blob { position: absolute; border-radius: 50%; filter: blur(50px); opacity: 0.5; z-index: 1; animation: blobFloat 10s infinite alternate; }
@@ -542,7 +642,7 @@
         .blob-2 { width: 250px; height: 250px; background: #5ac8fa; bottom: 20%; right: 10%; animation-delay: -2s; }
         @keyframes blobFloat { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(20px, -20px) scale(1.1); } 100% { transform: translate(-20px, 20px) scale(0.9); } }
         @keyframes glassFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
+    
         /* --- CRAFTING MODAL STYLES --- */
         .craft-header-btn {
             position: absolute; top: 16px; right: 16px; width: 32px; height: 32px;
@@ -556,13 +656,13 @@
             -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
             background-color: #ffffff;
         }
-
+    
         .craft-container {
             background: transparent; 
             padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 100%;
             position: relative;
         }
-
+    
         #btn-craft-action {
             width: 90%; 
             height: auto;
@@ -581,27 +681,27 @@
             padding: 12px 20px;
             text-shadow: 0 1px 1px rgba(0,0,0,0.1);
         }
-
+    
         #btn-craft-action:disabled {
             background: #2c3e50;
             color: #7f8c8d;
             box-shadow: none;
             cursor: not-allowed;
         }
-
+    
         .craft-btn-subtext {
             font-size: 0.75em; 
             font-weight: 500; 
             opacity: 0.9; 
             margin-top: 2px;
         }
-
+    
         #craft-modal .modal-content {
             background: #094d4f;
             background: radial-gradient(circle,rgba(9, 77, 79, 1) 0%, rgba(0, 20, 16, 1) 100%);
             height: 90vh;
         }
-
+    
         .craft-slots-area { position: relative; width: 300px; height: 300px; margin-top: 20px; }
         .craft-center-progress {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -612,7 +712,7 @@
         .craft-svg-circle circle { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
         .craft-bg-circle { stroke: rgba(255,255,255,0.1); }
         .craft-fg-circle { stroke: #ffffff; }
-
+    
         .craft-anvil-icon {
             position: absolute; width: 50px; height: 50px;
             -webkit-mask-image: url('https://raw.githubusercontent.com/Vasiliy-katsyka/upgradeEmpty/8e8c2524c119384132502547e562a1d128661cd9/telelakel_tgb_AgADOZMAAsCtWEs.svg');
@@ -621,7 +721,7 @@
             background-color: #ffffff;
         }
         .craft-pct-text { position: absolute; bottom: 25px; color: #fff; font-size: 0.9em; font-weight: 700; }
-
+    
         .craft-slot {
             position: absolute; width: 70px; height: 70px;
             background: rgba(255,255,255,0.1); border-radius: 16px;
@@ -639,24 +739,24 @@
             position: absolute; top: 2px; right: 2px; width: 16px; height: 16px; background: rgba(0,0,0,0.6);
             border-radius: 50%; color: #fff; font-size: 10px; display: flex; align-items: center; justify-content: center;
         }
-
+    
         .craft-probability-row { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; justify-content: center; }
         .prob-pill { display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 20px; color: #fff; font-size: 0.85em; }
         .prob-dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); }
-
+    
         /* Selection Grid */
         .craft-select-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
-        .craft-select-item { position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 1/1; background: var(--tg-theme-secondary-bg-color); border: 2px solid transparent; }
+        .craft-select-item { position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 1/1; background: #242f3d !important; border: 2px solid transparent; }
         .craft-select-item.selected { border-color: #3e97f0; background: rgba(62, 151, 240, 0.2); }
         .craft-select-item img { width: 100%; height: 100%; object-fit: contain; }
         .rarity-badge { position: absolute; top: 4px; left: 4px; background: rgba(0,0,0,0.6); color: #fff; font-size: 0.7em; padding: 2px 6px; border-radius: 4px; }
-
+    
         /* CUBE & BURNING ANIMATION */
         .cube-wrapper { width: 150px; height: 150px; perspective: 600px; margin: 0 auto; position: relative; }
         .cube { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transform: translateZ(-75px); }
         .cube.spinning { animation: spinCube 3s cubic-bezier(0.1, 0.7, 0.1, 1) forwards; }
         .cube.burning { animation: burnToAsh 1.5s ease-in forwards; }
-
+    
         #craft-anim-modal .modal-content {
             background: linear-gradient(180deg, #18222d 0%, #0e1621 100%) !important;
             height: 90vh !important;
@@ -669,12 +769,12 @@
             border-top-left-radius: 28px;
             border-top-right-radius: 28px;
         }
-
+    
         #craft-anim-modal .cube-wrapper {
             margin-bottom: 30px;
             flex-shrink: 0;
         }
-
+    
         .cube-face {
             position: absolute; width: 150px; height: 150px;
             background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2);
@@ -688,20 +788,20 @@
         .cube-face.left   { transform: rotateY(-90deg) translateZ(75px); }
         .cube-face.top    { transform: rotateX( 90deg) translateZ(75px); }
         .cube-face.bottom { transform: rotateX(-90deg) translateZ(75px); }
-
+    
         @keyframes spinCube {
             0% { transform: translateZ(-75px) rotateX(0deg) rotateY(0deg); }
             20% { transform: translateZ(-75px) rotateX(-180deg) rotateY(-90deg); }
             60% { transform: translateZ(-75px) rotateX(360deg) rotateY(720deg); }
             100% { transform: translateZ(-75px) rotateX(1440deg) rotateY(1800deg); }
         }
-
+    
         @keyframes burnToAsh {
             0% { filter: brightness(1); opacity: 1; transform: scale(1) translateZ(-75px); }
             50% { filter: brightness(3) sepia(1) hue-rotate(-30deg) blur(2px); opacity: 0.8; }
             100% { filter: grayscale(1) brightness(0.2) blur(10px); opacity: 0; transform: scale(0.5) translateZ(-75px) translateY(50px); }
         }
-
+    
         /* Redesigned Collectible Sheet Height */
         #collectible-modal .modal-content {
             background-color: var(--tg-theme-bg-color);
@@ -709,39 +809,41 @@
             width: 100%; max-width: 600px; display: flex; flex-direction: column; 
             height: 95vh; max-height: 95vh; overflow-y: auto;
         }
-
-        /* Customize Tab Dashboard Layout Styles */
+    
+        /* Tabbed capsule-like subnav design matching profile panel */
         .subnav-pills {
             display: flex;
             background-color: #1a1a1c;
-            border-radius: 14px;
             padding: 4px;
-            margin: 10px 15px;
+            border-radius: 40px; /* Capsule tab design */
             gap: 4px;
             border: 1px solid rgba(255, 255, 255, 0.05);
+            margin: 10px 15px;
+            overflow-x: auto; /* Gracious layout overflow handling */
+            scrollbar-width: none;
+            white-space: nowrap;
+        }
+        .subnav-pills::-webkit-scrollbar {
+            display: none;
         }
         .subnav-pills button {
-            flex: 1;
-            background: none;
-            border: none;
-            color: var(--tg-theme-hint-color, #708499);
-            padding: 10px 2px;
-            font-size: 0.8em;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            background: none; border: none; color: #8e8e93;
+            padding: 8px 18px; border-radius: 40px; font-size: 0.9em;
+            font-weight: 600; cursor: pointer; transition: all 0.2s ease;
+            display: inline-flex; align-items: center; gap: 6px;
+            text-transform: none; /* Just names without numbers */
+            letter-spacing: normal;
+            flex-shrink: 0;
         }
         .subnav-pills button.active {
-            background-color: #121214;
-            color: var(--tg-theme-text-color, #ffffff);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            background-color: rgba(142, 90, 246, 0.15);
+            color: #af9bf5;
         }
+    
+        /* Lighter background dashboard container elements */
         .model-card {
-            background-color: var(--panel-bg, #121214);
-            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.05));
+            background-color: #242f3d !important; /* Lighter background styling */
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
             border-radius: 16px;
             padding: 14px;
             display: flex;
@@ -859,27 +961,40 @@
 
 <!-- Modals -->
 
+<!-- Settings Modal (Native Telegram Style) -->
 <div id="settings-modal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header-bar">Settings</div>
-        <div class="modal-scrollable-content">
-            <div class="switch-row">
-                <span>Animations (Lottie)</span>
-                <label class="switch">
-                    <input type="checkbox" id="setting-animations" onchange="toggleSetting('animations', this.checked)">
-                    <span class="slider"></span>
-                </label>
+        <div class="modal-scrollable-content" style="padding-bottom: 20px;">
+            <div class="settings-group">
+                <div class="settings-row">
+                    <div class="settings-row-label">
+                        <span class="settings-row-icon">🎬</span>
+                        <span>Animations (Lottie)</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="setting-animations" onchange="toggleSetting('animations', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="settings-row">
+                    <div class="settings-row-label">
+                        <span class="settings-row-icon">👁️</span>
+                        <span>Show Hidden Gifts</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="setting-hidden" onchange="toggleSetting('showHidden', this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
             </div>
-            <div class="switch-row">
-                <span>Show Hidden Gifts</span>
-                <label class="switch">
-                    <input type="checkbox" id="setting-hidden" onchange="toggleSetting('showHidden', this.checked)">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div style="padding: 20px; display: flex; flex-direction: column; gap: 10px;">
-                <button class="modal-button" style="width:100%; background: var(--app-accent-blue);" onclick="startSelectionMode('hide')">Select & Hide Multiple</button>
-                <button class="modal-button secondary" style="width:100%; color: #ff595a;" onclick="resetAppData()">Reset All Data</button>
+            <div class="settings-button-group">
+                <button class="settings-action-btn" onclick="startSelectionMode('hide')">
+                    📁 Select & Hide Multiple
+                </button>
+                <button class="settings-action-btn danger" onclick="resetAppData()">
+                    🗑️ Reset All Data
+                </button>
             </div>
         </div>
         <div class="modal-buttons-footer">
@@ -1005,8 +1120,12 @@
                 </div>
             </div>
 
-            <!-- Context Helper Text Visibility Bar -->
+            <!-- Context Helper Text Visibility Bar with eye-slash icon -->
             <div id="col-visibility-bar" class="col-visibility-bar" onclick="toggleCollectibleVisibility()">
+                <svg id="col-visibility-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="vertical-align: middle; margin-right: 6px; color: #9d8df2; display: inline-block; position: relative; top: -1px;">
+                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                    <path d="M2 2l20 20" stroke="currentColor" stroke-width="2.5"/>
+                </svg>
                 <span id="col-visibility-text" class="col-visibility-text">This gift is visible. </span>
                 <span id="col-visibility-action" class="col-visibility-action">Hide from profile &gt;</span>
             </div>
@@ -1030,13 +1149,13 @@
         <!-- Queue Bar -->
         <div class="queue-bar" id="cust-queue-bar"></div>
         
-        <!-- Modal Inner Capsule Tabs -->
+        <!-- Modal Inner Capsule Tabs without Numbers -->
         <div class="subnav-pills">
-            <button id="btn-tab-base" class="active" onclick="switchCustTab('base')">1. Base</button>
-            <button id="btn-tab-models" onclick="switchCustTab('models')">2. Models</button>
-            <button id="btn-tab-backdrops" onclick="switchCustTab('backdrops')">3. Backdrops</button>
-            <button id="btn-tab-symbols" onclick="switchCustTab('symbols')">4. Symbols</button>
-            <button id="btn-tab-options" onclick="switchCustTab('options')">5. Options</button>
+            <button id="btn-tab-base" class="active" onclick="switchCustTab('base')">Base</button>
+            <button id="btn-tab-models" onclick="switchCustTab('models')">Models</button>
+            <button id="btn-tab-backdrops" onclick="switchCustTab('backdrops')">Backdrops</button>
+            <button id="btn-tab-symbols" onclick="switchCustTab('symbols')">Symbols</button>
+            <button id="btn-tab-options" onclick="switchCustTab('options')">Options</button>
         </div>
         
         <div class="modal-scrollable-content" style="padding: 0; background: var(--tg-theme-secondary-bg-color); flex-grow:1; display:flex; flex-direction:column;">
