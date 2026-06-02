@@ -50,11 +50,11 @@
         .page-header h2 { font-size: 1.15em; font-weight: 500; margin: 0; }
         
         #profile-page {
-            padding-top: 0px !important;
+            padding-top: 0px !important; /* Extend fully under status area */
         }
 
         .profile-top-section {
-            padding-top: 85px !important;
+            padding-top: 85px !important; /* safe area offset */
             padding-bottom: 25px;
             background: var(--app-profile-gradient-fallback);
             display: flex; justify-content: center; position: relative;
@@ -81,6 +81,7 @@
 
         .profile-main-info { display: flex; flex-direction: column; align-items: center; z-index: 2; position: relative; }
         
+        /* Pinned Avatar Container */
         .profile-avatar-wrapper {
             position: relative;
             width: 100px;
@@ -95,6 +96,7 @@
             z-index: 2;
         }
         
+        /* Floating Pinned Gifts around profile photo */
         .pinned-floating-gift {
             position: absolute;
             width: 34px;
@@ -123,6 +125,7 @@
         .profile-name-status h1 { font-size: 1.4em; font-weight: 700; text-align: center; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; }
         .profile-name-status p { font-size: 0.9em; opacity: 0.7; text-align: center; margin: 0; color: var(--tg-theme-text-color); }
 
+        /* Unified Info Section Container */
         .profile-info-block { 
             background-color: #121214; 
             border-radius: 20px; 
@@ -136,6 +139,7 @@
         .info-item .label { color: var(--tg-theme-hint-color); font-size: 0.85em; }
         .info-item .clickable { cursor: pointer; }
 
+        /* Capsule Tab Switchers */
         .profile-tabs-pill-container {
             display: inline-flex;
             background-color: #1a1a1c;
@@ -161,33 +165,26 @@
             background: var(--tg-theme-bg-color);
         }
         
-        .gift-card {
+        .gift-card, .buy-gift-item {
             background-color: var(--tg-theme-secondary-bg-color);
             border-radius: 12px; padding: 6px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             cursor: pointer; position: relative; overflow: hidden;
             transition: transform 0.1s ease-out; border: none; 
-            aspect-ratio: 1 / 1;
         }
-
-        #shop-page .gifts-grid {
-            gap: 6px;
-            padding: 8px;
-        }
+        .gift-card { aspect-ratio: 1 / 1; }
         
+        /* High-Contrast Card Style for Redesigned Shop */
         .buy-gift-item { 
             background-color: #121214; 
             border: 1px solid rgba(255, 255, 255, 0.05); 
-            border-radius: 8px; 
-            padding: 8px; 
-            aspect-ratio: 1 / 1.1; 
+            border-radius: 16px; 
+            padding: 12px; 
+            aspect-ratio: 1 / 1.35; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            justify-content: center; 
-            gap: 4px;
-            cursor: pointer; position: relative; overflow: hidden;
-            transition: transform 0.1s ease-out; border: none; 
+            justify-content: space-between; 
         }
         
         .gift-card.selected { box-shadow: inset 0 0 0 3px var(--tg-theme-link-color); background-color: rgba(98, 188, 249, 0.15); }
@@ -205,45 +202,50 @@
             width: 75%; height: 75%; display: flex; align-items: center; justify-content: center;
             position: relative; z-index: 2; margin-bottom: 0px; 
         }
-        .buy-gift-item .image-container { 
-            height: 60%; 
-            width: 80%;
-            margin-bottom: 2px; 
-            margin-top: 0; 
-        }
+        .buy-gift-item .image-container { height: 55%; margin-bottom: 4px; margin-top: 8px; }
         .image-container img, .image-container .lottie-wrapper { max-width: 100%; max-height: 100%; object-fit: contain; }
         .lottie-wrapper { width: 100%; height: 100%; }
         
         .gift-name { font-size: 0.85em; font-weight: 500; text-align: center; margin-top: 4px; z-index: 2; width: 100%; line-height: 1.2; padding: 0 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .buy-gift-item .gift-name { display: none !important; }
+        .buy-gift-item .gift-name { color: #ffffff; font-size: 0.9em; font-weight: 600; }
 
+        /* Sparkling Golden Star Price Badges */
         .gold-price-badge {
-            background: rgba(245, 158, 11, 0.15) !important;
-            color: #f59e0b !important;
+            background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
+            color: #000000;
             font-weight: 700;
-            font-size: 0.75em;
-            padding: 3px 8px;
-            border-radius: 12px;
+            font-size: 0.85em;
+            padding: 6px 14px;
+            border-radius: 18px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 2px;
-            box-shadow: none !important;
-            border: 1px solid rgba(245, 158, 11, 0.25);
+            gap: 4px;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
             position: relative;
-            overflow: visible;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .gold-price-badge::before {
-            content: '✨';
-            font-size: 0.8em;
-            opacity: 0.8;
-            margin-right: 2px;
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.4) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(30deg);
+            animation: sparkleSweep 2s infinite linear;
         }
-        .gold-price-badge::after {
-            content: '✨';
-            font-size: 0.8em;
-            opacity: 0.8;
-            margin-left: 2px;
+        @keyframes sparkleSweep {
+            0% { transform: translate(-40%, -40%) rotate(30deg); }
+            100% { transform: translate(40%, 40%) rotate(30deg); }
         }
 
         .gift-card-bg-pattern { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0; }
@@ -292,6 +294,7 @@
         }
         .modal-button.secondary { background-color: var(--tg-theme-bg-color); color: var(--tg-theme-link-color); }
         
+        /* New Collectible Modal Styles */
         .collectible-header {
             position: relative; padding: 40px 16px 24px; text-align: center; overflow: hidden;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -300,6 +303,7 @@
         .collectible-header h3 { margin-top: 15px; position: relative; z-index: 2; font-size: 1.5em; margin-bottom: 6px; font-weight: 700; }
         .collectible-header .sub-header { position: relative; z-index: 2; font-size: 1em; opacity: 0.9; }
 
+        /* Navigation Context Button (Three-dot Ellipsis) */
         .collectible-context-btn {
             position: absolute;
             top: 16px;
@@ -321,11 +325,12 @@
             background: rgba(255, 255, 255, 0.1);
         }
 
+        /* Action Buttons Row */
         .modal-action-row {
             display: flex;
             justify-content: space-between;
-            gap: 8px;
-            width: 95%;
+            gap: 12px;
+            width: 90%;
             margin: 20px auto 0 auto;
             position: relative;
             z-index: 2;
@@ -334,13 +339,13 @@
             flex: 1;
             background: rgba(0, 0, 0, 0.35);
             border: none;
-            border-radius: 6px;
-            padding: 10px 4px;
+            border-radius: 14px;
+            padding: 12px 6px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 4px;
+            gap: 6px;
             cursor: pointer;
             transition: background 0.2s ease, transform 0.1s;
             color: #ffffff;
@@ -368,6 +373,7 @@
             letter-spacing: 0.3px;
         }
 
+        /* Bordered Grid Details Table Style */
         .stats-table {
             background-color: rgba(255, 255, 255, 0.03); 
             border-radius: 14px; 
@@ -377,61 +383,40 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
         .stat-row { 
-            display: grid; 
-            grid-template-columns: 35% 65%; 
+            display: flex; 
+            justify-content: space-between; 
             align-items: center; 
+            padding: 14px 16px; 
             border-bottom: 1px solid rgba(255, 255, 255, 0.08); 
-            padding: 0;
         }
         .stat-row:last-child { border-bottom: none; }
-        
-        .stat-label { 
-            font-weight: bold; 
-            color: var(--tg-theme-text-color); 
-            font-size: 0.95em; 
-            padding: 14px 16px 14px 24px;
-            border-right: 1px solid rgba(255, 255, 255, 0.08);
-            height: 100%;
-            display: flex;
-            align-items: center;
-        }
-        .stat-value { 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            font-size: 0.95em; 
-            color: var(--tg-theme-text-color); 
-            padding: 14px 16px;
-            font-weight: bold;
-        }
+        .stat-label { font-weight: bold; color: var(--tg-theme-text-color); font-size: 0.95em; }
+        .stat-value { display: flex; align-items: center; gap: 8px; font-size: 0.95em; color: var(--tg-theme-text-color); }
         
         .owner-chip { display: flex; align-items: center; gap: 6px; }
         .owner-chip img { width: 20px; height: 20px; border-radius: 50%; }
         .owner-chip span { color: var(--tg-theme-link-color); }
         
+        /* Desaturated semi-transparent purple badge */
         .percentage-pill { 
             background-color: rgba(157, 141, 242, 0.15); 
             color: #9d8df2; 
-            padding: 1px 5px; 
-            border-radius: 4px; 
-            font-size: 0.75em; 
-            font-weight: bold;
-            margin-left: 6px;
-            display: inline-flex;
-            align-items: center;
-            height: 18px;
-            line-height: 1;
+            padding: 2px 8px; 
+            border-radius: 8px; 
+            font-size: 0.8em; 
+            font-weight: 600; 
         }
         .learn-more { font-size: 0.8em; color: var(--tg-theme-link-color); margin-left: 4px; opacity: 0.8; }
         
+        /* Redesigned Collectible CTA */
         .big-rounded-btn {
             width: 100%; 
             background-color: #8e5af6; 
             color: #ffffff;
             border: none; 
-            padding: 10px; 
-            border-radius: 40px; 
-            font-size: 1.0em; 
+            padding: 14px; 
+            border-radius: 30px; 
+            font-size: 1.1em; 
             font-weight: 600; 
             cursor: pointer;
             transition: background 0.2s;
@@ -445,17 +430,13 @@
             background: var(--tg-theme-bg-color);
         }
 
+        /* Visibility context styles */
         .col-visibility-bar {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
             text-align: center;
             margin: 15px auto 25px auto;
             font-size: 0.9em;
             cursor: pointer;
             user-select: none;
-            width: 100%;
         }
         .col-visibility-text {
             color: var(--tg-theme-hint-color);
@@ -474,6 +455,7 @@
             50% { transform: translateY(-4px); }
         }
 
+        /* Roulette Animations */
         .roulette-image-wrapper {
             width: 100%; height: 160px; position: relative; overflow: hidden; display: flex;
             align-items: center; justify-content: center;
@@ -485,6 +467,7 @@
             width: 160px; height: 160px; object-fit: contain; flex-shrink: 0;
         }
         
+        /* Vertical Text Slot */
         .slot-mask {
             height: 1.2em; overflow: hidden; position: relative; display: inline-block; vertical-align: bottom;
             width: 120px; text-align: right;
@@ -496,9 +479,9 @@
         .slot-item {
             height: 1.2em; display: flex; align-items: center; justify-content: flex-end; width: 100%;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            font-weight: bold;
         }
 
+        /* Menu */
         #long-press-menu {
             position: fixed; background: var(--tg-theme-secondary-bg-color);
             border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
@@ -508,6 +491,7 @@
         #long-press-menu li:hover { background: rgba(255,255,255,0.05); }
         #long-press-menu li.danger { color: #ff595a; }
 
+        /* Queue Bar */
         .queue-bar { display: flex; overflow-x: auto; padding: 12px 15px; gap: 8px; background: var(--tg-theme-bg-color); white-space: nowrap; scrollbar-width: none; }
         .queue-bar::-webkit-scrollbar { display: none; }
         .queue-chip { 
@@ -535,15 +519,6 @@
         .filter-option .label { font-size: 0.75em; text-align: center; overflow: hidden; white-space: nowrap; width: 100%; text-overflow: ellipsis;}
         .gradient-square { width: 55px; height: 55px; border-radius: 50%; margin-bottom: 5px; }
 
-        #customize-modal .filter-option {
-            background-color: #1c2733 !important; 
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        #customize-modal .filter-option.selected {
-            background-color: rgba(175, 155, 245, 0.2) !important;
-            border-color: #af9bf5 !important;
-        }
-
         .switch-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid rgba(0,0,0,0.1); font-weight: 500; }
         .switch { position: relative; display: inline-block; width: 50px; height: 30px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -560,6 +535,7 @@
         
         #qty-modal input { background: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); border: none; padding: 12px; border-radius: 12px; width: 100%; font-size: 1.4em; text-align: center; margin-bottom: 15px; outline: none; font-weight: bold; }
 
+        /* Loading */
         .glass-panel { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; animation: glassFloat 4s ease-in-out infinite; }
         .liquid-blob { position: absolute; border-radius: 50%; filter: blur(50px); opacity: 0.5; z-index: 1; animation: blobFloat 10s infinite alternate; }
         .blob-1 { width: 200px; height: 200px; background: #007AFF; top: 20%; left: 15%; }
@@ -567,6 +543,7 @@
         @keyframes blobFloat { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(20px, -20px) scale(1.1); } 100% { transform: translate(-20px, 20px) scale(0.9); } }
         @keyframes glassFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
+        /* --- CRAFTING MODAL STYLES --- */
         .craft-header-btn {
             position: absolute; top: 16px; right: 16px; width: 32px; height: 32px;
             background-color: rgba(0,0,0,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center;
@@ -667,12 +644,14 @@
         .prob-pill { display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 20px; color: #fff; font-size: 0.85em; }
         .prob-dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); }
 
+        /* Selection Grid */
         .craft-select-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
         .craft-select-item { position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 1/1; background: var(--tg-theme-secondary-bg-color); border: 2px solid transparent; }
         .craft-select-item.selected { border-color: #3e97f0; background: rgba(62, 151, 240, 0.2); }
         .craft-select-item img { width: 100%; height: 100%; object-fit: contain; }
         .rarity-badge { position: absolute; top: 4px; left: 4px; background: rgba(0,0,0,0.6); color: #fff; font-size: 0.7em; padding: 2px 6px; border-radius: 4px; }
 
+        /* CUBE & BURNING ANIMATION */
         .cube-wrapper { width: 150px; height: 150px; perspective: 600px; margin: 0 auto; position: relative; }
         .cube { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transform: translateZ(-75px); }
         .cube.spinning { animation: spinCube 3s cubic-bezier(0.1, 0.7, 0.1, 1) forwards; }
@@ -723,6 +702,7 @@
             100% { filter: grayscale(1) brightness(0.2) blur(10px); opacity: 0; transform: scale(0.5) translateZ(-75px) translateY(50px); }
         }
 
+        /* Redesigned Collectible Sheet Height */
         #collectible-modal .modal-content {
             background-color: var(--tg-theme-bg-color);
             border-top-left-radius: 28px; border-top-right-radius: 28px;
@@ -730,40 +710,38 @@
             height: 95vh; max-height: 95vh; overflow-y: auto;
         }
 
+        /* Customize Tab Dashboard Layout Styles */
         .subnav-pills {
-            display: inline-flex;
+            display: flex;
             background-color: #1a1a1c;
+            border-radius: 14px;
             padding: 4px;
-            border-radius: 40px;
+            margin: 10px 15px;
             gap: 4px;
             border: 1px solid rgba(255, 255, 255, 0.05);
-            margin: 10px 15px;
-            overflow-x: auto;
-            scrollbar-width: none;
-            align-self: center;
-        }
-        .subnav-pills::-webkit-scrollbar {
-            display: none;
         }
         .subnav-pills button {
-            background: none; 
-            border: none; 
-            color: #8e8e93;
-            padding: 8px 18px; 
-            border-radius: 40px; 
-            font-size: 0.85em;
-            font-weight: 600; 
-            cursor: pointer; 
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--tg-theme-hint-color, #708499);
+            padding: 10px 2px;
+            font-size: 0.8em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-radius: 10px;
+            cursor: pointer;
             transition: all 0.2s ease;
-            white-space: nowrap;
         }
         .subnav-pills button.active {
-            background-color: rgba(142, 90, 246, 0.15);
-            color: #af9bf5;
+            background-color: #121214;
+            color: var(--tg-theme-text-color, #ffffff);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
         }
         .model-card {
-            background-color: #1c2733;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: var(--panel-bg, #121214);
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.05));
             border-radius: 16px;
             padding: 14px;
             display: flex;
@@ -1029,13 +1007,6 @@
 
             <!-- Context Helper Text Visibility Bar -->
             <div id="col-visibility-bar" class="col-visibility-bar" onclick="toggleCollectibleVisibility()">
-                <span id="visibility-icon-container">
-                    <!-- Standard eye-off SVG layout as initial layout -->
-                    <svg id="visibility-eye-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--tg-theme-hint-color); vertical-align: middle; margin-right: 4px; opacity: 0.85;">
-                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                        <line x1="1" y1="1" x2="23" y2="23"></line>
-                    </svg>
-                </span>
                 <span id="col-visibility-text" class="col-visibility-text">This gift is visible. </span>
                 <span id="col-visibility-action" class="col-visibility-action">Hide from profile &gt;</span>
             </div>
@@ -1061,11 +1032,11 @@
         
         <!-- Modal Inner Capsule Tabs -->
         <div class="subnav-pills">
-            <button id="btn-tab-base" class="active" onclick="switchCustTab('base')">Base</button>
-            <button id="btn-tab-models" onclick="switchCustTab('models')">Models</button>
-            <button id="btn-tab-backdrops" onclick="switchCustTab('backdrops')">Backdrops</button>
-            <button id="btn-tab-symbols" onclick="switchCustTab('symbols')">Symbols</button>
-            <button id="btn-tab-options" onclick="switchCustTab('options')">Options</button>
+            <button id="btn-tab-base" class="active" onclick="switchCustTab('base')">1. Base</button>
+            <button id="btn-tab-models" onclick="switchCustTab('models')">2. Models</button>
+            <button id="btn-tab-backdrops" onclick="switchCustTab('backdrops')">3. Backdrops</button>
+            <button id="btn-tab-symbols" onclick="switchCustTab('symbols')">4. Symbols</button>
+            <button id="btn-tab-options" onclick="switchCustTab('options')">5. Options</button>
         </div>
         
         <div class="modal-scrollable-content" style="padding: 0; background: var(--tg-theme-secondary-bg-color); flex-grow:1; display:flex; flex-direction:column;">
@@ -1794,28 +1765,12 @@
     function updateVisibilityContextText(gift) {
         const textEl = document.getElementById('col-visibility-text');
         const actionEl = document.getElementById('col-visibility-action');
-        const iconContainer = document.getElementById('visibility-icon-container');
-        
         if (gift.hidden) {
             textEl.innerText = "This gift is hidden. ";
             actionEl.innerText = "Show on Profile >";
-            // Set dynamic SVG path to 'Eye Off' (eye with a diagonal slash)
-            iconContainer.innerHTML = `
-                <svg id="visibility-eye-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--tg-theme-hint-color); vertical-align: middle; margin-right: 4px; opacity: 0.85;">
-                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                    <line x1="1" y1="1" x2="23" y2="23"></line>
-                </svg>
-            `;
         } else {
             textEl.innerText = "This gift is visible. ";
             actionEl.innerText = "Hide from profile >";
-            // Set dynamic SVG path to standard 'Eye' (open eye)
-            iconContainer.innerHTML = `
-                <svg id="visibility-eye-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--tg-theme-hint-color); vertical-align: middle; margin-right: 4px; opacity: 0.85;">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                </svg>
-            `;
         }
     }
 
