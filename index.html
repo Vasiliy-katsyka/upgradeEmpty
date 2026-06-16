@@ -178,16 +178,23 @@
         .gift-card { aspect-ratio: 1 / 1; }
         
         /* High-Contrast Card Style for Redesigned Shop */
+        /* High-Contrast Card Style for Redesigned Shop */
         .buy-gift-item { 
             background-color: #121214; 
             border: 1px solid rgba(255, 255, 255, 0.05); 
             border-radius: 16px; 
             padding: 12px; 
-            aspect-ratio: 1 / 1.35; 
+            aspect-ratio: 1 / 1.15; /* Adjusted from 1.35 to prevent cards from looking too tall */
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             justify-content: space-between; 
+        }
+        
+        .buy-gift-item .image-container { 
+            height: 65%; /* Increased from 55% to fill the empty space left by the name */
+            margin-bottom: 4px; 
+            margin-top: 8px; 
         }
         
         .gift-card.selected { box-shadow: inset 0 0 0 3px var(--tg-theme-link-color); background-color: rgba(98, 188, 249, 0.15); }
@@ -205,7 +212,6 @@
             width: 75%; height: 75%; display: flex; align-items: center; justify-content: center;
             position: relative; z-index: 2; margin-bottom: 0px; 
         }
-        .buy-gift-item .image-container { height: 55%; margin-bottom: 4px; margin-top: 8px; }
         .image-container img, .image-container .lottie-wrapper { max-width: 100%; max-height: 100%; object-fit: contain; }
         .lottie-wrapper { width: 100%; height: 100%; }
         
@@ -1388,16 +1394,14 @@
         Object.entries(state.giftDefinitions).forEach(([id, name]) => {
             if (['custom_skebob', 'custom_baggin_cat'].includes(id)) return;
             
-            // Consistent pseudo-random price calculations based on characters code
             const index = Math.abs(id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % RANDOM_PRICES.length;
             const price = RANDOM_PRICES[index];
-
+    
             const el = document.createElement('div'); el.className = 'buy-gift-item';
             el.innerHTML = `
                 <div class="image-container">
                     <img src="${CDN_BASE}originals/${id}/Original.png" loading="lazy" onerror="this.style.display='none'">
                 </div>
-                <div class="gift-name">${name}</div>
                 <div class="gold-price-badge">⭐ ${price}</div>
             `;
             el.onclick = () => buyGift(id, name);
