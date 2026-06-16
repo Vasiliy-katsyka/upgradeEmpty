@@ -110,12 +110,15 @@
             height: 100%;
             object-fit: contain;
         }
-        .pinned-floating-gift.pos-0 { top: -25px; left: -25px; animation-delay: 0s; }
-        .pinned-floating-gift.pos-1 { top: -35px; left: 34px; animation-delay: 0.8s; }
-        .pinned-floating-gift.pos-2 { top: -25px; right: -25px; animation-delay: 1.6s; }
-        .pinned-floating-gift.pos-3 { bottom: 0px; left: -35px; animation-delay: 2.4s; }
-        .pinned-floating-gift.pos-4 { bottom: 0px; right: -35px; animation-delay: 3.2s; }
-        .pinned-floating-gift.pos-5 { bottom: -25px; left: 34px; animation-delay: 4.0s; }
+        /* Left Column */
+        .pinned-floating-gift.pos-0 { top: -15px; left: -25px; animation-delay: 0s; }     /* Top Left */
+        .pinned-floating-gift.pos-2 { top: 33px; left: -50px; animation-delay: 1.6s; }    /* Mid Left (Pushed Outward) */
+        .pinned-floating-gift.pos-4 { bottom: -5px; left: -20px; animation-delay: 3.2s; }  /* Bottom Left */
+        
+        /* Right Column (Mirroring Left) */
+        .pinned-floating-gift.pos-1 { top: -15px; right: -25px; animation-delay: 0.8s; }   /* Top Right */
+        .pinned-floating-gift.pos-3 { top: 33px; right: -50px; animation-delay: 2.4s; }   /* Mid Right (Pushed Outward) */
+        .pinned-floating-gift.pos-5 { bottom: -5px; right: -20px; animation-delay: 4.0s; } /* Bottom Right */
 
         @keyframes floatGently {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
