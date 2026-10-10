@@ -1447,22 +1447,25 @@
         .cust-footer { padding: 10px 16px 4px; flex-shrink: 0; border-top: 0.5px solid rgba(255,255,255,0.08); }
 
         /* ================= Corner number ribbon (3D, tinted from backdrop) ================= */
-        .gift-card.has-ribbon { overflow: hidden; }
+        /* Telegram corner ribbon: band ~13% of card width, centred ~30% in from the corner,
+           ends cut flush with (and slightly past) the top and right edges. */
+        .gift-card.has-ribbon { overflow: visible; container-type: inline-size; }
+        .gift-card.has-ribbon .gift-card-bg-pattern, .gift-card.has-ribbon .dynamic-pattern-container { border-radius: inherit; overflow: hidden; }
         .gift-ribbon {
             --rb: #2a2f3d;
-            position: absolute; top: 0; right: 0; width: 66px; height: 66px; overflow: hidden; z-index: 4; pointer-events: none;
+            position: absolute; top: -1.6cqw; right: -2.6cqw; width: 52cqw; height: 52cqw; overflow: hidden; z-index: 4; pointer-events: none;
         }
         .gift-ribbon span {
-            position: absolute; top: 13px; right: -27px; width: 104px; transform: rotate(45deg);
-            padding: 3px 0; text-align: center; color: #fff; font-size: 0.7em; font-weight: 700; letter-spacing: 0.1px; line-height: 1.25;
-            background: linear-gradient(180deg, color-mix(in srgb, var(--rb) 92%, #fff) 0%, var(--rb) 100%);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.18);
-            text-shadow: 0 1px 1px rgba(0,0,0,0.25);
+            position: absolute; left: calc(35.2cqw - 38cqw); top: calc(16.9cqw - 6.6cqw); width: 76cqw; height: 13.2cqw;
+            transform: rotate(45deg); display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 7.4cqw; font-weight: 600; letter-spacing: 0.1cqw; white-space: nowrap;
+            background: linear-gradient(180deg, color-mix(in srgb, var(--rb) 94%, #fff) 0%, var(--rb) 100%);
+            box-shadow: 0 0.6cqw 1.4cqw rgba(0,0,0,0.18);
         }
         .gift-card.has-ribbon .top-right-label { display: none; }
 
         /* Shop sections */
-        .shop-section-title { grid-column: 1 / -1; font-size: 1.05em; font-weight: 700; padding: 10px 4px 2px; display: flex; flex-direction: column; }
+        .shop-section-title { grid-column: 1 / -1; font-size: 0.85em; font-weight: 500; color: #8d8e93; text-align: center; padding: 0 4px 4px; }
         .shop-section-title small { font-size: 0.75em; font-weight: 500; color: #8d8e93; margin-top: 2px; }
         .shop-section-title.fun { padding-top: 22px; }
 
@@ -1567,7 +1570,8 @@
     <div id="shop-page" class="page" style="padding-top: 90px;">
         <div class="shop-header-pill-container" style="display: flex; justify-content: center; width: 100%; margin-bottom: 14px;">
             <div class="profile-tabs-pill-container">
-                <button class="active" style="pointer-events: none;">Shop</button>
+                <button id="shop-tab-upgradable" class="active" onclick="setShopView('upgradable')">Upgradable</button>
+                <button id="shop-tab-fun" onclick="setShopView('fun')">For Fun</button>
                 <button onclick="openCustomizeModal()">Customize</button>
             </div>
         </div>
@@ -2397,13 +2401,24 @@
     }
     function shopPrice(id) { return RANDOM_PRICES[Math.abs(String(id).split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0)) % RANDOM_PRICES.length]; }
 
+    let shopView = 'upgradable';
+    function setShopView(view) {
+        if (view === shopView) return;
+        haptic('light'); shopView = view;
+        document.getElementById('shop-tab-upgradable').classList.toggle('active', view === 'upgradable');
+        document.getElementById('shop-tab-fun').classList.toggle('active', view === 'fun');
+        renderShop();
+        document.getElementById('shop-page').scrollIntoView({ block: 'start' }); window.scrollTo(0, 0);
+    }
+
     function renderShop() {
         const grid = document.getElementById('shop-grid'); grid.innerHTML = '';
+        if (shopView === 'fun') { renderFunGifts(); return; }
         const items = Object.entries(state.giftDefinitions)
             .filter(([id, name]) => !['custom_skebob', 'custom_baggin_cat'].includes(id) && canUpgradeName(name))
             .map(([id, name]) => ({ id, name, price: shopPrice(id) }))
             .sort((a, b) => parseInt(a.price) - parseInt(b.price));
-        grid.insertAdjacentHTML('beforeend', `<div class="shop-section-title">Upgradable gifts<small>Can be turned into collectibles</small></div>`);
+        grid.insertAdjacentHTML('beforeend', `<div class="shop-section-title">Can be upgraded into unique collectibles</div>`);
         items.forEach(({ id, name, price }) => {
             const el = document.createElement('div'); el.className = 'buy-gift-item';
             el.innerHTML = `
@@ -2417,7 +2432,6 @@
             el.addEventListener('contextmenu', (e) => { e.preventDefault(); openQtyModal(id, name); });
             grid.appendChild(el);
         });
-        renderFunGifts();
     }
 
     // --- "Just for fun" gifts: every CDN original that is NOT in id-to-name.json ---
@@ -2464,10 +2478,12 @@
     }
     async function renderFunGifts() {
         const grid = document.getElementById('shop-grid');
+        grid.innerHTML = '<div class="spinner" style="grid-column:1/-1"></div>';
         const gifts = await getFunGifts();
-        grid.querySelectorAll('.fun-gift, .shop-section-title.fun').forEach(e => e.remove());
-        if (!gifts.length) return;
-        grid.insertAdjacentHTML('beforeend', `<div class="shop-section-title fun">Just for fun<small>Classic gifts — can't be upgraded</small></div>`);
+        if (shopView !== 'fun') return;
+        grid.innerHTML = '';
+        if (!gifts.length) { grid.innerHTML = '<div class="cust-empty">No classic gifts found.</div>'; return; }
+        grid.insertAdjacentHTML('beforeend', `<div class="shop-section-title">Classic gifts just for fun — can't be upgraded</div>`);
         gifts.forEach(({ id, name, price }) => {
             const el = document.createElement('div'); el.className = 'buy-gift-item fun-gift';
             el.innerHTML = `
@@ -2551,7 +2567,7 @@
                 visualHtml = state.settings.animations
                     ? LottieManager.lazyHtml(cd.model.isCustom ? cd.model.lottieUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/lottie/${encodeURIComponent(cd.model.name)}.json`, imgUrl)
                     : `<img src="${imgUrl}" loading="lazy" decoding="async">`;
-                const rb = cd.backdrop.hex ? `color-mix(in srgb, ${cd.backdrop.hex.edgeColor} 86%, #000)` : '#2a2f3d';
+                const rb = cd.backdrop.hex ? `color-mix(in srgb, ${cd.backdrop.hex.edgeColor} 88%, #000)` : '#2a2f3d';
                 el.classList.add('has-ribbon');
                 el.innerHTML = `${topIcon}<div class="gift-ribbon" style="--rb:${rb}"><span>#${gift.collectibleNumber.toLocaleString('en-US')}</span></div><div class="gift-card-bg-pattern" style="background:${bgStyle}"></div><div class="dynamic-pattern-container" id="pat-${gift.uniqueId}"></div><div class="image-container">${visualHtml}</div>`; 
                 setTimeout(() => generatePattern(`pat-${gift.uniqueId}`, cd.pattern, gift.name, true, cd.backdrop.hex.patternColor), 0);
