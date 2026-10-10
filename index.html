@@ -1146,6 +1146,195 @@
         }
         #inventory-grid.selecting ~ .send-gifts-fab { display: none; }
         .gift-card.selectable { transition: transform 0.18s cubic-bezier(0.2, 0.9, 0.25, 1.2); }
+
+        /* ================= CRAFTING (Telegram-style + Liquid Glass) ================= */
+        #craft-modal .modal-content.craft-sheet, .craft-sheet {
+            --craft-c: #1d6f73;
+            height: auto; max-height: 94vh; overflow: hidden; color: #fff;
+            background:
+                radial-gradient(120% 65% at 50% 22%, color-mix(in srgb, var(--craft-c) 62%, #0b1218) 0%, color-mix(in srgb, var(--craft-c) 26%, #070b10) 62%, #05080b 100%);
+            display: flex; flex-direction: column; padding-bottom: calc(14px + env(safe-area-inset-bottom));
+            transition: background 0.5s ease;
+        }
+        .craft-bg-pattern { opacity: 0.55; }
+        .craft-top { position: relative; z-index: 3; display: flex; align-items: center; justify-content: space-between; padding: 14px 14px 4px; }
+        .craft-title { font-weight: 700; font-size: 1.1em; letter-spacing: -0.2px; }
+        .craft-hbtn {
+            width: 36px; height: 36px; border-radius: 50% !important; color: #fff; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 1.15em; font-weight: 700; padding: 0;
+        }
+        .craft-hbtn svg { width: 16px; height: 16px; fill: none; stroke: #fff; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+
+        .craft-stage {
+            position: relative; z-index: 2; margin: 10px auto 0; width: 100%; max-width: 360px; padding: 0 16px;
+            display: grid; grid-template-columns: 84px 1fr 84px; grid-template-rows: 84px 84px; gap: 12px 10px; align-items: center;
+        }
+        #slot-0 { grid-column: 1; grid-row: 1; } #slot-1 { grid-column: 3; grid-row: 1; }
+        #slot-2 { grid-column: 1; grid-row: 2; } #slot-3 { grid-column: 3; grid-row: 2; }
+        .craft-core { grid-column: 2; grid-row: 1 / span 2; justify-self: center; }
+        #craft-modal .craft-slot {
+            position: relative; inset: auto; width: 84px; height: 84px; border-radius: 24px; border: none;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden;
+            transition: transform 0.2s cubic-bezier(0.2, 0.9, 0.25, 1.2);
+        }
+        #craft-modal .craft-slot:active { transform: scale(0.94); }
+        .craft-slot.empty { background: rgba(255,255,255,0.08); box-shadow: inset 0 0 0 0.5px rgba(255,255,255,0.14), inset 1.5px 1.5px 0.5px -1px rgba(255,255,255,0.5); }
+        .craft-slot.empty .add-circle { width: 30px; height: 30px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
+        .craft-slot.empty .add-circle svg { width: 16px; height: 16px; stroke: #111; stroke-width: 3; stroke-linecap: round; }
+        .craft-slot.filled img.slot-gift { width: 80%; height: 80%; object-fit: contain; position: relative; z-index: 1; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25)); }
+        .craft-slot.filled .slot-pattern { position: absolute; inset: 0; z-index: 0; }
+        .craft-slot .slot-pct {
+            position: absolute; top: 5px; left: 5px; z-index: 3; font-size: 0.68em; font-weight: 700; padding: 2px 6px; border-radius: 999px;
+            background: rgba(0,0,0,0.3); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+        }
+        #craft-modal .craft-slot .remove-btn {
+            position: absolute; top: 5px; right: 5px; left: auto; z-index: 3; width: 20px; height: 20px; border-radius: 50%;
+            background: rgba(0,0,0,0.3); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .craft-slot .remove-btn svg { width: 10px; height: 10px; stroke: #fff; stroke-width: 3.2; stroke-linecap: round; }
+
+        .craft-core {
+            position: relative; width: 132px; height: 132px; border-radius: 36px !important;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .craft-core .craft-svg-circle { position: absolute; width: 104px; height: 104px; transform: rotate(-90deg); }
+        .craft-core .craft-svg-circle circle { fill: none; stroke-width: 7; stroke-linecap: round; transition: stroke-dashoffset 0.6s cubic-bezier(0.2, 0.9, 0.25, 1), stroke 0.4s; }
+        .craft-core .craft-bg-circle { stroke: rgba(255,255,255,0.14); }
+        .craft-core .craft-fg-circle { stroke: #fff; }
+        .craft-core .craft-anvil-icon { position: relative; width: 40px; height: 40px; margin-bottom: 16px; }
+        .craft-core .craft-pct-text { position: absolute; bottom: 30px; left: 0; right: 0; text-align: center; font-size: 1em; font-weight: 700; }
+
+        .craft-info, .craft-progress-info { position: relative; z-index: 2; text-align: center; padding: 18px 22px 0; }
+        .craft-lead { font-size: 0.98em; line-height: 1.45; color: rgba(255,255,255,0.88); }
+        .craft-lead img { width: 20px; height: 20px; object-fit: contain; vertical-align: -4px; margin-right: 3px; }
+        .craft-warn { font-size: 0.9em; line-height: 1.4; color: rgba(255,255,255,0.6); margin-top: 12px; }
+        #craft-modal .craft-probability-row { display: flex; gap: 16px; justify-content: center; margin: 18px 0 4px; flex-wrap: wrap; }
+        .prob-chip { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.75em; font-weight: 600; color: rgba(255,255,255,0.8); }
+        .prob-ring { width: 40px; height: 40px; border-radius: 50%; padding: 3px; background: conic-gradient(#fff var(--p), rgba(255,255,255,0.16) 0); }
+        .prob-ring > div { width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(10,14,18,0.6); }
+        .prob-ring .prob-swatch { width: 24px; height: 24px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25); }
+        .prob-ring .prob-symbol { width: 20px; height: 20px; background: #fff; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; }
+        .craft-variants-pill {
+            margin: 14px auto 0; border-radius: 999px !important; color: #fff; padding: 7px 14px 7px 10px; font-size: 0.88em; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+        }
+        .craft-variants-icons { display: inline-flex; }
+        .craft-variants-icons img { width: 20px; height: 20px; object-fit: contain; margin-right: -3px; }
+        .craft-mix-row {
+            display: flex; align-items: center; justify-content: space-between; gap: 12px; max-width: 320px; margin: 14px auto 0;
+            padding: 8px 8px 8px 18px; border-radius: 999px; background: rgba(255,255,255,0.07); font-size: 0.9em; font-weight: 600;
+            transition: opacity 0.2s;
+        }
+        .craft-mix-row.disabled { opacity: 0.4; pointer-events: none; }
+
+        .craft-footer { position: relative; z-index: 2; padding: 20px 16px 0; }
+        #btn-craft-action.craft-cta, .craft-cta {
+            width: 100%; min-height: 58px; margin: 0; border: none; border-radius: 999px; color: #fff; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2;
+            font-size: 1.05em; font-weight: 700; padding: 8px 20px; overflow: hidden; position: relative;
+            background: linear-gradient(90deg, #3b9cff, #2f7bf0); box-shadow: 0 10px 26px rgba(0,0,0,0.3);
+            transition: transform 0.15s ease, background 0.4s ease, opacity 0.2s;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+        }
+        .craft-cta:active { transform: scale(0.97); }
+        .craft-cta.low { background: linear-gradient(90deg, #f7902f, #e1452f); }
+        .craft-cta.mid { background: linear-gradient(90deg, #3b9cff, #2f7bf0); }
+        .craft-cta.high { background: linear-gradient(90deg, #3fd06a, #22b3a0); }
+        .craft-cta:disabled { background: rgba(255,255,255,0.12) !important; color: rgba(255,255,255,0.45); box-shadow: none; }
+        .craft-cta .craft-btn-subtext { font-size: 0.78em; font-weight: 500; opacity: 0.88; margin-top: 2px; }
+        .craft-cta::before {
+            content: ''; position: absolute; inset: 0; pointer-events: none;
+            background-image: radial-gradient(circle, #fff 0 1px, transparent 1.6px), radial-gradient(circle, #fff 0 0.8px, transparent 1.4px), radial-gradient(circle, #fff 0 1px, transparent 1.6px), radial-gradient(circle, #fff 0 0.8px, transparent 1.4px), radial-gradient(circle, #fff 0 1px, transparent 1.6px);
+            background-size: 6px 6px; background-repeat: no-repeat;
+            background-position: 6% 30%, 18% 75%, 82% 22%, 92% 68%, 70% 85%;
+            animation: twinkle 2s ease-in-out infinite; opacity: 0.6;
+        }
+        .craft-cta:disabled::before { display: none; }
+        .craft-cta-light { background: #fff !important; color: #000 !important; text-shadow: none; }
+        .craft-cta-light::before { display: none; }
+
+        /* Crafting phase */
+        .craft-progress-info { display: none; padding-top: 26px; }
+        .craft-progress-info h3 { font-size: 1.3em; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .craft-anvil-icon.inline { position: relative; display: inline-block; width: 24px; height: 24px; }
+        .craft-progress-target { color: rgba(255,255,255,0.6); font-size: 0.9em; margin-top: 4px; font-weight: 500; }
+        .craft-chance-pill { display: inline-block; margin-top: 18px; padding: 7px 16px; border-radius: 999px !important; font-size: 0.85em; font-weight: 700; }
+        .craft-sheet.crafting .craft-info, .craft-sheet.crafting .craft-footer { display: none; }
+        .craft-sheet.crafting .craft-top .craft-hbtn { visibility: hidden; }
+        .craft-sheet.crafting .craft-progress-info { display: block; padding-bottom: 26px; }
+        .craft-sheet.crafting .craft-stage { margin-top: 90px; margin-bottom: 70px; }
+        .craft-stage { transition: margin 0.45s cubic-bezier(0.2, 0.9, 0.25, 1); }
+
+        .ccube-wrap { position: absolute; left: 50%; top: 50%; width: 112px; height: 112px; margin: -56px 0 0 -56px; perspective: 700px; z-index: 5; opacity: 0; pointer-events: none; }
+        .craft-sheet.crafting .ccube-wrap { opacity: 1; }
+        .ccube { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transform: translateZ(-56px); }
+        .ccube.spinning { animation: ccubeSpin 2.6s cubic-bezier(0.3, 0.05, 0.3, 1) infinite; }
+        .ccube.reveal { animation: none; transition: transform 0.9s cubic-bezier(0.2, 0.9, 0.25, 1.15); transform: translateZ(-56px) rotateX(0deg) rotateY(0deg) scale(1.25); }
+        .ccube.burning { animation: burnToAsh 1.4s ease-in forwards; }
+        .ccube-face {
+            position: absolute; width: 112px; height: 112px; border-radius: 28px; overflow: hidden;
+            display: flex; align-items: center; justify-content: center; backface-visibility: hidden;
+            background: rgba(255,255,255,0.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22), inset 2px 2px 1px -1px rgba(255,255,255,0.6);
+        }
+        .ccube-face img { width: 82%; height: 82%; object-fit: contain; }
+        .ccube-face .craft-anvil-icon { position: relative; width: 44px; height: 44px; }
+        .ccube-face.f-front  { transform: rotateY(0deg) translateZ(56px); }
+        .ccube-face.f-right  { transform: rotateY(90deg) translateZ(56px); }
+        .ccube-face.f-back   { transform: rotateY(180deg) translateZ(56px); }
+        .ccube-face.f-left   { transform: rotateY(-90deg) translateZ(56px); }
+        .ccube-face.f-top    { transform: rotateX(90deg) translateZ(56px); }
+        .ccube-face.f-bottom { transform: rotateX(-90deg) translateZ(56px); }
+        @keyframes ccubeSpin {
+            0%   { transform: translateZ(-56px) rotateX(-12deg) rotateY(0deg); }
+            50%  { transform: translateZ(-56px) rotateX(200deg) rotateY(270deg); }
+            100% { transform: translateZ(-56px) rotateX(348deg) rotateY(720deg); }
+        }
+        .craft-burst { position: absolute; left: 50%; top: 50%; width: 360px; height: 360px; margin: -180px 0 0 -180px; z-index: 4; pointer-events: none; opacity: 0;
+            background: repeating-conic-gradient(rgba(255,255,255,0.16) 0 6deg, transparent 6deg 22deg);
+            -webkit-mask: radial-gradient(circle, #000 0 20%, transparent 65%); mask: radial-gradient(circle, #000 0 20%, transparent 65%);
+            animation: burstSpin 8s linear infinite; transition: opacity 0.5s; }
+        .craft-sheet.crafting .craft-burst { opacity: 1; }
+        @keyframes burstSpin { to { transform: rotate(360deg); } }
+
+        /* Sub sheets (select / variants) */
+        .craft-subsheet { background: rgba(22,24,28,0.96); color: #fff; max-height: 80vh; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
+        .craft-section-label { padding: 8px 18px 4px; font-size: 0.78em; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+        #craft-select-modal .craft-select-grid, .craft-variants-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 8px 14px 16px; }
+        #craft-select-modal .craft-select-item { border-radius: 20px; border: none; overflow: hidden; position: relative; aspect-ratio: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        #craft-select-modal .craft-select-item img { width: 78%; height: 78%; position: relative; z-index: 1; }
+        #craft-select-modal .craft-select-item:active { transform: scale(0.95); }
+        .craft-select-item .sel-bonus { position: absolute; top: 6px; left: 6px; z-index: 2; font-size: 0.7em; font-weight: 700; padding: 2px 7px; border-radius: 999px; background: rgba(0,0,0,0.3); color: #8ff0a4; }
+        .craft-select-item .sel-num { position: absolute; bottom: 6px; left: 0; right: 0; z-index: 2; text-align: center; font-size: 0.68em; font-weight: 600; color: rgba(255,255,255,0.85); }
+        .craft-empty-note { grid-column: 1 / -1; text-align: center; color: rgba(255,255,255,0.5); padding: 28px 10px; line-height: 1.4; }
+        .craft-variant { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .craft-variant img { width: 72%; aspect-ratio: 1; object-fit: contain; }
+        .craft-variant .v-name { font-size: 0.78em; font-weight: 600; text-align: center; }
+
+        /* Failure */
+        .craft-fail-sheet { --craft-c: #6d2020; }
+        .craft-fail-body { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 18px 20px 4px; }
+        .craft-fail-icon { position: relative; width: 96px; height: 96px; border-radius: 30px !important; display: flex; align-items: center; justify-content: center; overflow: visible !important; margin-bottom: 22px; }
+        .craft-fail-icon .craft-anvil-icon { position: relative; width: 46px; height: 46px; background-color: #ff6b6b; }
+        .craft-fail-count { position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); background: #ff595a; padding: 2px 9px; border-radius: 999px; font-weight: 700; font-size: 0.85em; z-index: 3; }
+        .craft-fail-body h2 { color: #ff6b6b; font-size: 1.45em; margin-bottom: 8px; }
+        .craft-fail-body p { color: rgba(255,255,255,0.6); line-height: 1.4; margin-bottom: 24px; }
+        .craft-fail-grid { display: flex; justify-content: center; gap: 10px; margin-bottom: 28px; flex-wrap: wrap; }
+
+        /* Toast */
+        .app-toast {
+            position: fixed; left: 50%; top: calc(80px + env(safe-area-inset-top)); z-index: 5000; color: #fff;
+            border-radius: 18px !important; padding: 10px 16px; font-size: 0.88em; font-weight: 600; text-align: center; max-width: 86vw;
+            transform: translate(-50%, -20px); opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.3s cubic-bezier(0.2, 0.9, 0.25, 1.2);
+        }
+        .app-toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+        /* Crafted ribbon on collectible sheet */
+        .crafted-ribbon {
+            position: absolute; top: 18px; left: -34px; z-index: 6; transform: rotate(-45deg); padding: 3px 38px;
+            font-size: 0.7em; font-weight: 700; letter-spacing: 0.5px; color: #fff; background: rgba(0,0,0,0.3);
+            -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+        }
     </style>
 </head>
 <body>
@@ -1317,6 +1506,7 @@
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="12" cy="19" r="2.2"/></svg>
             </div>
             <div id="collectible-pattern-container" class="dynamic-pattern-container"></div>
+            <div class="crafted-ribbon" id="col-crafted-ribbon" style="display:none;">crafted</div>
             <div class="col-header-inner">
                 <div class="roulette-image-wrapper">
                     <div id="roulette-strip" class="roulette-strip" style="display:none;"></div>
@@ -1486,132 +1676,151 @@
 
 <!-- CRAFTING MAIN MODAL -->
 <div id="craft-modal" class="modal-overlay">
-    <div class="modal-content" style="height: 90vh; color: white;">
-        <div class="modal-header-bar" style="background:transparent; border:none; color:white;">
-            <span style="opacity:0.8">Craft Gift</span>
-            <div style="position:absolute; right:15px; top:15px; cursor:pointer;" onclick="closeModal('craft-modal')">✕</div>
+    <div class="modal-content craft-sheet" id="craft-sheet">
+        <div id="craft-bg-pattern" class="dynamic-pattern-container craft-bg-pattern"></div>
+        <div class="craft-top">
+            <button class="craft-hbtn lg" onclick="closeModal('craft-modal')" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+            <div class="craft-title">Craft Gift</div>
+            <button class="craft-hbtn lg" onclick="openCraftHelp()" aria-label="About crafting"><span>?</span></button>
         </div>
-        
-        <div class="craft-container">
-            <!-- Central Crafting Area -->
-            <div class="craft-slots-area">
-                <!-- Center Progress -->
-                <div class="craft-center-progress">
-                    <svg class="craft-svg-circle" viewBox="0 0 100 100">
-                        <circle class="craft-bg-circle" cx="50" cy="50" r="45"></circle>
-                        <circle id="craft-progress-ring" class="craft-fg-circle" cx="50" cy="50" r="45" stroke-dasharray="283" stroke-dashoffset="283"></circle>
-                    </svg>
-                    <div class="craft-anvil-icon"></div>
-                    <div class="craft-pct-text" id="craft-chance-text">0%</div>
-                </div>
 
-                <!-- 4 Slots -->
-                <div class="craft-slot top-left" id="slot-0" onclick="openCraftSelect()">
-                    <span class="add-icon">+</span>
-                </div>
-                <div class="craft-slot top-right" id="slot-1" onclick="openCraftSelect()">
-                    <span class="add-icon">+</span>
-                </div>
-                <div class="craft-slot bottom-left" id="slot-2" onclick="openCraftSelect()">
-                    <span class="add-icon">+</span>
-                </div>
-                <div class="craft-slot bottom-right" id="slot-3" onclick="openCraftSelect()">
-                    <span class="add-icon">+</span>
+        <div class="craft-stage" id="craft-stage">
+            <div class="craft-slot" id="slot-0"></div>
+            <div class="craft-core lg" id="craft-core">
+                <svg class="craft-svg-circle" viewBox="0 0 100 100">
+                    <circle class="craft-bg-circle" cx="50" cy="50" r="42"></circle>
+                    <circle id="craft-progress-ring" class="craft-fg-circle" cx="50" cy="50" r="42"></circle>
+                </svg>
+                <div class="craft-anvil-icon"></div>
+                <div class="craft-pct-text" id="craft-chance-text">0%</div>
+            </div>
+            <div class="craft-slot" id="slot-1"></div>
+            <div class="craft-slot" id="slot-2"></div>
+            <div class="craft-slot" id="slot-3"></div>
+
+            <div class="craft-burst"></div>
+            <div class="ccube-wrap" id="craft-cube-wrap">
+                <div class="ccube" id="craft-cube">
+                    <div class="ccube-face f-front"><img src="" alt=""></div>
+                    <div class="ccube-face f-back"><img src="" alt=""></div>
+                    <div class="ccube-face f-right"><img src="" alt=""></div>
+                    <div class="ccube-face f-left"><img src="" alt=""></div>
+                    <div class="ccube-face f-top"><div class="craft-anvil-icon"></div></div>
+                    <div class="ccube-face f-bottom"><div class="craft-anvil-icon"></div></div>
                 </div>
             </div>
+        </div>
 
-            <div style="text-align:center; margin-top: -20px;">
-                <p style="font-size:0.9em; opacity:0.7; max-width: 80%; margin: 0 auto;">
-                    Add up to 4 gifts to craft new <br>
-                    <b id="craft-target-name">Cake #000</b>.
-                </p>
-                <p style="font-size:0.8em; color: #ff595a; margin-top:8px;">
-                    If crafting fails, all selected gifts will be consumed.
-                </p>
-                
-                <!-- Backdrop Probabilities -->
-                <div class="craft-probability-row" id="craft-probs"></div>
-            </div>
-            
-            <div id="craft-mix-container" class="switch-row" style="background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 15px; width: 90%; opacity: 0.5; pointer-events: none; padding: 12px 16px; border: none;">
-                <span style="font-size: 0.95em;">Backdrop Mixing</span>
-                <label class="switch">
+        <div class="craft-info" id="craft-info">
+            <p class="craft-lead">Add up to <b>4 gifts</b> to craft new<br><img id="craft-target-icon" src="" alt=""><b id="craft-target-name">Gift #000</b>.</p>
+            <p class="craft-warn">If crafting fails, all selected gifts<br>will be consumed.</p>
+            <div class="craft-probability-row" id="craft-probs"></div>
+            <button class="craft-variants-pill lg" onclick="openCraftVariants()">
+                <span class="craft-variants-icons" id="craft-variants-icons"></span>
+                <span>View all new variants ›</span>
+            </button>
+            <label id="craft-mix-container" class="craft-mix-row">
+                <span>Backdrop Mixing</span>
+                <span class="switch">
                     <input type="checkbox" id="cb-mix-backdrop">
                     <span class="slider"></span>
-                </label>
-            </div>
-            <button id="btn-craft-action" class="big-rounded-btn" onclick="startCrafting()">
-                Craft Gift
-            </button>
+                </span>
+            </label>
+        </div>
+
+        <div class="craft-progress-info" id="craft-progress-info">
+            <h3><span class="craft-anvil-icon inline"></span> <span id="craft-progress-title">Crafting</span></h3>
+            <p class="craft-progress-target" id="craft-progress-target">Gift #000</p>
+            <p class="craft-warn">If crafting fails, all selected gifts<br>will be consumed.</p>
+            <div class="craft-chance-pill lg" id="craft-progress-chance">0% Success Chance</div>
+        </div>
+
+        <div class="craft-footer" id="craft-footer">
+            <button id="btn-craft-action" class="craft-cta lg-rim" onclick="startCrafting()">Craft Gift</button>
         </div>
     </div>
 </div>
 
-<!-- CRAFT SELECTION MODAL -->
-<div id="craft-select-modal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header-bar">Select Gifts</div>
+<!-- CRAFT SELECTION SHEET -->
+<div id="craft-select-modal" class="modal-overlay" style="z-index: 1100;">
+    <div class="modal-content craft-subsheet">
+        <div class="craft-top">
+            <button class="craft-hbtn lg" onclick="closeModal('craft-select-modal')" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+            <div class="craft-title">Select Gifts</div>
+            <div style="width:36px"></div>
+        </div>
         <div class="modal-scrollable-content">
+            <div class="craft-section-label">Your gifts</div>
             <div class="craft-select-grid" id="craft-select-grid"></div>
         </div>
-        <div class="modal-buttons-footer">
-            <button class="modal-button" onclick="closeModal('craft-select-modal')">Done</button>
+    </div>
+</div>
+
+<!-- CRAFT VARIANTS SHEET -->
+<div id="craft-variants-modal" class="modal-overlay" style="z-index: 1100;">
+    <div class="modal-content craft-subsheet">
+        <div class="craft-top">
+            <button class="craft-hbtn lg" onclick="closeModal('craft-variants-modal')" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+            <div class="craft-title">New Variants</div>
+            <div style="width:36px"></div>
+        </div>
+        <div class="modal-scrollable-content">
+            <div class="craft-section-label" id="craft-variants-label">Crafted models</div>
+            <div class="craft-variants-grid" id="craft-variants-grid"></div>
         </div>
     </div>
 </div>
 
-<!-- ANIMATION MODAL -->
-<div id="craft-anim-modal" class="modal-overlay" style="z-index: 2000; background: rgba(14, 22, 33, 0.95);">
-    <div class="modal-content" style="background: transparent; align-items: center; justify-content: center; box-shadow:none;">
-        <div class="cube-wrapper">
-            <div class="cube" id="craft-cube">
-                <div class="cube-face front"><img src=""></div>
-                <div class="cube-face back"><img src=""></div>
-                <div class="cube-face right"><img src=""></div>
-                <div class="cube-face left"><img src=""></div>
-                <div class="cube-face top"><div class="craft-anvil-icon" style="background:white"></div></div>
-                <div class="cube-face bottom"><div class="craft-anvil-icon" style="background:white"></div></div>
+<!-- CRAFT HELP SHEET -->
+<div id="craft-help-modal" class="modal-overlay" style="z-index: 1100;">
+    <div class="modal-content">
+        <div class="up-header" id="craft-help-header">
+            <div id="craft-help-pattern" class="dynamic-pattern-container"></div>
+            <div class="up-close lg" onclick="closeModal('craft-help-modal')"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+            <div class="up-visual"><img id="craft-help-image" src="" alt=""></div>
+            <h2>Gift Crafting</h2>
+            <p class="up-sub">Use your existing gifts to craft new ones.</p>
+        </div>
+        <div class="up-body">
+            <div class="up-feature">
+                <svg viewBox="0 0 24 24"><path d="M6 4h10l4 5-9 11L2 9z"/><path d="M2 9h18M11 20L7.5 9 10 4M11 20l3.5-11L12 4"/><path d="M20.5 1.5v3M19 3h3"/></svg>
+                <div><h4>Combine Gifts</h4><p>Add up to 4 collectibles from the same collection to attempt crafting a new upgraded model.</p></div>
             </div>
+            <div class="up-feature">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg>
+                <div><h4>Input Matters</h4><p>Each gift adds to the success chance. Rarer inputs and matching backdrops improve the outcome.</p></div>
+            </div>
+            <div class="up-feature">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16.5 9"/></svg>
+                <div><h4>Exclusive Look</h4><p>Reforge gifts into rare crafted collectibles with a brand new look.</p></div>
+            </div>
+            <button class="big-rounded-btn lg-rim" onclick="closeModal('craft-help-modal')">Start Crafting</button>
         </div>
-        <h2 style="margin-top:40px; color:white; font-weight:700;">Crafting...</h2>
-        <p id="craft-anim-status" style="color:rgba(255,255,255,0.7); margin-top:10px;">Heating up the anvil</p>
     </div>
 </div>
 
-<!-- FAILURE MODAL -->
+<!-- FAILURE SHEET -->
 <div id="failure-modal" class="modal-overlay">
-    <div class="modal-content" style="background-color: #1c1c1e; color: white; height: auto; min-height: 60vh; border-radius: 16px;">
-        
-        <div class="modal-header-bar" style="background: transparent; border: none; display: flex; justify-content: space-between; align-items: center; padding: 16px;">
-            <div onclick="closeModal('failure-modal')" style="cursor: pointer; background: rgba(255,255,255,0.1); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">✕</div>
-            <span style="font-weight: 600; font-size: 1.1em;">Crafting Gift</span>
-            <div style="width: 32px;"></div>
+    <div class="modal-content craft-sheet craft-fail-sheet">
+        <div class="craft-top">
+            <button class="craft-hbtn lg" onclick="closeModal('failure-modal')" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+            <div class="craft-title">Craft Gift</div>
+            <div style="width:36px"></div>
         </div>
-
-        <div class="modal-scrollable-content" style="display: flex; flex-direction: column; align-items: center; padding: 20px 20px 40px;">
-            
-            <div style="width: 100px; height: 100px; background: #3a2525; border-radius: 24px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; position: relative;">
-                <div class="craft-anvil-icon" style="background-color: #ff595a; transform: scale(1.5);"></div>
-                <div style="position: absolute; bottom: -10px; background: #3a2525; padding: 2px 8px; border-radius: 10px; font-weight: bold; font-size: 0.9em; border: 2px solid #1c1c1e;">
-                    4
-                </div>
+        <div class="craft-fail-body">
+            <div class="craft-fail-icon lg">
+                <div class="craft-anvil-icon"></div>
+                <div class="craft-fail-count" id="fail-count-badge">4</div>
             </div>
-
-            <h2 style="color: #ff595a; margin: 0 0 10px 0; font-weight: 700; font-size: 1.5em;">Unsuccessful attempt</h2>
-            <p style="text-align: center; color: #8e8e93; font-size: 0.95em; line-height: 1.4; margin: 0 0 30px 0;">
-                The crafting attempt failed.<br>
-                <span id="fail-count-text">4</span> gifts were lost.
-            </p>
-
-            <div id="failed-items-grid" style="display: flex; justify-content: center; gap: 12px; margin-bottom: 40px; width: 100%;"></div>
-
-            <button onclick="retryCrafting()" style="width: 100%; background: #ffffff; color: #000000; font-weight: 600; font-size: 1.1em; padding: 16px; border-radius: 12px; border: none; cursor: pointer;">
-                Craft Again
-            </button>
-
+            <h2>Unsuccessful attempt</h2>
+            <p>The crafting attempt failed.<br><span id="fail-count-text">4</span> gifts were lost.</p>
+            <div id="failed-items-grid" class="craft-fail-grid"></div>
+            <button class="craft-cta lg-rim craft-cta-light" onclick="retryCrafting()">Craft Again</button>
         </div>
     </div>
 </div>
+
+<div id="app-toast" class="app-toast lg lg-dark" data-lg-blur="6"></div>
 
 <!-- Menus -->
 <div id="long-press-menu" class="lg lg-dark hidden" data-lg-blur="7">
@@ -1669,7 +1878,7 @@
     let state = { inventory: [], giftDefinitions: {}, lastCollectibleNumber: 100, userBio: "Hello world", userPhone: "", userAvatar: "", settings: { animations: true, showHidden: false } };
     let giftFilter = 'all';
     let customizationQueue = []; let editingIndex = 0; let cachedParts = {};
-    let appRuntime = { longPressTimer: null, activeGiftId: null, shopGiftData: null, reordering: false, sortable: null, selectionMode: null, selectedIds: new Set(), animationState: null, detailInterval: null };
+    let appRuntime = { longPressTimer: null, activeGiftId: null, shopGiftData: null, reordering: false, sortable: null, selectionMode: null, selectedIds: new Set(), animationState: null, detailInterval: null, toastTimer: null };
 
     // --- Init ---
     window.addEventListener('DOMContentLoaded', async () => {
@@ -2105,6 +2314,7 @@
 
         // Name and Status
         document.getElementById('collectible-title').innerText = gift.name;
+        document.getElementById('col-crafted-ribbon').style.display = cd.model.crafted ? 'block' : 'none';
         document.getElementById('collectible-number').innerText = `#${gift.collectibleNumber.toLocaleString('en-US')}`;
         document.getElementById('collectible-model-name').innerText = cd.model.name;
 
@@ -2145,8 +2355,10 @@
 
         // Secondary stats data
         const total = Math.floor(seededRand(gift.name + 'total') * 140000) + 20000;
-        const issued = Math.max(gift.collectibleNumber, Math.floor(total * (0.7 + seededRand(gift.name + 'issued') * 0.29)));
-        document.getElementById('col-quantity').innerText = `${issued.toLocaleString('en-US')}/${Math.max(total, issued).toLocaleString('en-US')} issued`;
+        let issued = Math.floor(total * (0.7 + seededRand(gift.name + 'issued') * 0.29));
+        if (issued <= gift.collectibleNumber) issued = gift.collectibleNumber + Math.floor(seededRand(gift.name + 'extra') * 40000) + 500;
+        const supply = Math.max(total, Math.ceil(issued * (1.08 + seededRand(gift.name + 'supply') * 0.2)));
+        document.getElementById('col-quantity').innerText = `${issued.toLocaleString('en-US')}/${supply.toLocaleString('en-US')} issued`;
         const rarityBoost = cd.model.crafted ? 6 : (cd.model.rarityPermille && cd.model.rarityPermille < 10 ? 3 : 1);
         document.getElementById('col-value').innerText = `~$${Math.floor((seededRand(gift.uniqueId) * 60 + 8) * rarityBoost)}`;
 
@@ -2440,6 +2652,7 @@
     /* --- CRAFTING LOGIC --- */
     let craftingState = {
         active: false,
+        busy: false,
         baseName: "",
         targetNumber: 0,
         selectedIds: [],
@@ -2455,385 +2668,341 @@
         return `radial-gradient(circle, ${center}, ${edge})`;
     }
     
+    const CRAFT_SYMBOL_SHARE = 6; // each input gives its backdrop/symbol a 6% chance to carry over
+
+    function giftCraftPct(g) {
+        const p = g.collectibleData.model.rarityPermille || 1000;
+        return 22 + (p < 10 ? 3 : p < 50 ? 2 : p < 150 ? 1 : 0);
+    }
+    function craftGifts() { return craftingState.selectedIds.map(id => state.inventory.find(g => g.uniqueId === id)).filter(Boolean); }
+    function craftChance(gifts) { return Math.min(100, gifts.reduce((a, g) => a + giftCraftPct(g), 0)); }
+    function patternUrl(giftName, pattern) { return `${CDN_BASE}patterns/${encodeURIComponent(giftName)}/png/${encodeURIComponent(pattern.name)}.png`; }
+
+    function showToast(text) {
+        const t = document.getElementById('app-toast');
+        t.innerText = text; t.classList.add('show');
+        clearTimeout(appRuntime.toastTimer);
+        appRuntime.toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+    }
+
+    function craftCandidates() {
+        return state.inventory.filter(g =>
+            g.name === craftingState.baseName && g.isCollectible && !g.hidden &&
+            !craftingState.selectedIds.includes(g.uniqueId) && !g.collectibleData.model.crafted);
+    }
+
     function openCraftModal(initialGift) {
-        if(!initialGift) return; 
+        if(!initialGift) return;
         const mixCheckbox = document.getElementById('cb-mix-backdrop');
         if (mixCheckbox) mixCheckbox.checked = false;
         craftingState.baseName = initialGift.name;
         craftingState.selectedIds = [initialGift.uniqueId];
         craftingState.active = true;
+        craftingState.busy = false;
         craftingState.targetNumber = initialGift.collectibleNumber;
-        
+
+        const sheet = document.getElementById('craft-sheet');
+        sheet.classList.remove('crafting');
+        const cube = document.getElementById('craft-cube');
+        cube.className = 'ccube'; cube.style.transform = '';
+        const cd = initialGift.collectibleData;
+        sheet.style.setProperty('--craft-c', cd.backdrop.hex ? cd.backdrop.hex.centerColor : '#1d6f73');
+        const bgPat = document.getElementById('craft-bg-pattern');
+        bgPat.innerHTML = '';
+
         updateCraftUI();
+        closeModal('collectible-modal');
         document.getElementById('craft-modal').classList.add('active');
-        closeModal('collectible-modal'); 
+        setTimeout(() => generatePattern('craft-bg-pattern', cd.pattern, initialGift.name, false, 'rgba(255,255,255,0.05)'), 0);
+        tg.BackButton.show(); tg.BackButton.onClick(() => closeModal('craft-modal'));
+
+        fetchGiftParts(initialGift.name).then(parts => {
+            const crafted = parts.models.filter(m => m.crafted);
+            document.getElementById('craft-variants-icons').innerHTML = crafted.slice(0, 3).map(m => `<img src="${getModelImg(initialGift.name, m)}" alt="">`).join('');
+        });
     }
 
     function updateCraftUI() {
-        const slots = [0, 1, 2, 3];
-        const gifts = craftingState.selectedIds.map(id => state.inventory.find(g => g.uniqueId === id));
-        
-        const targetGift = state.inventory.find(g => g.uniqueId === craftingState.selectedIds[0]);
-        if(targetGift) {
-            document.getElementById('craft-target-name').innerText = `${craftingState.baseName} #${targetGift.collectibleNumber}`;
+        const gifts = craftGifts();
+        const first = gifts[0];
+        if (first) {
+            document.getElementById('craft-target-name').innerText = `${craftingState.baseName} #${craftingState.targetNumber.toLocaleString('en-US')}`;
+            document.getElementById('craft-target-icon').src = `${CDN_BASE}originals/${first.originalId}/Original.png`;
         }
 
-        slots.forEach(i => {
+        [0, 1, 2, 3].forEach(i => {
             const el = document.getElementById(`slot-${i}`);
-            el.innerHTML = '';
-            if (gifts[i]) {
-                const cd = gifts[i].collectibleData;
-                const bgStyle = getBackdropStyle(cd.backdrop);
-                
-                const img = document.createElement('img');
-                img.src = cd.model.isCustom ? cd.model.imageUrl : `${CDN_BASE}models/${encodeURIComponent(gifts[i].name)}/png/${encodeURIComponent(cd.model.name)}.png`;
-                
-                const rm = document.createElement('div');
-                rm.className = 'remove-btn';
-                rm.innerText = '✕';
-                rm.onclick = (e) => { e.stopPropagation(); removeCraftItem(gifts[i].uniqueId); };
-                
-                el.style.background = bgStyle;
-                el.appendChild(img);
-                el.appendChild(rm);
+            const g = gifts[i];
+            el.innerHTML = ''; el.style.background = ''; el.style.opacity = ''; el.style.transform = '';
+            if (g) {
+                const cd = g.collectibleData;
+                el.className = 'craft-slot filled';
+                el.style.background = getBackdropStyle(cd.backdrop);
+                el.innerHTML = `
+                    <div class="slot-pattern" id="slot-pat-${i}"></div>
+                    <img class="slot-gift" src="${getModelImg(g.name, cd.model)}" alt="">
+                    <span class="slot-pct">${giftCraftPct(g)}%</span>
+                    ${gifts.length > 1 ? `<span class="remove-btn"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></span>` : ''}`;
+                generatePattern(`slot-pat-${i}`, cd.pattern, g.name, true, cd.backdrop.hex.patternColor);
+                const rm = el.querySelector('.remove-btn');
+                if (rm) rm.onclick = (e) => { e.stopPropagation(); removeCraftItem(g.uniqueId); };
+                el.onclick = null;
             } else {
-                el.style.background = 'rgba(255,255,255,0.1)';
-                el.innerHTML = `<span class="add-icon">+</span>`;
+                el.className = 'craft-slot empty';
+                el.innerHTML = `<span class="add-circle"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>`;
+                el.onclick = () => openCraftSelect();
             }
         });
 
-        let chance = 0;
-        gifts.forEach(g => {
-            if(!g) return;
-            let itemVal = 20; 
-            const p = g.collectibleData.model.rarityPermille || 1000;
-            if(p < 10) itemVal += 2;      
-            else if(p < 100) itemVal += 1; 
-
-            chance += itemVal;
-        });
-
-        const mixContainer = document.getElementById('craft-mix-container');
-        const mixCheckbox = document.getElementById('cb-mix-backdrop');
-        if(mixContainer && mixCheckbox) {
-            const uniqueBackdrops =[...new Set(gifts.filter(g => g).map(g => g.collectibleData.backdrop.name))];
-            
-            if(uniqueBackdrops.length >= 2) {
-                mixContainer.style.opacity = '1';
-                mixContainer.style.pointerEvents = 'auto';
-            } else {
-                mixContainer.style.opacity = '0.5';
-                mixContainer.style.pointerEvents = 'none';
-                mixCheckbox.checked = false;
-            }
-        }
-        
-        if(gifts.length === 0) chance = 0;
-        
-        const radius = 45;
-        const circumference = 2 * Math.PI * radius;
-        const offset = circumference - (chance / 100) * circumference;
+        const chance = craftChance(gifts);
+        const circumference = 2 * Math.PI * 42;
         const ring = document.getElementById('craft-progress-ring');
-        if(ring) {
-            ring.style.strokeDasharray = `${circumference} ${circumference}`;
-            ring.style.strokeDashoffset = offset;
-            ring.style.stroke = chance < 50 ? '#ff595a' : '#ffffff'; 
-        }
-        
+        ring.style.strokeDasharray = `${circumference} ${circumference}`;
+        ring.style.strokeDashoffset = circumference - (chance / 100) * circumference;
+        ring.style.stroke = chance < 50 ? '#ffb27a' : chance < 80 ? '#ffffff' : '#8ff0a4';
         document.getElementById('craft-chance-text').innerText = `${chance}%`;
-        
-        const btn = document.getElementById('btn-craft-action');
-        if(btn) {
-            btn.innerHTML = `Craft Gift <br><span class="craft-btn-subtext">${chance}% Success Chance</span>`;
-            btn.disabled = gifts.length === 0;
-        }
 
-        const probContainer = document.getElementById('craft-probs');
-        if(probContainer) {
-            probContainer.innerHTML = '';
-            let backdropsMap = {};
-            gifts.forEach(g => {
-                if(!g) return;
-                const bgName = g.collectibleData.backdrop.name;
-                const bgHex = g.collectibleData.backdrop.hex.centerColor;
-                if(!backdropsMap[bgName]) backdropsMap[bgName] = { count: 0, hex: bgHex };
-                backdropsMap[bgName].count++;
-            });
-            
-            const totalInputs = gifts.length || 1;
-            Object.keys(backdropsMap).forEach(key => {
-                const data = backdropsMap[key];
-                const pct = Math.round((data.count / totalInputs) * 100);
-                const pill = document.createElement('div');
-                pill.className = 'prob-pill';
-                pill.innerHTML = `<div class="prob-dot" style="background:${data.hex}"></div> ${pct}%`;
-                probContainer.appendChild(pill);
-            });
-        }
+        const btn = document.getElementById('btn-craft-action');
+        btn.className = `craft-cta lg-rim ${chance < 50 ? 'low' : chance < 80 ? 'mid' : 'high'}`;
+        btn.innerHTML = `Craft ${craftingState.baseName} #${craftingState.targetNumber.toLocaleString('en-US')}<span class="craft-btn-subtext">${chance}% Success Chance</span>`;
+        btn.disabled = gifts.length === 0;
+
+        // Backdrop + symbol carry-over odds
+        const probs = document.getElementById('craft-probs');
+        probs.innerHTML = '';
+        const tally = (keyFn) => { const m = new Map(); gifts.forEach(g => { const k = keyFn(g); m.set(k.name, { ...k, count: (m.get(k.name)?.count || 0) + 1 }); }); return [...m.values()]; };
+        tally(g => ({ name: g.collectibleData.backdrop.name, bd: g.collectibleData.backdrop })).forEach(b => {
+            const pct = b.count * CRAFT_SYMBOL_SHARE;
+            probs.insertAdjacentHTML('beforeend', `<div class="prob-chip" title="${b.name}"><div class="prob-ring" style="--p:${pct * 4}%"><div><div class="prob-swatch" style="background:${getBackdropStyle(b.bd)}"></div></div></div>${pct}%</div>`);
+        });
+        tally(g => ({ name: g.collectibleData.pattern.name, giftName: g.name, pat: g.collectibleData.pattern })).forEach(p => {
+            const pct = p.count * CRAFT_SYMBOL_SHARE;
+            const url = patternUrl(p.giftName, p.pat);
+            probs.insertAdjacentHTML('beforeend', `<div class="prob-chip" title="${p.name}"><div class="prob-ring" style="--p:${pct * 4}%"><div><div class="prob-symbol" style="-webkit-mask-image:url('${url}');mask-image:url('${url}')"></div></div></div>${pct}%</div>`);
+        });
+
+        const mixRow = document.getElementById('craft-mix-container');
+        const uniqueBackdrops = new Set(gifts.map(g => g.collectibleData.backdrop.name));
+        mixRow.classList.toggle('disabled', uniqueBackdrops.size < 2);
+        if (uniqueBackdrops.size < 2) document.getElementById('cb-mix-backdrop').checked = false;
     }
 
     function removeCraftItem(id) {
         if(craftingState.selectedIds.length <= 1) return;
+        haptic('light');
         craftingState.selectedIds = craftingState.selectedIds.filter(x => x !== id);
         updateCraftUI();
     }
 
     function openCraftSelect() {
-        if(craftingState.selectedIds.length >= 4) return;
-        
+        if(craftingState.selectedIds.length >= 4 || craftingState.busy) return;
+        haptic('light');
+        const candidates = craftCandidates();
+        if (!candidates.length) { showToast(`You need more ${craftingState.baseName} collectibles from the same collection to craft.`); hapticNotify('error'); return; }
+
         const grid = document.getElementById('craft-select-grid');
         grid.innerHTML = '';
-        
-        const candidates = state.inventory.filter(g => 
-            g.name === craftingState.baseName && 
-            g.isCollectible && 
-            !g.hidden &&
-            !craftingState.selectedIds.includes(g.uniqueId) &&
-            !g.collectibleData.model.crafted 
-        );
-
-        if(candidates.length === 0) {
-            grid.innerHTML = '<div style="grid-column:span 3; text-align:center; padding:20px; color:gray;">No other matching gifts available.</div>';
-        }
-
         candidates.forEach(g => {
+            const cd = g.collectibleData;
             const el = document.createElement('div');
             el.className = 'craft-select-item';
-            const cd = g.collectibleData;
-            const bgStyle = getBackdropStyle(cd.backdrop);
-            
-            el.style.background = bgStyle;
+            el.style.background = getBackdropStyle(cd.backdrop);
             el.innerHTML = `
-                <span class="rarity-badge">${g.collectibleNumber}</span>
-                <img src="${cd.model.isCustom ? cd.model.imageUrl : `${CDN_BASE}models/${encodeURIComponent(g.name)}/png/${encodeURIComponent(cd.model.name)}.png`}">
-            `;
+                <span class="sel-bonus">+${giftCraftPct(g)}%</span>
+                <img src="${getModelImg(g.name, cd.model)}" alt="">
+                <span class="sel-num">#${g.collectibleNumber.toLocaleString('en-US')}</span>`;
             el.onclick = () => {
+                haptic('medium');
                 craftingState.selectedIds.push(g.uniqueId);
                 updateCraftUI();
                 closeModal('craft-select-modal');
             };
             grid.appendChild(el);
         });
-        
         document.getElementById('craft-select-modal').classList.add('active');
     }
 
-    async function startCrafting() {
-        let chance = 0;
-        const gifts = craftingState.selectedIds.map(id => state.inventory.find(g => g.uniqueId === id));
-        
-        gifts.forEach(g => {
-            if(!g) return;
-            let itemVal = 20; 
-            const p = g.collectibleData.model.rarityPermille || 1000;
-            if(p < 10) itemVal += 2;
-            else if(p < 100) itemVal += 1;
-            chance += itemVal;
-        });
-        
-        const isSuccess = (Math.random() * 100) < chance;
+    async function openCraftVariants() {
+        haptic('light');
+        const parts = await fetchGiftParts(craftingState.baseName);
+        let models = parts.models.filter(m => m.crafted);
+        const label = document.getElementById('craft-variants-label');
+        label.innerText = models.length ? `${models.length} crafted models` : 'Rare models';
+        if (!models.length) models = parts.models.filter(m => (m.rarityPermille || 0) < 10);
+        document.getElementById('craft-variants-grid').innerHTML = models.length
+            ? models.map(m => `<div class="craft-variant"><img src="${getModelImg(craftingState.baseName, m)}" alt=""><div class="v-name">${m.name}</div>${m.crafted ? '<div class="crafted-tag">Crafted</div>' : ''}</div>`).join('')
+            : '<div class="craft-empty-note">No new variants available yet.</div>';
+        document.getElementById('craft-variants-modal').classList.add('active');
+    }
 
-        const animModal = document.getElementById('craft-anim-modal');
-        const cube = document.getElementById('craft-cube');
-        const statusText = document.getElementById('craft-anim-status');
-        const faces = cube.querySelectorAll('.cube-face img');
-        
-        for(let i=0; i<4; i++) {
-            const g = gifts[i % gifts.length];
-            if(g) {
-                const cd = g.collectibleData;
-                faces[i].src = cd.model.isCustom ? cd.model.imageUrl : `${CDN_BASE}models/${encodeURIComponent(g.name)}/png/${encodeURIComponent(cd.model.name)}.png`;
-            }
+    async function openCraftHelp() {
+        haptic('light');
+        const first = craftGifts()[0];
+        const header = document.getElementById('craft-help-header');
+        const img = document.getElementById('craft-help-image');
+        document.getElementById('craft-help-pattern').innerHTML = '';
+        if (first) {
+            const cd = first.collectibleData;
+            header.style.background = getBackdropStyle(cd.backdrop);
+            img.src = getModelImg(first.name, cd.model);
+            const parts = await fetchGiftParts(first.name);
+            const crafted = parts.models.find(m => m.crafted);
+            if (crafted) img.src = getModelImg(first.name, crafted);
+            generatePattern('craft-help-pattern', cd.pattern, first.name, false, cd.backdrop.hex.patternColor);
         }
+        document.getElementById('craft-help-modal').classList.add('active');
+    }
 
-        animModal.classList.add('active');
-        cube.classList.remove('spinning', 'burning'); 
-        void cube.offsetWidth; 
-        cube.classList.add('spinning');
-        
+    function pickCarryOver(gifts, key, pool) {
+        // Each input gives its own backdrop/symbol a CRAFT_SYMBOL_SHARE% chance; otherwise roll from the full pool
+        let roll = Math.random() * 100;
+        for (const g of gifts) {
+            roll -= CRAFT_SYMBOL_SHARE;
+            if (roll < 0) return g.collectibleData[key];
+        }
+        return pool.length ? pool[Math.floor(Math.random() * pool.length)] : gifts[0].collectibleData[key];
+    }
+
+    function buildMixedBackdrop(consumed) {
+        const colors = consumed.map(g => g.collectibleData.backdrop.hex.centerColor);
+        let name, style;
+        if (consumed.length >= 4) {
+            name = "Prismatic Core";
+            style = `conic-gradient(from 0deg, ${colors[0]}, ${colors[1]}, ${colors[2]}, ${colors[3]}, ${colors[0]})`;
+        } else if (consumed.length === 3) {
+            name = "Tri-Fusion";
+            style = `linear-gradient(135deg, ${colors[0]}, ${colors[1]}, ${colors[2]})`;
+        } else {
+            const sorted = [...consumed].sort((a, b) => (a.collectibleData.backdrop.rarityPermille || 1000) - (b.collectibleData.backdrop.rarityPermille || 1000));
+            const b1 = sorted[0].collectibleData.backdrop, b2 = (sorted.find(g => g.collectibleData.backdrop.name !== b1.name) || sorted[0]).collectibleData.backdrop;
+            name = `${b1.name} + ${b2.name}`;
+            style = `radial-gradient(circle, ${b1.hex.centerColor}, ${b2.hex.edgeColor})`;
+        }
+        return { name, customGradient: style, hex: consumed[0].collectibleData.backdrop.hex, rarityPermille: 1 };
+    }
+
+    async function startCrafting() {
+        if (craftingState.busy) return;
+        const gifts = craftGifts();
+        if (!gifts.length) return;
+        craftingState.busy = true;
+        const chance = craftChance(gifts);
+        const isSuccess = (Math.random() * 100) < chance;
+        const isMix = document.getElementById('cb-mix-backdrop').checked;
+        const sheet = document.getElementById('craft-sheet');
+        const cube = document.getElementById('craft-cube');
+        const core = document.getElementById('craft-core');
+        const title = document.getElementById('craft-progress-title');
+
+        document.getElementById('craft-progress-target').innerText = `${craftingState.baseName} #${craftingState.targetNumber.toLocaleString('en-US')}`;
+        document.getElementById('craft-progress-chance').innerText = `${chance}% Success Chance`;
+        title.innerText = 'Crafting';
+
+        // Cube faces show the inputs
+        const faces = cube.querySelectorAll('.ccube-face');
+        ['f-front', 'f-right', 'f-back', 'f-left'].forEach((cls, i) => {
+            const g = gifts[i % gifts.length];
+            const face = cube.querySelector(`.${cls}`);
+            face.style.background = getBackdropStyle(g.collectibleData.backdrop);
+            face.querySelector('img').src = getModelImg(g.name, g.collectibleData.model);
+        });
+        faces.forEach(f => { if (f.classList.contains('f-top') || f.classList.contains('f-bottom')) f.style.background = 'rgba(255,255,255,0.14)'; });
+
+        // Fly the slots and the anvil into the center
+        const stageRect = document.getElementById('craft-stage').getBoundingClientRect();
+        const cx = stageRect.left + stageRect.width / 2, cy = stageRect.top + stageRect.height / 2;
+        [0, 1, 2, 3].forEach(i => {
+            const el = document.getElementById(`slot-${i}`);
+            const r = el.getBoundingClientRect();
+            const dx = cx - (r.left + r.width / 2), dy = cy - (r.top + r.height / 2);
+            el.animate([{ transform: 'none', opacity: 1 }, { transform: `translate(${dx}px, ${dy}px) scale(0.5) rotate(${i % 2 ? 25 : -25}deg)`, opacity: 0 }],
+                { duration: 650, delay: i * 70, easing: 'cubic-bezier(0.5, 0, 0.75, 0)', fill: 'forwards' });
+        });
+        core.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(0.6)', opacity: 0 }], { duration: 500, delay: 250, easing: 'ease-in', fill: 'forwards' });
+
         haptic('medium');
-        statusText.innerText = "Heating up the anvil...";
-        
-        setTimeout(() => { 
-            statusText.innerText = "Fusing atoms..."; 
-            haptic('light'); 
-        }, 1000);
+        await new Promise(r => setTimeout(r, 650));
+        sheet.classList.add('crafting');
+        cube.className = 'ccube spinning';
+        const hapticTimer = setInterval(() => haptic('light'), 450);
 
-        setTimeout(async () => {
-            const consumedGifts = [...gifts];
+        const parts = await fetchGiftParts(craftingState.baseName);
+        await new Promise(r => setTimeout(r, 2600));
+        clearInterval(hapticTimer);
 
-            state.inventory = state.inventory.filter(g => !craftingState.selectedIds.includes(g.uniqueId));
-            
-            if (isSuccess) {
-                statusText.innerText = "Constructing form...";
-                haptic('medium');
-                
-                const parts = await fetchGiftParts(craftingState.baseName);
-                
-                let craftedModels = parts.models.filter(m => m.crafted === true);
-                if (craftedModels.length === 0) craftedModels = parts.models.filter(m => (m.rarityPermille || 0) < 10);
-                if (craftedModels.length === 0) craftedModels = parts.models;
-                const newModel = craftedModels[Math.floor(Math.random() * craftedModels.length)];
-                
-                let winningBackdrop;
-                const isMixChecked = document.getElementById('cb-mix-backdrop')?.checked;
+        const consumed = [...gifts];
+        state.inventory = state.inventory.filter(g => !craftingState.selectedIds.includes(g.uniqueId));
 
-                const inputColors = consumedGifts.map(g => g.collectibleData.backdrop.hex.centerColor);
-                const slotCount = consumedGifts.length;
+        if (isSuccess) {
+            let craftedModels = parts.models.filter(m => m.crafted === true);
+            if (!craftedModels.length) craftedModels = parts.models.filter(m => (m.rarityPermille || 0) < 10);
+            if (!craftedModels.length) craftedModels = parts.models;
+            const newModel = craftedModels[Math.floor(Math.random() * craftedModels.length)];
+            const newBackdrop = isMix ? buildMixedBackdrop(consumed) : pickCarryOver(consumed, 'backdrop', parts.backdrops);
+            const newPattern = pickCarryOver(consumed, 'pattern', parts.patterns);
 
-                if (isMixChecked) {
-                    let gradientStyle = "";
-                    let bgName = "";
+            const newGift = {
+                uniqueId: Date.now(), originalId: consumed[0].originalId, name: craftingState.baseName,
+                isCollectible: true, timestamp: Date.now(), pinned: false, worn: false,
+                collectibleNumber: craftingState.targetNumber,
+                collectibleData: { model: newModel, backdrop: newBackdrop, pattern: newPattern }
+            };
+            state.inventory.unshift(newGift);
+            saveState(); renderInventory();
 
-                    if (slotCount === 3) {
-                        bgName = "Tri-Fusion";
-                        const c1 = inputColors[0];
-                        const c2 = inputColors[1] || c1;
-                        const c3 = inputColors[2] || c1;
-                        gradientStyle = `linear-gradient(135deg, ${c1}, ${c2}, ${c3})`;
+            // Reveal: stop the spin on the front face showing the new model
+            const front = cube.querySelector('.f-front');
+            front.style.background = getBackdropStyle(newBackdrop);
+            front.querySelector('img').src = getModelImg(newGift.name, newModel);
+            const cur = getComputedStyle(cube).transform;
+            cube.className = 'ccube';
+            cube.style.transform = cur === 'none' ? '' : cur;
+            void cube.offsetWidth;
+            cube.className = 'ccube reveal';
+            cube.style.transform = '';
+            title.innerText = 'Crafted!';
+            hapticNotify('success');
+            confetti({ particleCount: 160, spread: 90, origin: { y: 0.45 }, zIndex: 3000 });
 
-                    } else if (slotCount >= 4) {
-                        bgName = "Prismatic Core";
-                        const c1 = inputColors[0];
-                        const c2 = inputColors[1] || c1;
-                        const c3 = inputColors[2] || c1;
-                        const c4 = inputColors[3] || c1;
-                        gradientStyle = `conic-gradient(from 0deg, ${c1}, ${c2}, ${c3}, ${c4}, ${c1})`;
-
-                    } else {
-                        const sortedGifts = [...consumedGifts].sort((a, b) => 
-                            (a.collectibleData.backdrop.rarityPermille || 1000) - (b.collectibleData.backdrop.rarityPermille || 1000)
-                        );
-                        const uniqueBgs = [];
-                        const seen = new Set();
-                        sortedGifts.forEach(g => {
-                            if(!seen.has(g.collectibleData.backdrop.name)){
-                                seen.add(g.collectibleData.backdrop.name);
-                                uniqueBgs.push(g.collectibleData.backdrop);
-                            }
-                        });
-
-                        const bg1 = uniqueBgs[0];
-                        const bg2 = uniqueBgs[1] || bg1; 
-                        
-                        bgName = `${bg1.name} + ${bg2.name}`;
-                        gradientStyle = `radial-gradient(circle, ${bg1.hex.centerColor}, ${bg2.hex.edgeColor})`;
-                    }
-
-                    winningBackdrop = {
-                        name: bgName,
-                        customGradient: gradientStyle, 
-                        hex: consumedGifts[0].collectibleData.backdrop.hex, 
-                        rarityPermille: 1 
-                    };
-
-                } else {
-                    const slotRoll = Math.floor(Math.random() * 4); 
-                    if (slotRoll < gifts.length) {
-                        winningBackdrop = gifts[slotRoll].collectibleData.backdrop;
-                    } else {
-                        winningBackdrop = parts.backdrops[Math.floor(Math.random() * parts.backdrops.length)];
-                    }
-                }
-
-                const newPattern = parts.patterns[Math.floor(Math.random() * parts.patterns.length)];
-
-                const newGift = {
-                    uniqueId: Date.now(),
-                    originalId: consumedGifts[0].originalId,
-                    name: craftingState.baseName,
-                    isCollectible: true,
-                    timestamp: Date.now(),
-                    pinned: false,
-                    worn: false,
-                    collectibleNumber: craftingState.targetNumber,
-                    collectibleData: {
-                        model: newModel,
-                        backdrop: winningBackdrop,
-                        pattern: newPattern
-                    }
-                };
-                
-                state.inventory.unshift(newGift);
-                saveState();
-                renderInventory();
-                
-                animModal.classList.remove('active');
+            setTimeout(() => {
+                craftingState.busy = false;
                 closeModal('craft-modal');
-                setTimeout(() => openCollectibleModal(newGift, false), 300);
-                confetti({ particleCount: 200, spread: 100, zIndex: 3000 });
-                hapticNotify('success');
-
-            } else {
-                statusText.innerText = "Instability detected...";
-                cube.classList.remove('spinning');
-                cube.classList.add('burning');
-                hapticNotify('error');
-                
-                saveState();
-                renderInventory();
-                
-                setTimeout(() => {
-                    animModal.classList.remove('active');
-                    closeModal('craft-modal');
-                    showFailureScreen(consumedGifts);
-                }, 1600);
-            }
-        }, 2500);
+                setTimeout(() => openCollectibleModal(newGift, false), 250);
+            }, 1300);
+        } else {
+            title.innerText = 'Crafting failed';
+            cube.className = 'ccube burning';
+            hapticNotify('error');
+            saveState(); renderInventory(); applyWornGiftVisuals();
+            setTimeout(() => {
+                craftingState.busy = false;
+                closeModal('craft-modal');
+                showFailureScreen(consumed);
+            }, 1500);
+        }
     }
 
     function showFailureScreen(lostGifts) {
         const modal = document.getElementById('failure-modal');
         const grid = document.getElementById('failed-items-grid');
-        const countText = document.getElementById('fail-count-text');
-        
-        countText.innerText = lostGifts.length;
+        document.getElementById('fail-count-text').innerText = lostGifts.length;
+        document.getElementById('fail-count-badge').innerText = lostGifts.length;
         grid.innerHTML = '';
-        
         lostGifts.forEach(g => {
             const cd = g.collectibleData;
             const el = document.createElement('div');
-            el.style.cssText = `
-                width: 70px; height: 70px; 
-                background: ${getBackdropStyle(cd.backdrop)};
-                border-radius: 12px; position: relative; overflow: hidden;
-                display: flex; align-items: center; justify-content: center;
-            `;
-            
-            const img = document.createElement('img');
-            img.src = cd.model.isCustom ? cd.model.imageUrl : `${CDN_BASE}models/${encodeURIComponent(g.name)}/png/${encodeURIComponent(cd.model.name)}.png`;
-            img.style.cssText = "width: 80%; height: 80%; object-fit: contain; filter: grayscale(100%) brightness(0.7);";
-            
-            const tag = document.createElement('div');
-            tag.innerText = `#${g.collectibleNumber}`;
-            tag.style.cssText = `
-                position: absolute; top: 0px; right: 0px; 
-                background: #ff595a; color: white; 
-                font-size: 0.6em; padding: 2px 6px; 
-                border-bottom-left-radius: 6px; font-weight: bold;
-            `;
-
-            el.appendChild(img);
-            el.appendChild(tag);
+            el.style.cssText = `width: 68px; height: 68px; background: ${getBackdropStyle(cd.backdrop)}; border-radius: 20px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; filter: grayscale(0.85) brightness(0.65);`;
+            el.innerHTML = `<img src="${getModelImg(g.name, cd.model)}" style="width:80%;height:80%;object-fit:contain;"><span style="position:absolute;top:4px;left:4px;font-size:0.6em;font-weight:700;padding:1px 6px;border-radius:999px;background:rgba(0,0,0,0.4);">#${g.collectibleNumber}</span>`;
             grid.appendChild(el);
         });
-        
         modal.classList.add('active');
     }
 
     function retryCrafting() {
         closeModal('failure-modal');
-        const sameTypeGift = state.inventory.find(g => 
-            g.name === craftingState.baseName && 
-            g.isCollectible && 
-            !g.collectibleData.model.crafted
-        );
-        
-        if(sameTypeGift) {
-            openCraftModal(sameTypeGift);
-        } else {
-            tg.showAlert("No more gifts of this type available to craft!");
-        }
+        const sameTypeGift = state.inventory.find(g => g.name === craftingState.baseName && g.isCollectible && !g.hidden && !g.collectibleData.model.crafted);
+        if (sameTypeGift) openCraftModal(sameTypeGift);
+        else showToast(`No more ${craftingState.baseName} collectibles to craft.`);
     }
 
     // --- Animation Helpers ---
@@ -2958,14 +3127,18 @@
     }
 
     function closeModal(id) {
+        if (id === 'craft-modal' && craftingState.busy && document.getElementById('craft-sheet').classList.contains('crafting') && !craftingState.finishing) return;
         document.getElementById(id).classList.remove('active');
         tg.BackButton.hide();
+        if (['craft-select-modal', 'craft-variants-modal', 'craft-help-modal'].includes(id) && document.getElementById('craft-modal').classList.contains('active')) {
+            tg.BackButton.show(); tg.BackButton.onClick(() => closeModal('craft-modal'));
+        }
         if(id==='detail-modal') {
             document.getElementById('detail-lottie').innerHTML='';
             document.getElementById('up-pattern').innerHTML='';
             if(appRuntime.detailInterval) { clearInterval(appRuntime.detailInterval); appRuntime.detailInterval = null; }
         }
-        if(id==='collectible-modal') { document.getElementById('collectible-lottie').innerHTML=''; document.getElementById('roulette-strip').innerHTML=''; if(appRuntime.animationState) skipAnimation(); }
+        if(id==='collectible-modal') { document.getElementById('col-crafted-ribbon').style.display='none'; document.getElementById('collectible-lottie').innerHTML=''; document.getElementById('roulette-strip').innerHTML=''; if(appRuntime.animationState) skipAnimation(); }
         if (document.getElementById('shop-page').classList.contains('active')) { tg.BackButton.show(); tg.BackButton.onClick(() => switchTab('inventory')); }
     }
     
