@@ -2088,7 +2088,8 @@
         applyTelegramTheme(); tg.onEvent('themeChanged', applyTelegramTheme);
         loadState();
         if (!state.userPhone) state.userPhone = `+888 ${Math.floor(Math.random()*9000+1000)} ${Math.floor(Math.random()*9000+1000)}`;
-        updateUserProfile(); applyWornGiftVisuals(); renderInventory(); await fetchGiftDefinitions(); renderShop(); hideLoader(); classifyAllGifts();
+        updateUserProfile(); applyWornGiftVisuals(); renderInventory(); await fetchGiftDefinitions(); renderShop(); refreshUpgradability(); hideLoader(); classifyAllGifts();
+        setInterval(async () => { await fetchGiftDefinitions(); funGiftsCache = null; renderShop(); classifyAllGifts(); }, 15 * 60 * 1000);
         
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal-overlay')) {
@@ -2341,7 +2342,7 @@
     function haptic(style) { if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred(style || 'light'); }
     function hapticNotify(type) { if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred(type); }
 
-    async function fetchGiftDefinitions() { try { const res = await fetch(`${CDN_BASE}id-to-name.json`); if (!res.ok) throw new Error(); state.giftDefinitions = await res.json(); } catch (e) {} }
+    async function fetchGiftDefinitions() { try { const res = await fetch(`${CDN_BASE}id-to-name.json`, { cache: 'no-cache' }); if (!res.ok) throw new Error(); state.giftDefinitions = await res.json(); } catch (e) {} }
     async function fetchGiftParts(giftName) {
         if(cachedParts[giftName]) return cachedParts[giftName];
         try {
@@ -2369,18 +2370,35 @@
 
     // --- Renderers ---
     // --- Which gifts can actually be upgraded: a gift needs models on the CDN ---
-    const MODELS_KEY = 'gift_has_models_v1', MODELS_TTL = 24 * 3600 * 1000;
+    // Results expire so newly released upgrades are picked up: "no models" is re-checked hourly
+    const MODELS_KEY = 'gift_has_models_v1', MODELS_TTL_YES = 24 * 3600 * 1000, MODELS_TTL_NO = 3600 * 1000;
     let modelAvailability = {};
     try { modelAvailability = JSON.parse(localStorage.getItem(MODELS_KEY)) || {}; } catch (e) {}
     function canUpgradeName(name) { const e = modelAvailability[name]; return !(e && e.v === false); }
-    function isUpgradable(g) { return !g.isCollectible && !g.basic && canUpgradeName(g.name); }
+    // Upgradability is live: a gift can be upgraded once its id is in id-to-name.json AND it has models
+    function upgradeNameOf(g) { return state.giftDefinitions[g.originalId] || null; }
+    function isUpgradable(g) { const n = upgradeNameOf(g); return !g.isCollectible && !!n && canUpgradeName(n); }
+    function refreshUpgradability() {
+        if (!Object.keys(state.giftDefinitions).length) return;
+        let unlocked = 0;
+        state.inventory.forEach(g => {
+            if (g.isCollectible) return;
+            const n = upgradeNameOf(g);
+            if (n && canUpgradeName(n)) {
+                if (g.basic) { unlocked++; delete g.basic; }
+                g.name = n;
+            } else g.basic = true;
+        });
+        saveState(); renderInventory();
+        if (unlocked) setTimeout(() => showToast(`🎉 Upgrades are out! ${unlocked === 1 ? 'One of your gifts' : `${unlocked} of your gifts`} can now be upgraded.`), 400);
+    }
     function setModelAvailability(name, v) {
         modelAvailability[name] = { v, t: Date.now() };
         try { localStorage.setItem(MODELS_KEY, JSON.stringify(modelAvailability)); } catch (e) {}
     }
     async function checkModels(name) {
         const e = modelAvailability[name];
-        if (e && Date.now() - e.t < MODELS_TTL) return e.v;
+        if (e && Date.now() - e.t < (e.v ? MODELS_TTL_YES : MODELS_TTL_NO)) return e.v;
         if (MY_CUSTOM_ADDITIONS[name]) { setModelAvailability(name, true); return true; }
         try {
             const res = await fetch(`${CDN_BASE}models/${encodeURIComponent(name)}/models.json`);
@@ -2397,7 +2415,8 @@
         let i = 0;
         const worker = async () => { while (i < names.length) await checkModels(names[i++]); };
         await Promise.all(Array.from({ length: 8 }, worker));
-        if (names.map(canUpgradeName).join() !== before) { funGiftsCache = null; renderShop(); renderInventory(); }
+        if (names.map(canUpgradeName).join() !== before) { funGiftsCache = null; renderShop(); }
+        refreshUpgradability();
     }
     function shopPrice(id) { return RANDOM_PRICES[Math.abs(String(id).split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0)) % RANDOM_PRICES.length]; }
 
@@ -2605,6 +2624,7 @@
         const btn = document.getElementById('btn-upgrade'); 
         btn.innerText = "Preparing...";
         const gift = state.inventory.find(g => g.uniqueId === appRuntime.activeGiftId);
+        if (upgradeNameOf(gift)) gift.name = upgradeNameOf(gift);
         
         const parts = await fetchGiftParts(gift.name);
         const validModels = parts.models.filter(m => !m.crafted);
@@ -2637,6 +2657,7 @@
 
     async function handleUpgradeAll() {
         const toUpgrade = state.inventory.filter(isUpgradable);
+        toUpgrade.forEach(g => g.name = upgradeNameOf(g));
         if(!toUpgrade.length) { if (typeof showToast === 'function') showToast('All gifts are already upgraded.'); return; }
         
         const btn = document.querySelector('#action-toolbar button'); 
@@ -3413,6 +3434,7 @@
     }
 
     async function openDetailModal(gift) {
+        if (upgradeNameOf(gift)) gift.name = upgradeNameOf(gift);
         appRuntime.activeGiftId = gift.uniqueId;
         if (appRuntime.detailInterval) { clearInterval(appRuntime.detailInterval); appRuntime.detailInterval = null; }
         const imgEl = document.getElementById('detail-image');
