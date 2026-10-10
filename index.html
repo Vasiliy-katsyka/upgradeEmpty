@@ -998,12 +998,46 @@
         }
         body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
 
-        .glass, .glass-pill, .action-row-btn, .collectible-context-btn, .up-close,
-        .profile-tabs-pill-container, .gift-filter-chip.active, #long-press-menu {
-            background: var(--glass-bg) !important;
-            -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
-            border: 0.5px solid var(--glass-border) !important;
-            box-shadow: var(--glass-shadow);
+        /* ---- Liquid Glass material ----
+           .lg  = refractive glass (SVG lens displacement via backdrop-filter on Chromium,
+                  blur fallback on WebKit) + specular rim highlights.
+           Filters are generated per element size by initLiquidGlass(). */
+        .action-row-btn.lg { position: relative; }
+        .lg {
+            isolation: isolate; overflow: hidden;
+            background: rgba(255,255,255,0.045) !important;
+            border: none !important;
+            -webkit-backdrop-filter: blur(12px) saturate(185%) brightness(1.05);
+            backdrop-filter: blur(12px) saturate(185%) brightness(1.05);
+            box-shadow: none !important;
+        }
+        .lg::before {
+            /* soft light sheen across the body */
+            content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 0;
+            background: linear-gradient(165deg, rgba(255,255,255,0.20) 0%, rgba(255,255,255,0.04) 38%, rgba(255,255,255,0) 60%, rgba(255,255,255,0.07) 100%);
+        }
+        .lg::after {
+            /* specular rim: bright top-left edge, softer bottom-right, inner glow */
+            content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 2;
+            box-shadow:
+                inset 1.5px 1.5px 0.5px -1px rgba(255,255,255,0.95),
+                inset -1.5px -1.5px 0.5px -1px rgba(255,255,255,0.65),
+                inset 0 0 0 0.5px rgba(255,255,255,0.22),
+                inset 0 0 10px 1px rgba(255,255,255,0.07),
+                inset 0 -12px 16px -14px rgba(255,255,255,0.25);
+        }
+        .lg > * { position: relative; z-index: 1; }
+        /* An outer box-shadow shifts Chromium's backdrop-filter url() origin, so only the blur fallback gets one */
+        html:not(.lg-refract) .lg { box-shadow: 0 8px 24px rgba(0,0,0,0.22), 0 1px 3px rgba(0,0,0,0.18) !important; }
+        html.lg-refract .lg { background: rgba(255,255,255,0.025) !important; }
+        .lg.lg-tint-teal { background: rgba(108,201,216,0.78) !important; }
+        html.lg-refract .lg.lg-tint-teal { background: rgba(108,201,216,0.72) !important; }
+        .lg.lg-dark { background: rgba(30,30,34,0.55) !important; }
+        html.lg-refract .lg.lg-dark { background: rgba(28,28,32,0.62) !important; }
+        .lg-rim { position: relative; }
+        .lg-rim::after {
+            content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+            box-shadow: inset 1.5px 1.5px 0.5px -1px rgba(255,255,255,0.9), inset -1.5px -1.5px 0.5px -1px rgba(255,255,255,0.5), inset 0 0 0 0.5px rgba(255,255,255,0.2);
         }
 
         /* Floating sheets with large continuous corners + grabber */
@@ -1032,7 +1066,7 @@
         }
         .big-rounded-btn:active { transform: scale(0.97); filter: brightness(0.95); background: linear-gradient(180deg, #7fd6e3 0%, #5ec0d0 100%); }
         .modal-button { box-shadow: inset 0 1px 0 rgba(255,255,255,0.3); }
-        .action-button.glass-pill { color: #fff; padding: 8px 16px; font-weight: 600; }
+        .action-button.glass-pill { color: #fff; padding: 8px 16px; font-weight: 600; background: #1c1c1e; border: none; }
 
         /* Header glass buttons */
         .collectible-context-btn, .up-close { width: 36px; height: 36px; border-radius: 50% !important; color: #fff; top: 16px; right: 16px; }
@@ -1057,21 +1091,22 @@
         .profile-top-section { padding-bottom: 26px; }
         .profile-avatar { cursor: pointer; box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
         .profile-info-block { border-radius: 26px; background: #1c1c1e; }
-        .profile-pill-wrapper .profile-tabs-pill-container { border-radius: 999px; padding: 4px; }
+        .profile-pill-wrapper { justify-content: center !important; padding: 4px 12px 0; }
+        .profile-pill-wrapper .profile-tabs-pill-container { width: auto; border-radius: 999px; padding: 3px; background: #1c1c1e; border: none; box-shadow: none; }
+        .profile-pill-wrapper .profile-tabs-pill-container button { padding: 7px 16px; font-size: 0.9em; }
+        .gift-filter-row { justify-content: center; }
         .profile-tabs-pill-container { border-radius: 999px !important; }
         .profile-tabs-pill-container button { border-radius: 999px; }
         .profile-tabs-pill-container button.active {
             background: rgba(255,255,255,0.14); color: var(--teal-text);
             box-shadow: inset 0 0.5px 0 rgba(255,255,255,0.35);
         }
-        .gift-filter-chip { border-radius: 999px; border: 0.5px solid transparent; }
+        .gift-filter-chip { border-radius: 999px; border: none; }
+        .gift-filter-chip.active { background: #1c1c1e; }
         .gift-card { border-radius: 20px; }
         .send-gifts-fab {
             border-radius: 999px; padding: 13px 24px;
-            background: linear-gradient(180deg, rgba(127,214,227,0.92) 0%, rgba(94,192,208,0.92) 100%);
-            -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
-            border: 0.5px solid rgba(255,255,255,0.35);
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 10px 30px rgba(0,0,0,0.45);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
 
         /* Shop */
@@ -1079,7 +1114,7 @@
         .star-price-pill { border-radius: 999px; }
 
         /* Context menu as glass popover */
-        #long-press-menu { border-radius: 22px; padding: 6px; min-width: 210px; background: rgba(40,40,44,0.72) !important; }
+        #long-press-menu { border-radius: 24px; padding: 6px; min-width: 210px; }
         #long-press-menu li { border-radius: 14px; padding: 12px 16px; }
         #long-press-menu li:active { background: rgba(255,255,255,0.1); }
 
@@ -1173,7 +1208,7 @@
         <div id="action-toolbar" class="hidden"></div>
         <div class="gifts-grid" id="inventory-grid"></div>
 
-        <button class="send-gifts-fab" onclick="switchTab('shop')">
+        <button class="send-gifts-fab lg lg-tint-teal" onclick="switchTab('shop')">
             <svg viewBox="0 0 24 24"><path d="M20 7h-2.18A3 3 0 0 0 12 4.03 3 3 0 0 0 6.18 7H4a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h7V7h2v5h7a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1zM9 7a1 1 0 1 1 1-1v1H9zm6 0h-1V6a1 1 0 1 1 1 1zM4 13v6a2 2 0 0 0 2 2h5v-8H4zm9 8h5a2 2 0 0 0 2-2v-6h-7v8z"/></svg>
             Send Gifts to Friends
         </button>
@@ -1242,7 +1277,7 @@
     <div class="modal-content">
         <div class="up-header" id="up-header">
             <div id="up-pattern" class="dynamic-pattern-container"></div>
-            <div class="up-close" onclick="closeModal('detail-modal')"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+            <div class="up-close lg" onclick="closeModal('detail-modal')"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
             <div class="up-visual">
                 <img id="detail-image" src="" alt="">
                 <div id="detail-lottie" class="lottie-wrapper" style="display:none;"></div>
@@ -1269,7 +1304,7 @@
                 <span class="up-check-circle"></span>
                 <span>Add my name to the gift</span>
             </label>
-            <button class="big-rounded-btn" id="btn-upgrade" onclick="handleUpgrade()">Confirm</button>
+            <button class="big-rounded-btn lg-rim" id="btn-upgrade" onclick="handleUpgrade()">Confirm</button>
         </div>
     </div>
 </div>
@@ -1278,7 +1313,7 @@
 <div id="collectible-modal" class="modal-overlay">
     <div class="modal-content">
         <div id="collectible-header" class="collectible-header">
-            <div id="collectible-context-btn" class="collectible-context-btn" onclick="openCollectibleContextMenu(event)">
+            <div id="collectible-context-btn" class="collectible-context-btn lg" onclick="openCollectibleContextMenu(event)">
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="12" cy="19" r="2.2"/></svg>
             </div>
             <div id="collectible-pattern-container" class="dynamic-pattern-container"></div>
@@ -1292,15 +1327,15 @@
                 <div class="sub-header" id="collectible-model-name">Model Name</div>
 
                 <div class="modal-action-row" id="modal-action-row">
-                    <button class="action-row-btn locked" id="btn-col-transfer" onclick="handleTransferClick()">
+                    <button class="action-row-btn lg locked" id="btn-col-transfer" onclick="handleTransferClick()">
                         <svg class="action-btn-icon" viewBox="0 0 24 24"><path d="M6 3h10l4 5-9 11L2 8l4-5zm-.9 5h11.8l-2.4-3H7.5L5.1 8zm2.4 1.5L11 15.8l1.3-1.6L9.6 9.5h-2.1zM15 13a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9zm-.3 2.2v1.6H12v1.4h2.7v1.6l2.6-2.3-2.6-2.3z"/></svg>
                         <span class="action-btn-text"><svg viewBox="0 0 24 24"><path d="M17 9h-1V7a4 4 0 0 0-8 0v2H7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2zm-7-2a2 2 0 0 1 4 0v2h-4V7z"/></svg>Transfer</span>
                     </button>
-                    <button class="action-row-btn" id="btn-col-wear" onclick="handleWearClick()">
+                    <button class="action-row-btn lg" id="btn-col-wear" onclick="handleWearClick()">
                         <svg class="action-btn-icon" viewBox="0 0 24 24"><path d="M2.5 7.5l5 3.8L12 4.5l4.5 6.8 5-3.8-2 9H4.5l-2-9zM4.5 18.5h15v2h-15z"/></svg>
                         <span class="action-btn-text" id="wear-btn-text">Wear</span>
                     </button>
-                    <button class="action-row-btn" id="btn-col-share" onclick="handleShareClick()">
+                    <button class="action-row-btn lg" id="btn-col-share" onclick="handleShareClick()">
                         <svg class="action-btn-icon" viewBox="0 0 24 24"><path d="M13.5 4.5V9C7 9.8 3.8 14.3 3 20c2.4-3.6 5.6-5.2 10.5-5.2v4.7L21.5 12l-8-7.5z"/></svg>
                         <span class="action-btn-text">Share</span>
                     </button>
@@ -1351,7 +1386,7 @@
                 <span id="col-visibility-action" class="col-visibility-action">Hide from profile ›</span>
             </div>
 
-            <button id="btn-collectible-action" class="big-rounded-btn" onclick="closeModal('collectible-modal')">OK</button>
+            <button id="btn-collectible-action" class="big-rounded-btn lg-rim" onclick="closeModal('collectible-modal')">OK</button>
         </div>
     </div>
 </div>
@@ -1579,7 +1614,7 @@
 </div>
 
 <!-- Menus -->
-<div id="long-press-menu" class="hidden">
+<div id="long-press-menu" class="lg lg-dark hidden" data-lg-blur="7">
     <ul>
         <li id="menu-pin" onclick="togglePin()">Pin to Profile</li>
         <li id="menu-wear" onclick="toggleWear()">Wear Gift</li>
@@ -1662,6 +1697,116 @@
             });
         });
     });
+
+    // --- Liquid Glass engine ---
+    // Builds a per-size SVG lens filter: a displacement map that bends the backdrop inward
+    // along a convex bezel (like iOS Liquid Glass), with slight chromatic dispersion.
+    // backdrop-filter: url() renders on Chromium (Android/Desktop Telegram); WebKit keeps the blur fallback.
+    const LiquidGlass = (() => {
+        const ua = navigator.userAgent;
+        const supported = /Chrome\/|Chromium\//.test(ua) && !/iPhone|iPad|iPod/.test(ua);
+        if (supported) document.documentElement.classList.add('lg-refract');
+        const cache = new Map();
+        let svgDefs = null;
+
+        function defs() {
+            if (svgDefs) return svgDefs;
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('width', '0'); svg.setAttribute('height', '0');
+            svg.style.cssText = 'position:absolute;width:0;height:0;pointer-events:none';
+            svgDefs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+            svg.appendChild(svgDefs); document.body.appendChild(svg);
+            return svgDefs;
+        }
+
+        function buildMap(w, h, r, bezel) {
+            const c = document.createElement('canvas'); c.width = w; c.height = h;
+            const ctx = c.getContext('2d'); const img = ctx.createImageData(w, h); const d = img.data;
+            const hw = w / 2, hh = h / 2, ix = hw - r, iy = hh - r;
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    const px = x + 0.5 - hw, py = y + 0.5 - hh;
+                    const ax = Math.abs(px), ay = Math.abs(py);
+                    const qx = ax - ix, qy = ay - iy;
+                    let dist, nx, ny;
+                    if (qx > 0 && qy > 0) { const len = Math.hypot(qx, qy) || 1; dist = r - len; nx = qx / len; ny = qy / len; }
+                    else if (qx > qy) { dist = hw - ax; nx = 1; ny = 0; }
+                    else { dist = hh - ay; nx = 0; ny = 1; }
+                    nx *= Math.sign(px) || 1; ny *= Math.sign(py) || 1;
+                    let mag = 0;
+                    if (dist < bezel) {
+                        const t = Math.max(0, dist) / bezel;            // 0 at rim, 1 at bezel end
+                        mag = 1 - Math.sqrt(1 - Math.pow(1 - t, 2));      // circular (convex) bezel profile
+                        mag = Math.pow(mag, 0.8);
+                    }
+                    const i = (y * w + x) * 4;
+                    d[i] = 128 - nx * mag * 127;      // sample inward → edge magnification
+                    d[i + 1] = 128 - ny * mag * 127;
+                    d[i + 2] = 128; d[i + 3] = 255;
+                }
+            }
+            ctx.putImageData(img, 0, 0);
+            return c.toDataURL();
+        }
+
+        function filterFor(w, h, r, blur) {
+            const key = `${w}x${h}x${r}x${blur}`;
+            if (cache.has(key)) return cache.get(key);
+            const id = `lg-${cache.size}`;
+            const bezel = Math.max(6, Math.min(r * 0.9, Math.min(w, h) * 0.42));
+            const scale = Math.min(70, Math.max(18, Math.min(w, h) * 0.55));
+            const map = buildMap(w, h, r, bezel);
+            const NS = 'http://www.w3.org/2000/svg';
+            const f = document.createElementNS(NS, 'filter');
+            f.setAttribute('id', id); f.setAttribute('x', '0'); f.setAttribute('y', '0');
+            f.setAttribute('width', w); f.setAttribute('height', h);
+            f.setAttribute('filterUnits', 'userSpaceOnUse'); f.setAttribute('color-interpolation-filters', 'sRGB');
+            f.innerHTML = `
+                <feGaussianBlur in="SourceGraphic" stdDeviation="${blur}" result="blur"/>
+                <feImage href="${map}" x="0" y="0" width="${w}" height="${h}" preserveAspectRatio="none" result="map"/>
+                <feDisplacementMap in="blur" in2="map" scale="${scale}" xChannelSelector="R" yChannelSelector="G" result="dR"/>
+                <feDisplacementMap in="blur" in2="map" scale="${scale * 0.93}" xChannelSelector="R" yChannelSelector="G" result="dG"/>
+                <feDisplacementMap in="blur" in2="map" scale="${scale * 0.86}" xChannelSelector="R" yChannelSelector="G" result="dB"/>
+                <feColorMatrix in="dR" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r"/>
+                <feColorMatrix in="dG" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="g"/>
+                <feColorMatrix in="dB" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="b"/>
+                <feBlend in="r" in2="g" mode="screen" result="rg"/>
+                <feBlend in="rg" in2="b" mode="screen" result="rgb"/>
+                <feColorMatrix in="rgb" type="saturate" values="1.6"/>`;
+            defs().appendChild(f);
+            cache.set(key, id);
+            return id;
+        }
+
+        function apply(el) {
+            if (!supported) return;
+            const rect = el.getBoundingClientRect();
+            const w = Math.round(el.offsetWidth), h = Math.round(el.offsetHeight);
+            if (!w || !h || !rect.width) return;
+            const br = parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0;
+            const r = Math.min(br, w / 2, h / 2);
+            const blur = parseFloat(el.dataset.lgBlur || '1.2');
+            const id = filterFor(w, h, Math.round(r), blur);
+            el.style.backdropFilter = `url(#${id})`;
+            el.style.webkitBackdropFilter = `url(#${id})`;
+        }
+
+        const ro = new ResizeObserver(entries => entries.forEach(e => apply(e.target)));
+        const watched = new WeakSet();
+        function scan(root = document) {
+            root.querySelectorAll('.lg').forEach(el => { if (!watched.has(el)) { watched.add(el); ro.observe(el); } });
+        }
+        function init() {
+            scan();
+            new MutationObserver(muts => muts.forEach(m => m.addedNodes.forEach(n => {
+                if (n.nodeType !== 1) return;
+                if (n.classList.contains('lg') && !watched.has(n)) { watched.add(n); ro.observe(n); }
+                scan(n);
+            }))).observe(document.body, { childList: true, subtree: true });
+        }
+        return { init, apply, supported };
+    })();
+    window.addEventListener('DOMContentLoaded', () => LiquidGlass.init());
 
     // --- Core Functions ---
     function updateUserProfile() {
@@ -2888,8 +3033,10 @@
             y = rect.bottom + 10;
         }
         
-        if(x+180>window.innerWidth) x=window.innerWidth-190; 
-        if(y+160>window.innerHeight) y=window.innerHeight-170; 
+        menu.classList.remove('hidden');
+        const mw = menu.offsetWidth || 220, mh = menu.offsetHeight || 260;
+        x = Math.max(10, Math.min(x, window.innerWidth - mw - 10));
+        y = Math.max(10, Math.min(y, window.innerHeight - mh - 10));
         menu.style.left=x+'px'; 
         menu.style.top=y+'px'; 
         menu.classList.remove('hidden'); 
