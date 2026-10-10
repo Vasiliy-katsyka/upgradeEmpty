@@ -1447,24 +1447,17 @@
         .cust-footer { padding: 10px 16px 4px; flex-shrink: 0; border-top: 0.5px solid rgba(255,255,255,0.08); }
 
         /* ================= Corner number ribbon (3D, tinted from backdrop) ================= */
-        .gift-card.has-ribbon { overflow: visible; }
-        .gift-card.has-ribbon .gift-card-bg-pattern, .gift-card.has-ribbon .dynamic-pattern-container { border-radius: inherit; overflow: hidden; }
+        .gift-card.has-ribbon { overflow: hidden; }
         .gift-ribbon {
             --rb: #2a2f3d;
-            position: absolute; top: -4px; right: -4px; width: 74px; height: 74px; overflow: hidden; z-index: 4; pointer-events: none;
+            position: absolute; top: 0; right: 0; width: 66px; height: 66px; overflow: hidden; z-index: 4; pointer-events: none;
         }
-        .gift-ribbon::before, .gift-ribbon::after {
-            content: ''; position: absolute; z-index: -1; width: 4px; height: 4px;
-            background: color-mix(in srgb, var(--rb) 55%, #000);
-        }
-        .gift-ribbon::before { top: 0; left: 0; }
-        .gift-ribbon::after { bottom: 0; right: 0; }
         .gift-ribbon span {
-            position: absolute; top: 17px; left: -6px; width: 104px; transform: rotate(45deg);
-            padding: 3px 0 3px 4px; text-align: center; color: #fff; font-size: 0.66em; font-weight: 700; letter-spacing: 0.2px;
-            background: linear-gradient(180deg, color-mix(in srgb, var(--rb) 82%, #fff) 0%, var(--rb) 55%, color-mix(in srgb, var(--rb) 80%, #000) 100%);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3), inset 0 0.5px 0 rgba(255,255,255,0.25);
-            text-shadow: 0 1px 1px rgba(0,0,0,0.35);
+            position: absolute; top: 13px; right: -27px; width: 104px; transform: rotate(45deg);
+            padding: 3px 0; text-align: center; color: #fff; font-size: 0.7em; font-weight: 700; letter-spacing: 0.1px; line-height: 1.25;
+            background: linear-gradient(180deg, color-mix(in srgb, var(--rb) 92%, #fff) 0%, var(--rb) 100%);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+            text-shadow: 0 1px 1px rgba(0,0,0,0.25);
         }
         .gift-card.has-ribbon .top-right-label { display: none; }
 
@@ -2091,7 +2084,7 @@
         applyTelegramTheme(); tg.onEvent('themeChanged', applyTelegramTheme);
         loadState();
         if (!state.userPhone) state.userPhone = `+888 ${Math.floor(Math.random()*9000+1000)} ${Math.floor(Math.random()*9000+1000)}`;
-        updateUserProfile(); applyWornGiftVisuals(); renderInventory(); await fetchGiftDefinitions(); renderShop(); hideLoader();
+        updateUserProfile(); applyWornGiftVisuals(); renderInventory(); await fetchGiftDefinitions(); renderShop(); hideLoader(); classifyAllGifts();
         
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal-overlay')) {
@@ -2371,14 +2364,44 @@
     }
 
     // --- Renderers ---
+    // --- Which gifts can actually be upgraded: a gift needs models on the CDN ---
+    const MODELS_KEY = 'gift_has_models_v1', MODELS_TTL = 24 * 3600 * 1000;
+    let modelAvailability = {};
+    try { modelAvailability = JSON.parse(localStorage.getItem(MODELS_KEY)) || {}; } catch (e) {}
+    function canUpgradeName(name) { const e = modelAvailability[name]; return !(e && e.v === false); }
+    function isUpgradable(g) { return !g.isCollectible && !g.basic && canUpgradeName(g.name); }
+    function setModelAvailability(name, v) {
+        modelAvailability[name] = { v, t: Date.now() };
+        try { localStorage.setItem(MODELS_KEY, JSON.stringify(modelAvailability)); } catch (e) {}
+    }
+    async function checkModels(name) {
+        const e = modelAvailability[name];
+        if (e && Date.now() - e.t < MODELS_TTL) return e.v;
+        if (MY_CUSTOM_ADDITIONS[name]) { setModelAvailability(name, true); return true; }
+        try {
+            const res = await fetch(`${CDN_BASE}models/${encodeURIComponent(name)}/models.json`);
+            let v = null;
+            if (res.ok) { const list = await res.json().catch(() => []); v = Array.isArray(list) && list.length > 0; }
+            else if (res.status === 404 || res.status === 403) v = false;
+            if (v !== null) setModelAvailability(name, v);
+            return v;
+        } catch (err) { return null; } // network issue: don't decide
+    }
+    async function classifyAllGifts() {
+        const names = [...new Set(Object.values(state.giftDefinitions))];
+        const before = names.map(canUpgradeName).join();
+        let i = 0;
+        const worker = async () => { while (i < names.length) await checkModels(names[i++]); };
+        await Promise.all(Array.from({ length: 8 }, worker));
+        if (names.map(canUpgradeName).join() !== before) { funGiftsCache = null; renderShop(); renderInventory(); }
+    }
+    function shopPrice(id) { return RANDOM_PRICES[Math.abs(String(id).split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0)) % RANDOM_PRICES.length]; }
+
     function renderShop() {
         const grid = document.getElementById('shop-grid'); grid.innerHTML = '';
         const items = Object.entries(state.giftDefinitions)
-            .filter(([id]) => !['custom_skebob', 'custom_baggin_cat'].includes(id))
-            .map(([id, name]) => {
-                const index = Math.abs(id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % RANDOM_PRICES.length;
-                return { id, name, price: RANDOM_PRICES[index] };
-            })
+            .filter(([id, name]) => !['custom_skebob', 'custom_baggin_cat'].includes(id) && canUpgradeName(name))
+            .map(([id, name]) => ({ id, name, price: shopPrice(id) }))
             .sort((a, b) => parseInt(a.price) - parseInt(b.price));
         grid.insertAdjacentHTML('beforeend', `<div class="shop-section-title">Upgradable gifts<small>Can be turned into collectibles</small></div>`);
         items.forEach(({ id, name, price }) => {
@@ -2389,7 +2412,7 @@
                 </div>
                 <div class="star-price-pill"><span class="star">⭐</span>${price}</div>
             `;
-            el.onclick = () => buyGift(id, name);
+            el.onclick = () => buyGift(id, name, 1, { price: parseInt(price) });
             el.addEventListener('touchstart', (e) => startShopLongPress(e, id, name), {passive:false}); el.addEventListener('touchend', cancelLongPress);
             el.addEventListener('contextmenu', (e) => { e.preventDefault(); openQtyModal(id, name); });
             grid.appendChild(el);
@@ -2428,12 +2451,14 @@
     }
     async function getFunGifts() {
         if (funGiftsCache) return funGiftsCache;
-        const known = new Set(Object.keys(state.giftDefinitions));
+        const defs = state.giftDefinitions;
         const ids = new Set([...(await listCdnOriginals()), ...Object.keys(CLASSIC_GIFTS)]);
-        funGiftsCache = [...ids].filter(id => id && !known.has(id)).map(id => {
+        // id-to-name gifts that have no models on the CDN can't be upgraded either
+        Object.entries(defs).forEach(([id, name]) => { if (!canUpgradeName(name) && !['custom_skebob', 'custom_baggin_cat'].includes(id)) ids.add(id); });
+        funGiftsCache = [...ids].filter(id => id && (!defs[id] || !canUpgradeName(defs[id]))).map(id => {
             const c = CLASSIC_GIFTS[id];
-            const price = c ? c.price : [15, 25, 50, 100, 250][Math.abs([...id].reduce((a, ch) => a + ch.charCodeAt(0), 0)) % 5];
-            return { id, name: c ? c.name : 'Gift', price };
+            const price = c ? c.price : defs[id] ? parseInt(shopPrice(id)) : [15, 25, 50, 100, 250][Math.abs([...id].reduce((a, ch) => a + ch.charCodeAt(0), 0)) % 5];
+            return { id, name: c ? c.name : (defs[id] || 'Gift'), price };
         }).sort((a, b) => a.price - b.price);
         return funGiftsCache;
     }
@@ -2491,7 +2516,7 @@
         let displayList = state.settings.showHidden ? state.inventory : state.inventory.filter(g => !g.hidden);
         document.getElementById('tab-gift-count').innerText = state.inventory.length;
         if (giftFilter === 'collectible') displayList = displayList.filter(g => g.isCollectible);
-        else if (giftFilter === 'regular') displayList = displayList.filter(g => !g.isCollectible && !g.basic);
+        else if (giftFilter === 'regular') displayList = displayList.filter(isUpgradable);
         else if (giftFilter === 'crafted') displayList = displayList.filter(g => g.isCollectible && g.collectibleData.model.crafted);
         
         renderPinnedGiftsAroundAvatar();
@@ -2526,7 +2551,7 @@
                 visualHtml = state.settings.animations
                     ? LottieManager.lazyHtml(cd.model.isCustom ? cd.model.lottieUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/lottie/${encodeURIComponent(cd.model.name)}.json`, imgUrl)
                     : `<img src="${imgUrl}" loading="lazy" decoding="async">`;
-                const rb = cd.backdrop.hex ? `color-mix(in srgb, ${cd.backdrop.hex.edgeColor} 80%, #000)` : '#2a2f3d';
+                const rb = cd.backdrop.hex ? `color-mix(in srgb, ${cd.backdrop.hex.edgeColor} 86%, #000)` : '#2a2f3d';
                 el.classList.add('has-ribbon');
                 el.innerHTML = `${topIcon}<div class="gift-ribbon" style="--rb:${rb}"><span>#${gift.collectibleNumber.toLocaleString('en-US')}</span></div><div class="gift-card-bg-pattern" style="background:${bgStyle}"></div><div class="dynamic-pattern-container" id="pat-${gift.uniqueId}"></div><div class="image-container">${visualHtml}</div>`; 
                 setTimeout(() => generatePattern(`pat-${gift.uniqueId}`, cd.pattern, gift.name, true, cd.backdrop.hex.patternColor), 0);
@@ -2537,7 +2562,7 @@
                     ? LottieManager.lazyHtml(`${CDN_BASE}originals/${gift.originalId}/Original.json`, imgUrl)
                     : `<img src="${imgUrl}" loading="lazy" decoding="async">`;
                 el.innerHTML = `${appRuntime.selectionMode ? '' : `<img class="gift-sender" src="${selfAvatarUrl()}" alt="">`}<div class="image-container">${visualHtml}</div>`;
-                if (!appRuntime.selectionMode) el.onclick = () => gift.basic ? openGiftInfo(gift) : openDetailModal(gift);
+                if (!appRuntime.selectionMode) el.onclick = () => isUpgradable(gift) ? openDetailModal(gift) : openGiftInfo(gift);
             }
             if (gift.hidden && !appRuntime.selectionMode) el.insertAdjacentHTML('beforeend', HIDDEN_EYE_HTML);
             grid.appendChild(el);
@@ -2548,7 +2573,7 @@
     function updateActionToolbar() {
         const toolbar = document.getElementById('action-toolbar'); toolbar.innerHTML = ''; toolbar.className = 'hidden';
         if (appRuntime.selectionMode === 'hide') { toolbar.className = ''; toolbar.style.borderBottom = 'none'; toolbar.innerHTML = `<button class="action-button glass-pill" onclick="cancelSelectionMode()">Cancel</button><button class="action-button" onclick="confirmHideSelected()" style="background:var(--teal); color:#fff; font-weight:600; padding:8px 18px;" ${appRuntime.selectedIds.size ? '' : 'disabled'}>Hide (${appRuntime.selectedIds.size})</button>`; return; }
-        if (state.inventory.some(g => !g.isCollectible && !g.basic)) { toolbar.className = ''; toolbar.style.borderBottom = 'none'; toolbar.innerHTML = `<button class="action-button glass-pill" onclick="handleUpgradeAll()">✨ Upgrade All</button>`; }
+        if (state.inventory.some(isUpgradable)) { toolbar.className = ''; toolbar.style.borderBottom = 'none'; toolbar.innerHTML = `<button class="action-button glass-pill" onclick="handleUpgradeAll()">✨ Upgrade All</button>`; }
     }
 
     // --- Actions ---
@@ -2595,7 +2620,7 @@
     }
 
     async function handleUpgradeAll() {
-        const toUpgrade = state.inventory.filter(g => !g.isCollectible && !g.basic);
+        const toUpgrade = state.inventory.filter(isUpgradable);
         if(!toUpgrade.length) { if (typeof showToast === 'function') showToast('All gifts are already upgraded.'); return; }
         
         const btn = document.querySelector('#action-toolbar button'); 
@@ -3350,7 +3375,7 @@
         document.getElementById('gi-from-name').innerText = u?.first_name || 'You';
         const d = new Date(gift.timestamp);
         document.getElementById('gi-date').innerText = `${d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} at ${d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`;
-        document.getElementById('gi-value').innerText = gift.price || 15;
+        document.getElementById('gi-value').innerText = gift.price || parseInt(shopPrice(gift.originalId)) || 15;
         updateGiftInfoVisibility(gift);
         const lot = document.getElementById('gi-lottie');
         const img = document.getElementById('gi-image');
@@ -3389,7 +3414,11 @@
         // Preview only the variants obtainable by a regular upgrade (crafted models come from crafting)
         const models = parts.models.filter(m => !m.crafted);
         const pool = models.length ? models : parts.models;
-        if (!pool.length) return;
+        if (!pool.length) {
+            setModelAvailability(gift.name, false); funGiftsCache = null;
+            closeModal('detail-modal'); openGiftInfo(gift); renderInventory(); renderShop();
+            return;
+        }
 
         const pick = arr => arr[Math.floor(Math.random() * arr.length)];
         const showVariant = (animate) => {
@@ -3547,7 +3576,7 @@
     function newQueueItem() { return { id: null, name: null, parts: { model: null, backdrop: null, pattern: null }, random: { model: true, backdrop: true, pattern: true } }; }
     function custCurrent() { return customizationQueue[editingIndex]; }
     function custPartsOf(q) { return q && q.name ? cachedParts[q.name] : null; }
-    function baseGiftList() { return Object.entries(state.giftDefinitions).filter(([id]) => !['custom_skebob', 'custom_baggin_cat'].includes(id)); }
+    function baseGiftList() { return Object.entries(state.giftDefinitions).filter(([id, name]) => !['custom_skebob', 'custom_baggin_cat'].includes(id) && canUpgradeName(name)); }
 
     function openCustomizeModal() {
         haptic('light');
