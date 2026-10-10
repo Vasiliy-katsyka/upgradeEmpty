@@ -792,6 +792,201 @@
             text-transform: uppercase;
             z-index: 5;
         }
+
+        /* ================= REDESIGN (Telegram native look) ================= */
+        :root {
+            --sheet-bg: #1c1c1d;
+            --cell-bg: #242426;
+            --line: rgba(255, 255, 255, 0.1);
+            --teal: #6cc9d8;
+            --teal-text: #79d4e2;
+            --teal-dim: rgba(108, 201, 216, 0.16);
+            --profile-default-bg: radial-gradient(circle at 50% 35%, #6b7896 0%, #4a5571 55%, #3a435a 100%);
+        }
+
+        /* ---------- Profile ---------- */
+        #profile-page { background: #000; padding-bottom: 96px; }
+        .profile-top-section {
+            padding-top: 90px !important; padding-bottom: 14px;
+            background: var(--profile-default-bg); flex-direction: column; align-items: center;
+            overflow: hidden;
+        }
+        .profile-top-section .profile-main-info { width: 100%; }
+        .profile-avatar-wrapper { width: 100px; height: 100px; margin-bottom: 12px; }
+        .profile-avatar { width: 100px; height: 100px; box-shadow: none; }
+        .pinned-floating-gift { width: 30px; height: 30px; }
+        .pinned-floating-gift.pos-0 { top: -20px; left: -42px; right: auto; bottom: auto; }
+        .pinned-floating-gift.pos-2 { top: 16px; left: -97px; right: auto; bottom: auto; }
+        .pinned-floating-gift.pos-4 { top: 68px; left: -50px; right: auto; bottom: auto; }
+        .pinned-floating-gift.pos-1 { top: -20px; right: -42px; left: auto; bottom: auto; }
+        .pinned-floating-gift.pos-3 { top: 16px; right: -97px; left: auto; bottom: auto; }
+        .pinned-floating-gift.pos-5 { top: 68px; right: -50px; left: auto; bottom: auto; }
+        .profile-name-status h1 {
+            font-size: 1.45em; font-weight: 700; text-transform: none; letter-spacing: 0;
+            color: #fff; margin-bottom: 2px;
+        }
+        .profile-name-status p { color: rgba(255,255,255,0.75); opacity: 1; font-size: 0.92em; }
+        .profile-actions {
+            display: flex; gap: 8px; width: 100%; padding: 16px 12px 0; position: relative; z-index: 2;
+        }
+        .profile-action-btn {
+            flex: 1; background: rgba(0, 0, 0, 0.24); border: none; border-radius: 14px;
+            padding: 10px 4px 9px; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 4px;
+            font-size: 0.8em; font-weight: 600; cursor: pointer; transition: transform 0.1s, background 0.2s;
+        }
+        .profile-action-btn:active { transform: scale(0.97); background: rgba(0,0,0,0.35); }
+        .profile-action-btn svg { width: 24px; height: 24px; fill: #fff; }
+
+        .profile-info-block {
+            background: var(--sheet-bg); border: none; border-radius: 16px; margin: 12px; padding: 14px 18px;
+        }
+        .info-item { border-bottom: none; margin-bottom: 14px; padding-bottom: 0; }
+        .info-item .value { font-size: 1.05em; font-weight: 600; margin-bottom: 3px; color: #fff; }
+        .info-item .value.regular { font-weight: 400; }
+        .info-item .label { font-size: 0.85em; color: #8d8e93; font-weight: 500; }
+
+        .profile-pill-wrapper { padding: 4px 12px 0; justify-content: flex-start !important; margin: 6px 0 4px !important; }
+        .profile-pill-wrapper .profile-tabs-pill-container { width: 100%; background: var(--sheet-bg); border: none; border-radius: 22px; }
+        .profile-tabs-pill-container button { color: #8d8e93; font-size: 0.95em; padding: 8px 16px; }
+        .profile-tabs-pill-container button.active { background: rgba(255,255,255,0.08); color: var(--teal-text); }
+        .tab-count { opacity: 0.6; font-weight: 500; margin-left: 2px; }
+
+        .gift-filter-row { display: flex; gap: 6px; padding: 10px 12px 2px; overflow-x: auto; scrollbar-width: none; }
+        .gift-filter-row::-webkit-scrollbar { display: none; }
+        .gift-filter-chip {
+            border: none; background: transparent; color: #a0a1a6; font-weight: 600; font-size: 0.88em;
+            padding: 7px 14px; border-radius: 18px; white-space: nowrap; cursor: pointer;
+        }
+        .gift-filter-chip.active { background: var(--sheet-bg); color: #fff; }
+
+        #action-toolbar { background: transparent; padding: 8px 12px 0; }
+        #inventory-grid { background: #000; padding: 10px 12px 20px; gap: 8px; }
+        .gift-card { background-color: var(--sheet-bg); border-radius: 14px; }
+        .top-right-label { background: rgba(0,0,0,0.35); font-size: 0.58em; top: 11px; right: -33px; }
+
+        .send-gifts-fab {
+            position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom)); transform: translateX(-50%);
+            z-index: 50; background: var(--teal); color: #fff; border: none; border-radius: 24px;
+            padding: 11px 22px; font-size: 1em; font-weight: 600; display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 6px 22px rgba(0,0,0,0.45); cursor: pointer; white-space: nowrap;
+        }
+        .send-gifts-fab svg { width: 20px; height: 20px; fill: #fff; }
+        .send-gifts-fab:active { transform: translateX(-50%) scale(0.97); }
+        body:not(.on-profile) .send-gifts-fab { display: none; }
+
+        /* ---------- Shop ---------- */
+        #shop-page { background: #000 !important; }
+        #shop-grid { gap: 10px; padding: 8px 12px 30px; }
+        .buy-gift-item {
+            background: #1b1b1c; border: none; border-radius: 18px; aspect-ratio: 1 / 1.2;
+            padding: 12px 8px 14px; justify-content: space-between;
+        }
+        .buy-gift-item .image-container { width: 78%; height: 62%; margin: 6px 0 0; }
+        .star-price-pill {
+            position: relative; display: inline-flex; align-items: center; gap: 4px;
+            padding: 5px 16px 5px 12px; border-radius: 16px; overflow: hidden;
+            background: rgba(214, 158, 46, 0.17); color: #f6c453; font-weight: 700; font-size: 0.95em;
+        }
+        .star-price-pill .star { font-size: 1.05em; filter: drop-shadow(0 0 3px rgba(255,196,0,0.6)); }
+        .star-price-pill::before, .star-price-pill::after {
+            content: ''; position: absolute; inset: 0; pointer-events: none;
+            background-image:
+                radial-gradient(circle, #ffd76a 0 1px, transparent 1.6px),
+                radial-gradient(circle, #ffd76a 0 1px, transparent 1.6px),
+                radial-gradient(circle, #ffd76a 0 0.8px, transparent 1.4px),
+                radial-gradient(circle, #ffd76a 0 1px, transparent 1.6px),
+                radial-gradient(circle, #ffd76a 0 0.8px, transparent 1.4px);
+            background-size: 6px 6px; background-repeat: no-repeat;
+            background-position: 8% 18%, 92% 20%, 86% 82%, 22% 84%, 60% 10%;
+            animation: twinkle 1.8s ease-in-out infinite;
+        }
+        .star-price-pill::after {
+            background-position: 4% 70%, 96% 60%, 50% 90%, 72% 14%, 30% 8%;
+            animation-delay: 0.9s;
+        }
+        @keyframes twinkle { 0%, 100% { opacity: 0.15; } 50% { opacity: 1; } }
+
+        /* ---------- Collectible sheet ---------- */
+        #collectible-modal .modal-content {
+            background: var(--sheet-bg); height: auto; max-height: 96vh; overflow-y: auto;
+            border-top-left-radius: 16px; border-top-right-radius: 16px;
+        }
+        #collectible-modal .collectible-header { padding: 26px 16px 18px; flex-shrink: 0; }
+        .col-header-inner { position: relative; z-index: 2; width: 100%; display: flex; flex-direction: column; align-items: center; }
+        #collectible-modal .roulette-image-wrapper { height: 170px; }
+        .collectible-header h3.col-title { margin: 12px 0 2px; font-size: 1.5em; font-weight: 700; color: #fff; }
+        .col-number { color: rgba(255,255,255,0.68); font-weight: 600; }
+        #collectible-modal .sub-header { color: rgba(255,255,255,0.65); font-weight: 600; font-size: 1em; opacity: 1; }
+        .collectible-context-btn svg { width: 22px; height: 22px; fill: currentColor; }
+        #collectible-modal .modal-action-row { width: 100%; gap: 8px; margin-top: 18px; padding: 0 4px; }
+        .action-row-btn { background: rgba(0, 0, 0, 0.22); border-radius: 14px; padding: 11px 6px 10px; gap: 4px; }
+        .action-row-btn svg.action-btn-icon { width: 26px; height: 26px; fill: currentColor; }
+        .action-row-btn.locked { opacity: 0.55; }
+        .action-row-btn.locked:active { transform: none; }
+        .action-btn-text { display: inline-flex; align-items: center; gap: 4px; font-size: 0.9em; }
+        .action-btn-text svg { width: 13px; height: 13px; fill: currentColor; }
+
+        .col-body { padding: 16px 16px calc(18px + env(safe-area-inset-bottom)); background: var(--sheet-bg); }
+        .col-hint { text-align: center; color: #8d8e93; font-size: 0.9em; margin: 2px 0 14px; line-height: 1.35; }
+        .col-hint .tg-link, .col-visibility-action { color: var(--teal-text); font-weight: 600; cursor: pointer; }
+        #collectible-modal .stats-table {
+            background: transparent; border: 1px solid var(--line); border-radius: 14px; margin-bottom: 14px;
+        }
+        #collectible-modal .stat-row {
+            display: grid; grid-template-columns: 32% 1fr; padding: 0; align-items: stretch;
+            border-bottom: 1px solid var(--line);
+        }
+        #collectible-modal .stat-row:last-child { border-bottom: none; }
+        #collectible-modal .stat-label {
+            background: var(--cell-bg); border-right: 1px solid var(--line);
+            padding: 12px 14px; font-weight: 600; font-size: 0.95em; color: #fff; display: flex; align-items: center;
+        }
+        #collectible-modal .stat-value { padding: 10px 14px; font-weight: 600; min-width: 0; min-height: 46px; color: #fff; }
+        #collectible-modal .slot-mask { width: auto; max-width: 60%; text-align: left; flex-shrink: 1; }
+        #collectible-modal .slot-scroll { right: auto; left: 0; }
+        #collectible-modal .slot-item { justify-content: flex-start; }
+        .ton-address { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; color: var(--teal-text); font-weight: 500 !important; letter-spacing: 0.2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        #collectible-modal .owner-chip img { width: 26px; height: 26px; }
+        #collectible-modal .owner-chip span { color: var(--teal-text); font-weight: 500; }
+        #collectible-modal .percentage-pill, .teal-pill {
+            background: var(--teal-dim); color: var(--teal-text); border-radius: 12px; padding: 3px 9px;
+            font-size: 0.82em; font-weight: 500; white-space: nowrap; flex-shrink: 0;
+        }
+        .teal-pill { cursor: pointer; }
+        #collectible-modal .col-visibility-bar { margin: 4px auto 16px; }
+        .big-rounded-btn { background: var(--teal); border-radius: 14px; padding: 15px; font-size: 1.05em; }
+        .big-rounded-btn:active { background: #5bb6c5; }
+        .big-rounded-btn:disabled { opacity: 0.6; }
+
+        /* ---------- Upgrade preview sheet ---------- */
+        #detail-modal .modal-content { background: var(--sheet-bg); border-top-left-radius: 16px; border-top-right-radius: 16px; max-height: 96vh; overflow-y: auto; }
+        .up-header {
+            position: relative; overflow: hidden; text-align: center; padding: 34px 24px 26px; color: #fff;
+            transition: background 0.6s ease; flex-shrink: 0;
+        }
+        .up-close {
+            position: absolute; top: 14px; right: 14px; z-index: 5; width: 32px; height: 32px; border-radius: 50%;
+            background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; cursor: pointer;
+        }
+        .up-close svg { width: 16px; height: 16px; stroke: #fff; stroke-width: 2.6; fill: none; stroke-linecap: round; }
+        .up-visual { position: relative; z-index: 2; width: 150px; height: 150px; margin: 0 auto 10px; }
+        .up-visual img { width: 100%; height: 100%; object-fit: contain; transition: opacity 0.3s ease, transform 0.3s ease; }
+        .up-visual img.swap { opacity: 0; transform: scale(0.85); }
+        .up-header h2 { position: relative; z-index: 2; font-size: 1.55em; font-weight: 700; margin-bottom: 6px; }
+        .up-sub { position: relative; z-index: 2; font-size: 1em; line-height: 1.4; color: rgba(255,255,255,0.78); font-weight: 500; }
+        .up-body { padding: 22px 22px calc(18px + env(safe-area-inset-bottom)); }
+        .up-feature { display: flex; gap: 18px; align-items: flex-start; margin-bottom: 22px; }
+        .up-feature svg { width: 30px; height: 30px; flex-shrink: 0; stroke: #fff; fill: none; stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; margin-top: 2px; }
+        .up-feature h4 { font-size: 1.05em; font-weight: 700; margin-bottom: 3px; }
+        .up-feature p { color: #8d8e93; font-size: 0.95em; line-height: 1.35; font-weight: 500; }
+        .up-divider { height: 1px; background: var(--line); margin: 0 0 16px; }
+        .up-check { display: flex; align-items: center; justify-content: center; gap: 14px; font-weight: 600; margin-bottom: 18px; cursor: pointer; }
+        .up-check input { display: none; }
+        .up-check-circle { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #4a4a4e; display: flex; align-items: center; justify-content: center; transition: 0.15s; }
+        .up-check input:checked + .up-check-circle { background: var(--teal); border-color: var(--teal); }
+        .up-check input:checked + .up-check-circle::after { content: ''; width: 6px; height: 11px; border: solid #fff; border-width: 0 2.5px 2.5px 0; transform: rotate(45deg) translate(-1px, -1px); }
+
+        .crafted-tag { font-size: 0.7em; font-weight: 700; color: #ffb648; background: rgba(255,182,72,0.14); padding: 2px 6px; border-radius: 6px; margin-top: 4px; }
     </style>
 </head>
 <body>
@@ -808,8 +1003,6 @@
 <div class="app-container">
     <!-- Profile Page -->
     <div id="profile-page" class="page">
-        <!-- Native SettingsButton used in JS instead of custom DOM profile setting controls -->
-
         <div class="profile-top-section" id="profile-bg">
             <div id="profile-pattern-overlay"></div>
             <div class="profile-main-info">
@@ -819,19 +1012,32 @@
                 </div>
                 <div class="profile-name-status">
                     <h1 id="user-name">Loading...</h1>
-                    <p id="gift-count-display">0 gifts</p>
+                    <p id="gift-count-display">online</p>
                 </div>
+            </div>
+            <div class="profile-actions">
+                <button class="profile-action-btn" onclick="setProfilePhoto()">
+                    <svg viewBox="0 0 24 24"><path d="M9 3L7.2 5H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.2L15 3H9zm3 5a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>
+                    Set Photo
+                </button>
+                <button class="profile-action-btn" onclick="editBio()">
+                    <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                    Edit Info
+                </button>
+                <button class="profile-action-btn" onclick="openSettingsModal()">
+                    <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.48.48 0 0 0-.59.22L2.74 8.87a.47.47 0 0 0 .12.61l2.03 1.58c-.05.3-.07.63-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.47.47 0 0 0-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/></svg>
+                    Settings
+                </button>
             </div>
         </div>
         
-        <!-- Info elements wrapped inside single high contrast dark panel container -->
         <div class="profile-info-block">
             <div class="info-item">
                 <span class="value" id="profile-phone">+888 0000 0000</span>
                 <span class="label">Mobile</span>
             </div>
             <div class="info-item clickable" onclick="editBio()">
-                <span class="value" id="profile-bio">Hello world</span>
+                <span class="value regular" id="profile-bio">Hello world</span>
                 <span class="label">Bio</span>
             </div>
             <div class="info-item">
@@ -841,20 +1047,32 @@
         </div>
 
         <!-- Pill Tab Switcher -->
-        <div class="profile-pill-wrapper" style="display: flex; justify-content: center; width: 100%; margin: 15px 0;">
+        <div class="profile-pill-wrapper" style="display: flex; width: 100%;">
             <div class="profile-tabs-pill-container">
-                <button id="tab-pill-inventory" class="active" onclick="switchTab('inventory')">Gifts 🌸🧁🔎</button>
+                <button id="tab-pill-inventory" class="active" onclick="switchTab('inventory')">Gifts <span class="tab-count" id="tab-gift-count">0</span></button>
                 <button id="tab-pill-shop" onclick="switchTab('shop')">Gift Shop</button>
             </div>
+        </div>
+        <div class="gift-filter-row" id="gift-filter-row">
+            <button class="gift-filter-chip active" data-filter="all" onclick="setGiftFilter('all')">All Gifts</button>
+            <button class="gift-filter-chip" data-filter="collectible" onclick="setGiftFilter('collectible')">Collectibles</button>
+            <button class="gift-filter-chip" data-filter="regular" onclick="setGiftFilter('regular')">Upgradable</button>
+            <button class="gift-filter-chip" data-filter="crafted" onclick="setGiftFilter('crafted')">Crafted</button>
         </div>
         
         <div id="action-toolbar" class="hidden"></div>
         <div class="gifts-grid" id="inventory-grid"></div>
+
+        <button class="send-gifts-fab" onclick="switchTab('shop')">
+            <svg viewBox="0 0 24 24"><path d="M20 7h-2.18A3 3 0 0 0 12 4.03 3 3 0 0 0 6.18 7H4a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h7V7h2v5h7a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1zM9 7a1 1 0 1 1 1-1v1H9zm6 0h-1V6a1 1 0 1 1 1 1zM4 13v6a2 2 0 0 0 2 2h5v-8H4zm9 8h5a2 2 0 0 0 2-2v-6h-7v8z"/></svg>
+            Send Gifts to Friends
+        </button>
+        <input type="file" id="avatar-file-input" accept="image/*" class="hidden" onchange="handleAvatarFile(this)">
     </div>
 
     <!-- Redesigned Shop Page -->
-    <div id="shop-page" class="page" style="padding-top: 55px; background-color: #000000;">
-        <div class="shop-header-pill-container" style="display: flex; justify-content: center; width: 100%; margin-bottom: 20px;">
+    <div id="shop-page" class="page" style="padding-top: 90px;">
+        <div class="shop-header-pill-container" style="display: flex; justify-content: center; width: 100%; margin-bottom: 14px;">
             <div class="profile-tabs-pill-container">
                 <button class="active" style="pointer-events: none;">Shop</button>
                 <button onclick="openCustomizeModal()">Customize</button>
@@ -912,70 +1130,89 @@
 
 <div id="detail-modal" class="modal-overlay">
     <div class="modal-content">
-        <div class="modal-header-bar"><span id="detail-title">Gift</span></div>
-        <div class="modal-scrollable-content" style="padding: 20px; text-align: center;">
-            <div class="image-container" style="width: 160px; height: 160px; margin: 0 auto;">
-                <img id="detail-image" src="" style="display:none; width: 100%; height: 100%; object-fit: contain;">
-                <div id="detail-lottie" class="lottie-wrapper"></div>
+        <div class="up-header" id="up-header">
+            <div id="up-pattern" class="dynamic-pattern-container"></div>
+            <div class="up-close" onclick="closeModal('detail-modal')"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+            <div class="up-visual">
+                <img id="detail-image" src="" alt="">
+                <div id="detail-lottie" class="lottie-wrapper" style="display:none;"></div>
             </div>
-            <p style="color: var(--tg-theme-hint-color); margin-top: 15px; line-height: 1.5;" id="detail-desc">
-                This is a regular gift. Upgrade it to make it a unique collectible!
-            </p>
+            <h2 id="detail-title">Upgrade Gift</h2>
+            <p class="up-sub" id="detail-desc">Turn your gift into a unique collectible that you can transfer or auction.</p>
         </div>
-        <div class="modal-buttons-footer">
-            <button class="modal-button" id="btn-upgrade" onclick="handleUpgrade()">Upgrade</button>
+        <div class="up-body">
+            <div class="up-feature">
+                <svg viewBox="0 0 24 24"><path d="M6 4h10l4 5-9 11L2 9z"/><path d="M2 9h18M11 20L7.5 9 10 4M11 20l3.5-11L12 4"/><path d="M20.5 1.5v3M19 3h3M3 17.5v3M1.5 19h3"/></svg>
+                <div><h4>Unique</h4><p>Upgrade your gift to get a unique number, model, backdrop and symbol.</p></div>
+            </div>
+            <div class="up-feature">
+                <svg viewBox="0 0 24 24"><path d="M13.5 3.5l6 6M10.5 6.5l6 6M12.5 4.5l-4.5 4.5M18.5 10.5L14 15M11 11l-7.5 7.5a1.5 1.5 0 0 0 2 2L13 13"/><path d="M3 22h9"/></svg>
+                <div><h4>Tradable</h4><p>Sell your gift on Telegram or on external NFT marketplaces.</p></div>
+            </div>
+            <div class="up-feature">
+                <svg viewBox="0 0 24 24"><path d="M3 7l4.5 4L12 4l4.5 7L21 7l-2 10H5z"/><path d="M5 20.5h14"/></svg>
+                <div><h4>Wearable</h4><p>Display gifts on your profile and use them as a cover or status.</p></div>
+            </div>
+            <div class="up-divider"></div>
+            <label class="up-check">
+                <input type="checkbox" id="up-add-name">
+                <span class="up-check-circle"></span>
+                <span>Add my name to the gift</span>
+            </label>
+            <button class="big-rounded-btn" id="btn-upgrade" onclick="handleUpgrade()">Confirm</button>
         </div>
     </div>
 </div>
 
 <!-- REDESIGNED COLLECTIBLE / ROULETTE MODAL -->
 <div id="collectible-modal" class="modal-overlay">
-    <div class="modal-content" style="background-color: var(--tg-theme-bg-color);">
-        <!-- Top Gradient Section with ellipsis button and action row button layout -->
+    <div class="modal-content">
         <div id="collectible-header" class="collectible-header">
-            <!-- Context Menu Ellipsis button in colored card header -->
-            <div id="collectible-context-btn" class="collectible-context-btn" onclick="openCollectibleContextMenu(event)">⋮</div>
-            
+            <div id="collectible-context-btn" class="collectible-context-btn" onclick="openCollectibleContextMenu(event)">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="12" cy="19" r="2.2"/></svg>
+            </div>
             <div id="collectible-pattern-container" class="dynamic-pattern-container"></div>
-            <div style="position: relative; z-index: 2; width: 100%; display: flex; flex-direction: column; align-items: center;">
+            <div class="col-header-inner">
                 <div class="roulette-image-wrapper">
                     <div id="roulette-strip" class="roulette-strip" style="display:none;"></div>
-                    <img id="collectible-image" src="" style="width:160px; height:160px; object-fit:contain; display:none;">
-                    <div id="collectible-lottie" class="lottie-wrapper" style="width:160px; height:160px; display:none;"></div>
+                    <img id="collectible-image" src="" style="width:170px; height:170px; object-fit:contain; display:none;">
+                    <div id="collectible-lottie" class="lottie-wrapper" style="width:170px; height:170px; display:none;"></div>
                 </div>
-                <h3 id="collectible-title">Gift Name #000</h3>
+                <h3 class="col-title"><span id="collectible-title">Gift</span> <span class="col-number" id="collectible-number">#000</span></h3>
                 <div class="sub-header" id="collectible-model-name">Model Name</div>
 
-                <!-- 3 Action Button Row -->
                 <div class="modal-action-row" id="modal-action-row">
-                    <button class="action-row-btn" id="btn-col-transfer" onclick="handleTransferClick()">
-                        <img class="action-btn-icon" src="https://github.com/Vasiliy-katsyka/upgrade/blob/main/transfer-gift.png?raw=true" alt="Transfer">
-                        <span class="action-btn-text">Transfer</span>
+                    <button class="action-row-btn locked" id="btn-col-transfer" onclick="handleTransferClick()">
+                        <svg class="action-btn-icon" viewBox="0 0 24 24"><path d="M6 3h10l4 5-9 11L2 8l4-5zm-.9 5h11.8l-2.4-3H7.5L5.1 8zm2.4 1.5L11 15.8l1.3-1.6L9.6 9.5h-2.1zM15 13a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9zm-.3 2.2v1.6H12v1.4h2.7v1.6l2.6-2.3-2.6-2.3z"/></svg>
+                        <span class="action-btn-text"><svg viewBox="0 0 24 24"><path d="M17 9h-1V7a4 4 0 0 0-8 0v2H7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2zm-7-2a2 2 0 0 1 4 0v2h-4V7z"/></svg>Transfer</span>
                     </button>
                     <button class="action-row-btn" id="btn-col-wear" onclick="handleWearClick()">
-                        <img class="action-btn-icon" id="wear-btn-img" src="https://github.com/Vasiliy-katsyka/upgrade/blob/main/wear-gift.png?raw=true" alt="Wear">
+                        <svg class="action-btn-icon" viewBox="0 0 24 24"><path d="M2.5 7.5l5 3.8L12 4.5l4.5 6.8 5-3.8-2 9H4.5l-2-9zM4.5 18.5h15v2h-15z"/></svg>
                         <span class="action-btn-text" id="wear-btn-text">Wear</span>
                     </button>
-                    <button class="action-row-btn disabled" id="btn-col-sell" disabled>
-                        <img class="action-btn-icon" src="https://github.com/Vasiliy-katsyka/upgrade/blob/main/sell-gift.png?raw=true" alt="Sell">
-                        <span class="action-btn-text">Sell</span>
+                    <button class="action-row-btn" id="btn-col-share" onclick="handleShareClick()">
+                        <svg class="action-btn-icon" viewBox="0 0 24 24"><path d="M13.5 4.5V9C7 9.8 3.8 14.3 3 20c2.4-3.6 5.6-5.2 10.5-5.2v4.7L21.5 12l-8-7.5z"/></svg>
+                        <span class="action-btn-text">Share</span>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Scrollable Content with Table -->
-        <div class="modal-scrollable-content" style="padding: 16px;">
+        <div class="col-body">
+            <div class="col-hint">This gift is in the TON blockchain. <span class="tg-link" onclick="handleTransferClick()">View ›</span></div>
             <div class="stats-table">
-                <!-- Owner -->
                 <div class="stat-row">
                     <div class="stat-label">Owner</div>
+                    <div class="stat-value"><span class="ton-address" id="col-owner-address">user.ton</span></div>
+                </div>
+                <div class="stat-row">
+                    <div class="stat-label">Telegram</div>
                     <div class="stat-value owner-chip">
                         <img id="col-owner-img" src="">
                         <span id="col-owner-name">User</span>
+                        <img id="col-owner-worn" src="" style="display:none; width:22px; height:22px; border-radius:0; object-fit:contain;">
                     </div>
                 </div>
-                <!-- Model -->
                 <div class="stat-row">
                     <div class="stat-label">Model</div>
                     <div class="stat-value">
@@ -983,7 +1220,6 @@
                         <span class="percentage-pill" id="col-model-pct">0%</span>
                     </div>
                 </div>
-                <!-- Symbol -->
                 <div class="stat-row">
                     <div class="stat-label">Symbol</div>
                     <div class="stat-value">
@@ -991,7 +1227,6 @@
                         <span class="percentage-pill" id="col-symbol-pct">0%</span>
                     </div>
                 </div>
-                <!-- Backdrop -->
                 <div class="stat-row">
                     <div class="stat-label">Backdrop</div>
                     <div class="stat-value">
@@ -999,30 +1234,26 @@
                         <span class="percentage-pill" id="col-backdrop-pct">0%</span>
                     </div>
                 </div>
-                <!-- Quantity -->
                 <div class="stat-row">
                     <div class="stat-label">Quantity</div>
-                    <div class="stat-value" id="col-quantity">100/1000 issued</div>
+                    <div class="stat-value" id="col-quantity">100/1,000 issued</div>
                 </div>
-                <!-- Value -->
                 <div class="stat-row">
                     <div class="stat-label">Value</div>
-                    <div class="stat-value" style="color: var(--tg-theme-link-color);">
-                        <span id="col-value">~10 TON</span> 
-                        <span class="learn-more">learn more</span>
+                    <div class="stat-value">
+                        <span id="col-value">~$10</span>
+                        <span class="teal-pill" onclick="tg.showAlert('Value is estimated from recent sales of similar collectibles.')">Learn more</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Context Helper Text Visibility Bar -->
-            <div id="col-visibility-bar" class="col-visibility-bar" onclick="toggleCollectibleVisibility()">
-                <span id="col-visibility-text" class="col-visibility-text">This gift is visible. </span>
-                <span id="col-visibility-action" class="col-visibility-action">Hide from profile &gt;</span>
-            </div>
-        </div>
+            <div id="col-upgraded-by" class="col-hint" style="display:none;"></div>
 
-        <!-- Spaced Floating layout OK Button Footer -->
-        <div class="collectible-footer-container">
+            <div id="col-visibility-bar" class="col-visibility-bar" onclick="toggleCollectibleVisibility()">
+                <span id="col-visibility-text" class="col-visibility-text">Gift is visible. </span>
+                <span id="col-visibility-action" class="col-visibility-action">Hide from profile ›</span>
+            </div>
+
             <button id="btn-collectible-action" class="big-rounded-btn" onclick="closeModal('collectible-modal')">OK</button>
         </div>
     </div>
@@ -1303,7 +1534,8 @@
     const PIN_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z" /></svg>`;
     const RANDOM_PRICES = ["15", "25", "50", "100", "250", "50+", "100+", "250+"];
 
-    let state = { inventory: [], giftDefinitions: {}, lastCollectibleNumber: 100, userBio: "Hello world", userPhone: "", settings: { animations: true, showHidden: false } };
+    let state = { inventory: [], giftDefinitions: {}, lastCollectibleNumber: 100, userBio: "Hello world", userPhone: "", userAvatar: "", settings: { animations: true, showHidden: false } };
+    let giftFilter = 'all';
     let customizationQueue = []; let editingIndex = 0; let cachedParts = {};
     let appRuntime = { longPressTimer: null, activeGiftId: null, shopGiftData: null, reordering: false, sortable: null, selectionMode: null, selectedIds: new Set(), animationState: null, detailInterval: null };
 
@@ -1311,7 +1543,7 @@
     window.addEventListener('DOMContentLoaded', async () => {
         const loadingScreen = document.getElementById('loading-overlay');
         lottie.loadAnimation({ container: document.getElementById('loading-anim'), renderer: 'svg', loop: true, autoplay: true, path: 'https://cdn.changes.tg/gifts/models/Artisan%20Brick/lottie/Ice%20Mammoth.json' });
-        setTimeout(() => { loadingScreen.style.opacity = '0'; document.getElementById('profile-page').classList.add('active'); setTimeout(() => { loadingScreen.classList.remove('active'); }, 200); }, Math.random() * 3000 + 2000);
+        setTimeout(() => { loadingScreen.style.opacity = '0'; document.getElementById('profile-page').classList.add('active'); document.body.classList.add('on-profile'); setTimeout(() => { loadingScreen.classList.remove('active'); }, 200); }, Math.random() * 3000 + 2000);
 
         applyTelegramTheme(); tg.onEvent('themeChanged', applyTelegramTheme);
         loadState();
@@ -1348,6 +1580,7 @@
             avatarEl.src = "https://i.pravatar.cc/150?u=test"; 
             usernameEl.innerText = "@webuser"; 
         }
+        if (state.userAvatar) avatarEl.src = state.userAvatar;
         nameEl.innerText = displayName;
         
         document.getElementById('profile-phone').innerText = state.userPhone; 
@@ -1355,6 +1588,44 @@
         appendWornGiftToName();
     }
     
+    function editBio() {
+        haptic('light');
+        const val = prompt("Edit bio", state.userBio);
+        if (val === null) return;
+        state.userBio = val.trim() || "Hello world";
+        saveState(); updateUserProfile();
+    }
+
+    function setProfilePhoto() { haptic('light'); document.getElementById('avatar-file-input').click(); }
+    function handleAvatarFile(input) {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        const img = new Image();
+        img.onload = () => {
+            const size = 256, canvas = document.createElement('canvas');
+            canvas.width = size; canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            const min = Math.min(img.width, img.height);
+            ctx.drawImage(img, (img.width - min) / 2, (img.height - min) / 2, min, min, 0, 0, size, size);
+            state.userAvatar = canvas.toDataURL('image/jpeg', 0.85);
+            URL.revokeObjectURL(img.src);
+            saveState(); updateUserProfile(); hapticNotify('success');
+        };
+        img.src = URL.createObjectURL(file);
+        input.value = '';
+    }
+
+    function setGiftFilter(f) {
+        haptic('light'); giftFilter = f;
+        document.querySelectorAll('.gift-filter-chip').forEach(c => c.classList.toggle('active', c.dataset.filter === f));
+        renderInventory();
+    }
+
+    // Stable pseudo-random numbers per gift (so quantity/value don't change on every open)
+    function seededRand(seed) { let h = 2166136261; String(seed).split('').forEach(c => { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); }); return ((h >>> 0) % 100000) / 100000; }
+    function getModelImg(giftName, model) { return model.isCustom ? model.imageUrl : `${CDN_BASE}models/${encodeURIComponent(giftName)}/png/${encodeURIComponent(model.name)}.png`; }
+    function hasCraftedModels(parts) { return !!parts && parts.models.some(m => m.crafted === true); }
+
     function applyTelegramTheme() {
         const p = tg.themeParams; const r = document.documentElement.style;
         if (p.bg_color) r.setProperty('--tg-theme-bg-color', p.bg_color); if (p.text_color) r.setProperty('--tg-theme-text-color', p.text_color); if (p.hint_color) r.setProperty('--tg-theme-hint-color', p.hint_color); if (p.link_color) r.setProperty('--tg-theme-link-color', p.link_color); if (p.button_color) r.setProperty('--tg-theme-button-color', p.button_color); if (p.button_text_color) r.setProperty('--tg-theme-button-text-color', p.button_text_color); if (p.secondary_bg_color) r.setProperty('--tg-theme-secondary-bg-color', p.secondary_bg_color);
@@ -1391,18 +1662,20 @@
     // --- Renderers ---
     function renderShop() {
         const grid = document.getElementById('shop-grid'); grid.innerHTML = '';
-        Object.entries(state.giftDefinitions).forEach(([id, name]) => {
-            if (['custom_skebob', 'custom_baggin_cat'].includes(id)) return;
-            
-            const index = Math.abs(id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % RANDOM_PRICES.length;
-            const price = RANDOM_PRICES[index];
-    
+        const items = Object.entries(state.giftDefinitions)
+            .filter(([id]) => !['custom_skebob', 'custom_baggin_cat'].includes(id))
+            .map(([id, name]) => {
+                const index = Math.abs(id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % RANDOM_PRICES.length;
+                return { id, name, price: RANDOM_PRICES[index] };
+            })
+            .sort((a, b) => parseInt(a.price) - parseInt(b.price));
+        items.forEach(({ id, name, price }) => {
             const el = document.createElement('div'); el.className = 'buy-gift-item';
             el.innerHTML = `
                 <div class="image-container">
                     <img src="${CDN_BASE}originals/${id}/Original.png" loading="lazy" onerror="this.style.display='none'">
                 </div>
-                <div class="gold-price-badge">⭐ ${price}</div>
+                <div class="star-price-pill"><span class="star">⭐</span>${price}</div>
             `;
             el.onclick = () => buyGift(id, name);
             el.addEventListener('touchstart', (e) => startShopLongPress(e, id, name), {passive:false}); el.addEventListener('touchend', cancelLongPress);
@@ -1441,12 +1714,15 @@
         if (appRuntime.reordering) return;
         grid.innerHTML = '';
         let displayList = state.settings.showHidden ? state.inventory : state.inventory.filter(g => !g.hidden);
-        document.getElementById('gift-count-display').innerText = `${state.inventory.length} gifts`;
+        document.getElementById('tab-gift-count').innerText = state.inventory.length;
+        if (giftFilter === 'collectible') displayList = displayList.filter(g => g.isCollectible);
+        else if (giftFilter === 'regular') displayList = displayList.filter(g => !g.isCollectible);
+        else if (giftFilter === 'crafted') displayList = displayList.filter(g => g.isCollectible && g.collectibleData.model.crafted);
         
         renderPinnedGiftsAroundAvatar();
         updateActionToolbar();
         
-        if (displayList.length === 0) { grid.innerHTML = `<div style="grid-column:span 3; text-align:center; padding:40px 20px; color:var(--tg-theme-hint-color);">${state.inventory.length>0?"All hidden.":"Empty."}</div>`; return; }
+        if (displayList.length === 0) { grid.innerHTML = `<div style="grid-column:span 3; text-align:center; padding:40px 20px; color:var(--tg-theme-hint-color);">${state.inventory.length>0?"Nothing here.":"No gifts yet. Tap “Send Gifts to Friends” to buy some."}</div>`; return; }
         
         displayList.sort((a, b) => {
             if (a.pinned && !b.pinned) return -1; if (!a.pinned && b.pinned) return 1;
@@ -1511,7 +1787,7 @@
         const validModels = parts.models.filter(m => !m.crafted);
         const modelPool = validModels.length > 0 ? validModels : parts.models;
 
-        if (!modelPool.length) { alert("No parts!"); return; }
+        if (!modelPool.length) { btn.innerText = "Confirm"; tg.showAlert("No upgrade variants available for this gift."); return; }
 
         gift.isCollectible = true;
         state.lastCollectibleNumber++;
@@ -1522,13 +1798,18 @@
             backdrop: parts.backdrops[Math.floor(Math.random() * parts.backdrops.length)],
             pattern: parts.patterns[Math.floor(Math.random() * parts.patterns.length)]
         };
+        if (document.getElementById('up-add-name').checked) {
+            const u = tg.initDataUnsafe.user;
+            gift.upgradedBy = u ? [u.first_name, u.last_name].filter(Boolean).join(' ') : 'You';
+            gift.upgradedAt = Date.now();
+        }
 
         saveState(); 
         renderInventory(); 
         closeModal('detail-modal');
 
         openCollectibleModal(gift, true, { ...parts, models: modelPool });
-        btn.innerText = "Upgrade";
+        btn.innerText = "Confirm";
     }
 
     async function handleUpgradeAll() {
@@ -1579,14 +1860,26 @@
         generatePattern('collectible-pattern-container', cd.pattern, gift.name, false, cd.backdrop.hex.patternColor);
 
         // Name and Status
-        document.getElementById('collectible-title').innerText = `${gift.name} #${gift.collectibleNumber.toLocaleString()}`;
+        document.getElementById('collectible-title').innerText = gift.name;
+        document.getElementById('collectible-number').innerText = `#${gift.collectibleNumber.toLocaleString('en-US')}`;
         document.getElementById('collectible-model-name').innerText = cd.model.name;
 
         // Owner Chip
         const user = tg.initDataUnsafe.user;
         const ownerImg = document.getElementById('col-owner-img');
-        ownerImg.src = user?.photo_url || "https://i.pravatar.cc/150?u=user";
+        ownerImg.src = state.userAvatar || user?.photo_url || "https://i.pravatar.cc/150?u=user";
         document.getElementById('col-owner-name').innerText = user?.first_name || 'You';
+        const handle = (user?.username || user?.first_name || 'giftowner').toLowerCase().replace(/[^a-z0-9_-]/g, '') || 'giftowner';
+        document.getElementById('col-owner-address').innerText = `${handle}.ton`;
+        const wornGift = state.inventory.find(g => g.worn && g.isCollectible);
+        const wornEl = document.getElementById('col-owner-worn');
+        if (wornGift) { wornEl.src = getModelImg(wornGift.name, wornGift.collectibleData.model); wornEl.style.display = 'block'; } else wornEl.style.display = 'none';
+        const upEl = document.getElementById('col-upgraded-by');
+        if (gift.upgradedBy) {
+            const d = new Date(gift.upgradedAt || gift.timestamp);
+            upEl.innerHTML = `Upgraded by <span class="tg-link">${gift.upgradedBy.replace(/</g, '&lt;')}</span> on ${d.toLocaleDateString('en-GB')}.`;
+            upEl.style.display = 'block';
+        } else upEl.style.display = 'none';
 
         // Stats (Final Values)
         const setTextAndPct = (idSlot, idPct, val, permille) => {
@@ -1596,7 +1889,11 @@
             }
             const pctEl = document.getElementById(idPct);
             if(pctEl) {
-                if (permille === 0) {
+                if (idPct === 'col-model-pct' && cd.model.crafted) {
+                    pctEl.innerText = "Crafted";
+                    pctEl.style.backgroundColor = "rgba(255, 182, 72, 0.15)";
+                    pctEl.style.color = "#ffb648";
+                } else if (!permille) {
                     pctEl.innerText = "Epic";
                     pctEl.style.backgroundColor = "rgba(255, 215, 0, 0.15)";
                     pctEl.style.color = "#ffd700";
@@ -1613,9 +1910,11 @@
         setTextAndPct('slot-backdrop', 'col-backdrop-pct', cd.backdrop.name, cd.backdrop.rarityPermille);
 
         // Secondary stats data
-        const issued = Math.floor(Math.random() * 500000) + 10000;
-        document.getElementById('col-quantity').innerText = `${Math.floor(Math.random()*issued).toLocaleString()} / ${issued.toLocaleString()} issued`;
-        document.getElementById('col-value').innerText = `~${Math.floor(Math.random()*100)+5} TON`;
+        const total = Math.floor(seededRand(gift.name + 'total') * 140000) + 20000;
+        const issued = Math.max(gift.collectibleNumber, Math.floor(total * (0.7 + seededRand(gift.name + 'issued') * 0.29)));
+        document.getElementById('col-quantity').innerText = `${issued.toLocaleString('en-US')}/${Math.max(total, issued).toLocaleString('en-US')} issued`;
+        const rarityBoost = cd.model.crafted ? 6 : (cd.model.rarityPermille && cd.model.rarityPermille < 10 ? 3 : 1);
+        document.getElementById('col-value').innerText = `~$${Math.floor((seededRand(gift.uniqueId) * 60 + 8) * rarityBoost)}`;
 
         // Load 3 Action buttons states
         updateWearButtonState(gift);
@@ -1714,6 +2013,7 @@
                 imgEl.src = imgPath;
             }
 
+            ['slot-model','slot-symbol','slot-backdrop'].forEach(id => document.getElementById(id).style.width = '');
             document.getElementById('slot-model').innerHTML = `<div class="slot-item">${cd.model.name}</div>`;
             document.getElementById('slot-symbol').innerHTML = `<div class="slot-item">${cd.pattern.name}</div>`;
             document.getElementById('slot-backdrop').innerHTML = `<div class="slot-item">${cd.backdrop.name}</div>`;
@@ -1725,20 +2025,24 @@
 
     // --- Action Button Row Functions ---
     function updateWearButtonState(gift) {
-        const wearImg = document.getElementById('wear-btn-img');
-        const wearText = document.getElementById('wear-btn-text');
-        if (gift.worn) {
-            wearImg.src = "https://github.com/Vasiliy-katsyka/upgrade/blob/main/unwear-gift.png?raw=true";
-            wearText.innerText = "Take Off";
-        } else {
-            wearImg.src = "https://github.com/Vasiliy-katsyka/upgrade/blob/main/wear-gift.png?raw=true";
-            wearText.innerText = "Wear";
-        }
+        document.getElementById('wear-btn-text').innerText = gift.worn ? "Take Off" : "Wear";
     }
 
     function handleTransferClick() {
         haptic('light');
-        tg.showAlert("Transfer feature is coming soon!");
+        tg.showAlert("Transfer is locked. Collectibles can be transferred 7 days after upgrade.");
+    }
+
+    function handleShareClick() {
+        haptic('light');
+        const gift = state.inventory.find(g => g.uniqueId === appRuntime.activeGiftId);
+        if (!gift) return;
+        const cd = gift.collectibleData;
+        const text = `${gift.name} #${gift.collectibleNumber.toLocaleString('en-US')} — ${cd.model.name} · ${cd.pattern.name} · ${cd.backdrop.name}`;
+        const slug = gift.name.replace(/[^A-Za-z0-9]/g, '');
+        const url = `https://t.me/nft/${slug}-${gift.collectibleNumber}`;
+        try { tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`); }
+        catch (e) { navigator.clipboard?.writeText(`${text}\n${url}`); tg.showAlert("Link copied!"); }
     }
 
     function handleWearClick() {
@@ -1773,11 +2077,11 @@
         const textEl = document.getElementById('col-visibility-text');
         const actionEl = document.getElementById('col-visibility-action');
         if (gift.hidden) {
-            textEl.innerText = "This gift is hidden. ";
-            actionEl.innerText = "Show on Profile >";
+            textEl.innerText = "Gift is hidden. ";
+            actionEl.innerText = "Show on profile ›";
         } else {
-            textEl.innerText = "This gift is visible. ";
-            actionEl.innerText = "Hide from profile >";
+            textEl.innerText = "Gift is visible. ";
+            actionEl.innerText = "Hide from profile ›";
         }
     }
 
@@ -2134,6 +2438,7 @@
                 
                 let craftedModels = parts.models.filter(m => m.crafted === true);
                 if (craftedModels.length === 0) craftedModels = parts.models.filter(m => (m.rarityPermille || 0) < 10);
+                if (craftedModels.length === 0) craftedModels = parts.models;
                 const newModel = craftedModels[Math.floor(Math.random() * craftedModels.length)];
                 
                 let winningBackdrop;
@@ -2301,6 +2606,7 @@
     function initSlotMachine(elementId, options, finalValue) {
         const wrapper = document.getElementById(elementId);
         wrapper.innerHTML = '';
+        wrapper.style.width = '120px';
         const scroll = document.createElement('div');
         scroll.className = 'slot-scroll';
         scroll.id = `${elementId}-scroll`;
@@ -2321,11 +2627,10 @@
 
     function stopSlotMachine(elementId, finalValue) {
         const scroll = document.getElementById(`${elementId}-scroll`);
-        if(scroll) {
-            scroll.getAnimations().forEach(anim => anim.cancel());
-            scroll.style.transform = 'none';
-            scroll.innerHTML = `<div class="slot-item">${finalValue}</div>`;
-        }
+        if(scroll) scroll.getAnimations().forEach(anim => anim.cancel());
+        const wrapper = document.getElementById(elementId);
+        wrapper.style.width = '';
+        wrapper.innerHTML = `<div class="slot-item">${finalValue}</div>`;
     }
 
     function skipAnimation() {
@@ -2381,33 +2686,41 @@
     // --- Generic UI ---
     async function openDetailModal(gift) {
         appRuntime.activeGiftId = gift.uniqueId;
-        document.getElementById('detail-title').innerText = gift.name;
+        if (appRuntime.detailInterval) { clearInterval(appRuntime.detailInterval); appRuntime.detailInterval = null; }
         const imgEl = document.getElementById('detail-image');
-        imgEl.style.display = 'block';
-        document.getElementById('detail-lottie').style.display = 'none';
-        
-        const parts = await fetchGiftParts(gift.name);
-        if (parts.models.length > 0) {
-            let partIndex = Math.floor(Math.random() * parts.models.length);
-            
-            const setModel = (idx) => {
-                const model = parts.models[idx];
-                imgEl.src = model.isCustom ? model.imageUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/png/${encodeURIComponent(model.name)}.png`;
-            };
-    
-            setModel(partIndex);
-            
-            if(parts.models.length > 1) {
-                appRuntime.detailInterval = setInterval(() => {
-                    partIndex = (partIndex + 1) % parts.models.length;
-                    setModel(partIndex);
-                }, 2000);
-            }
-        } else {
-            imgEl.src = `${CDN_BASE}originals/${gift.originalId}/Original.png`;
-        }
+        const header = document.getElementById('up-header');
+        document.getElementById('up-add-name').checked = false;
+        imgEl.classList.remove('swap');
+        imgEl.src = `${CDN_BASE}originals/${gift.originalId}/Original.png`;
+        header.style.background = 'radial-gradient(circle at 50% 30%, #d98a6c, #b8604a)';
+        document.getElementById('up-pattern').innerHTML = '';
         document.getElementById('detail-modal').classList.add('active');
         tg.BackButton.show(); tg.BackButton.onClick(() => closeModal('detail-modal'));
+
+        const parts = await fetchGiftParts(gift.name);
+        if (appRuntime.activeGiftId !== gift.uniqueId || !document.getElementById('detail-modal').classList.contains('active')) return;
+        // Preview only the variants obtainable by a regular upgrade (crafted models come from crafting)
+        const models = parts.models.filter(m => !m.crafted);
+        const pool = models.length ? models : parts.models;
+        if (!pool.length) return;
+
+        const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+        const showVariant = (animate) => {
+            const model = pick(pool);
+            const backdrop = parts.backdrops.length ? pick(parts.backdrops) : null;
+            const pattern = parts.patterns.length ? pick(parts.patterns) : null;
+            const apply = () => {
+                imgEl.src = getModelImg(gift.name, model);
+                if (backdrop) header.style.background = getBackdropStyle(backdrop);
+                const patEl = document.getElementById('up-pattern');
+                patEl.innerHTML = '';
+                if (pattern) generatePattern('up-pattern', pattern, gift.name, false, backdrop ? backdrop.hex.patternColor : '#ffffff55');
+                imgEl.classList.remove('swap');
+            };
+            if (animate) { imgEl.classList.add('swap'); setTimeout(apply, 300); } else apply();
+        };
+        showVariant(false);
+        appRuntime.detailInterval = setInterval(() => showVariant(true), 2200);
     }
 
     function closeModal(id) {
@@ -2415,6 +2728,7 @@
         tg.BackButton.hide();
         if(id==='detail-modal') {
             document.getElementById('detail-lottie').innerHTML='';
+            document.getElementById('up-pattern').innerHTML='';
             if(appRuntime.detailInterval) { clearInterval(appRuntime.detailInterval); appRuntime.detailInterval = null; }
         }
         if(id==='collectible-modal') { document.getElementById('collectible-lottie').innerHTML=''; document.getElementById('roulette-strip').innerHTML=''; if(appRuntime.animationState) skipAnimation(); }
@@ -2429,6 +2743,7 @@
         document.getElementById('tab-pill-inventory').classList.remove('active');
         document.getElementById('tab-pill-shop').classList.remove('active');
         
+        document.body.classList.toggle('on-profile', tab === 'inventory');
         if (tab === 'inventory') { 
             document.getElementById('profile-page').classList.add('active'); 
             document.getElementById('tab-pill-inventory').classList.add('active'); 
@@ -2450,7 +2765,7 @@
     function openSettingsModal() { document.getElementById('settings-modal').classList.add('active'); document.getElementById('setting-animations').checked = state.settings.animations; document.getElementById('setting-hidden').checked = state.settings.showHidden; tg.BackButton.show(); tg.BackButton.onClick(() => closeModal('settings-modal')); }
     function toggleSetting(key, value) { state.settings[key] = value; haptic('light'); saveState(); renderInventory(); }
     function saveState() { localStorage.setItem(LS_KEY, JSON.stringify(state)); }
-    function loadState() { const saved = localStorage.getItem(LS_KEY); if (saved) { const parsed = JSON.parse(saved); state.inventory = parsed.inventory || []; state.lastCollectibleNumber = parsed.lastCollectibleNumber || 100; state.userBio = parsed.userBio || "Hello world"; state.userPhone = parsed.userPhone || ""; if(parsed.settings) state.settings = parsed.settings; } }
+    function loadState() { const saved = localStorage.getItem(LS_KEY); if (saved) { const parsed = JSON.parse(saved); state.inventory = parsed.inventory || []; state.lastCollectibleNumber = parsed.lastCollectibleNumber || 100; state.userBio = parsed.userBio || "Hello world"; state.userPhone = parsed.userPhone || ""; state.userAvatar = parsed.userAvatar || ""; if(parsed.settings) state.settings = parsed.settings; } }
     function resetAppData() { tg.showConfirm("Reset App?", (confirmed) => { if(confirmed) { localStorage.removeItem(LS_KEY); location.reload(); }}); }
     
     // --- Context Menu & Queue Logic ---
@@ -2465,11 +2780,16 @@
         document.getElementById('menu-hide').innerText = gift.hidden?"Unhide":"Hide"; 
         
         // Dynamically toggle Craft option visibility directly inside ellipsis context menus
+        // Any collectible whose CDN model list contains crafted: true variants can be crafted
         const menuCraft = document.getElementById('menu-craft');
-        const ALLOWED_CRAFT_GIFTS = ["Jingle Bells", "Desk Calendar"];
-        const isCraftable = ALLOWED_CRAFT_GIFTS.includes(gift.name) && gift.collectibleData && !gift.collectibleData.model.crafted;
+        const canBeCraftBase = gift.isCollectible && gift.collectibleData && !gift.collectibleData.model.crafted;
         if(menuCraft) {
-            menuCraft.style.display = isCraftable ? 'block' : 'none';
+            menuCraft.style.display = (canBeCraftBase && hasCraftedModels(cachedParts[gift.name])) ? 'block' : 'none';
+            if (canBeCraftBase && !cachedParts[gift.name]) {
+                fetchGiftParts(gift.name).then(parts => {
+                    if (appRuntime.activeGiftId === gift.uniqueId && hasCraftedModels(parts)) menuCraft.style.display = 'block';
+                });
+            }
         }
 
         let x = e.clientX, y = e.clientY; 
@@ -2578,6 +2898,7 @@
                     <img src="${item.isCustom ? item.imageUrl : `${CDN_BASE}models/${encodeURIComponent(giftName)}/png/${encodeURIComponent(item.name)}.png`}">
                     <div class="label" style="font-size:0.85em; font-weight:600; text-align:center; margin-bottom:4px;">${item.name}</div>
                     <div class="${badgeClass}">${pctVal}</div>
+                    ${item.crafted ? '<div class="crafted-tag">Crafted</div>' : ''}
                 `;
             } else if (type === 'backdrop') {
                 const isPinned = ["Black", "Midnight Blue", "Electric Purple"].includes(item.name);
