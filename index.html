@@ -987,6 +987,107 @@
         .up-check input:checked + .up-check-circle::after { content: ''; width: 6px; height: 11px; border: solid #fff; border-width: 0 2.5px 2.5px 0; transform: rotate(45deg) translate(-1px, -1px); }
 
         .crafted-tag { font-size: 0.7em; font-weight: 700; color: #ffb648; background: rgba(255,182,72,0.14); padding: 2px 6px; border-radius: 6px; margin-top: 4px; }
+
+        /* ================= iOS LIQUID GLASS LAYER ================= */
+        :root {
+            --glass-bg: linear-gradient(180deg, rgba(255,255,255,0.17) 0%, rgba(255,255,255,0.07) 100%);
+            --glass-border: rgba(255,255,255,0.22);
+            --glass-shadow: inset 0 1px 0 rgba(255,255,255,0.38), inset 0 -1px 0 rgba(255,255,255,0.06), 0 8px 24px rgba(0,0,0,0.22);
+            --glass-blur: blur(22px) saturate(180%);
+            --sheet-radius: 38px;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+
+        .glass, .glass-pill, .action-row-btn, .collectible-context-btn, .up-close,
+        .profile-tabs-pill-container, .gift-filter-chip.active, #long-press-menu {
+            background: var(--glass-bg) !important;
+            -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
+            border: 0.5px solid var(--glass-border) !important;
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* Floating sheets with large continuous corners + grabber */
+        .modal-overlay { background-color: rgba(0,0,0,0.42); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); padding: 0 8px calc(8px + env(safe-area-inset-bottom)); }
+        .modal-overlay .modal-content {
+            border-radius: var(--sheet-radius) !important; position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 0.5px 0 rgba(255,255,255,0.18);
+            transform: translateY(30px) scale(0.98); transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.25, 1.1);
+        }
+        .modal-overlay.active .modal-content { transform: none; }
+        #collectible-modal .modal-content::before, #detail-modal .modal-content::before {
+            content: ''; position: absolute; top: 7px; left: 50%; transform: translateX(-50%); z-index: 20;
+            width: 38px; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.4);
+        }
+        #loading-overlay { padding: 0; }
+
+        /* Capsule buttons */
+        .big-rounded-btn, .modal-button, #btn-craft-action, .action-button {
+            border-radius: 999px !important;
+        }
+        .big-rounded-btn {
+            height: 54px; padding: 0 20px; font-weight: 600; letter-spacing: -0.2px;
+            background: linear-gradient(180deg, #7fd6e3 0%, #5ec0d0 100%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), inset 0 -1px 0 rgba(0,0,0,0.08), 0 8px 22px rgba(94,192,208,0.28);
+            transition: transform 0.15s ease, filter 0.15s;
+        }
+        .big-rounded-btn:active { transform: scale(0.97); filter: brightness(0.95); background: linear-gradient(180deg, #7fd6e3 0%, #5ec0d0 100%); }
+        .modal-button { box-shadow: inset 0 1px 0 rgba(255,255,255,0.3); }
+        .action-button.glass-pill { color: #fff; padding: 8px 16px; font-weight: 600; }
+
+        /* Header glass buttons */
+        .collectible-context-btn, .up-close { width: 36px; height: 36px; border-radius: 50% !important; color: #fff; top: 16px; right: 16px; }
+        .collectible-context-btn svg { width: 20px; height: 20px; }
+        #collectible-modal .modal-action-row { gap: 10px; }
+        .action-row-btn { border-radius: 24px !important; padding: 12px 6px 11px; color: #fff; transition: transform 0.15s ease; }
+        .action-row-btn:active { transform: scale(0.95); }
+        .action-row-btn.locked { opacity: 0.6; }
+
+        /* Collectible content */
+        #collectible-modal .collectible-header { padding-top: 30px; border-radius: var(--sheet-radius) var(--sheet-radius) 0 0; }
+        .col-body { padding-top: 18px; }
+        #collectible-modal .stats-table { border-radius: 22px; background: rgba(255,255,255,0.03); }
+        #collectible-modal .stat-label { background: rgba(255,255,255,0.045); }
+        #collectible-modal .percentage-pill, .teal-pill { border-radius: 999px; padding: 3px 10px; }
+
+        /* Upgrade sheet */
+        .up-header { border-radius: var(--sheet-radius) var(--sheet-radius) 0 0; }
+        .up-close svg { width: 14px; height: 14px; }
+
+        /* Profile */
+        .profile-top-section { padding-bottom: 26px; }
+        .profile-avatar { cursor: pointer; box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
+        .profile-info-block { border-radius: 26px; background: #1c1c1e; }
+        .profile-pill-wrapper .profile-tabs-pill-container { border-radius: 999px; padding: 4px; }
+        .profile-tabs-pill-container { border-radius: 999px !important; }
+        .profile-tabs-pill-container button { border-radius: 999px; }
+        .profile-tabs-pill-container button.active {
+            background: rgba(255,255,255,0.14); color: var(--teal-text);
+            box-shadow: inset 0 0.5px 0 rgba(255,255,255,0.35);
+        }
+        .gift-filter-chip { border-radius: 999px; border: 0.5px solid transparent; }
+        .gift-card { border-radius: 20px; }
+        .send-gifts-fab {
+            border-radius: 999px; padding: 13px 24px;
+            background: linear-gradient(180deg, rgba(127,214,227,0.92) 0%, rgba(94,192,208,0.92) 100%);
+            -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
+            border: 0.5px solid rgba(255,255,255,0.35);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 10px 30px rgba(0,0,0,0.45);
+        }
+
+        /* Shop */
+        .buy-gift-item { border-radius: 26px; background: #1c1c1e; box-shadow: inset 0 0.5px 0 rgba(255,255,255,0.08); }
+        .star-price-pill { border-radius: 999px; }
+
+        /* Context menu as glass popover */
+        #long-press-menu { border-radius: 22px; padding: 6px; min-width: 210px; background: rgba(40,40,44,0.72) !important; }
+        #long-press-menu li { border-radius: 14px; padding: 12px 16px; }
+        #long-press-menu li:active { background: rgba(255,255,255,0.1); }
+
+        /* Misc rounded controls */
+        .queue-chip, .subnav-pills, .subnav-pills button { border-radius: 999px; }
+        .filter-option, .model-card { border-radius: 20px; }
+        .craft-slot { border-radius: 22px; }
+        #qty-modal input { border-radius: 18px; }
     </style>
 </head>
 <body>
@@ -1008,26 +1109,12 @@
             <div class="profile-main-info">
                 <!-- Avatar wrapper to carry scattered pinned icons -->
                 <div class="profile-avatar-wrapper" id="pinned-gifts-container">
-                    <img src="" class="profile-avatar" id="user-avatar">
+                    <img src="" class="profile-avatar" id="user-avatar" onclick="setProfilePhoto()">
                 </div>
                 <div class="profile-name-status">
                     <h1 id="user-name">Loading...</h1>
                     <p id="gift-count-display">online</p>
                 </div>
-            </div>
-            <div class="profile-actions">
-                <button class="profile-action-btn" onclick="setProfilePhoto()">
-                    <svg viewBox="0 0 24 24"><path d="M9 3L7.2 5H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.2L15 3H9zm3 5a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>
-                    Set Photo
-                </button>
-                <button class="profile-action-btn" onclick="editBio()">
-                    <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-                    Edit Info
-                </button>
-                <button class="profile-action-btn" onclick="openSettingsModal()">
-                    <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.48.48 0 0 0-.59.22L2.74 8.87a.47.47 0 0 0 .12.61l2.03 1.58c-.05.3-.07.63-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.47.47 0 0 0-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/></svg>
-                    Settings
-                </button>
             </div>
         </div>
         
@@ -1199,20 +1286,7 @@
         </div>
 
         <div class="col-body">
-            <div class="col-hint">This gift is in the TON blockchain. <span class="tg-link" onclick="handleTransferClick()">View ›</span></div>
             <div class="stats-table">
-                <div class="stat-row">
-                    <div class="stat-label">Owner</div>
-                    <div class="stat-value"><span class="ton-address" id="col-owner-address">user.ton</span></div>
-                </div>
-                <div class="stat-row">
-                    <div class="stat-label">Telegram</div>
-                    <div class="stat-value owner-chip">
-                        <img id="col-owner-img" src="">
-                        <span id="col-owner-name">User</span>
-                        <img id="col-owner-worn" src="" style="display:none; width:22px; height:22px; border-radius:0; object-fit:contain;">
-                    </div>
-                </div>
                 <div class="stat-row">
                     <div class="stat-label">Model</div>
                     <div class="stat-value">
@@ -1766,7 +1840,7 @@
     function updateActionToolbar() {
         const toolbar = document.getElementById('action-toolbar'); toolbar.innerHTML = ''; toolbar.className = 'hidden';
         if (appRuntime.selectionMode === 'hide') { toolbar.className = ''; toolbar.style.borderBottom = '1px solid rgba(255,255,255,0.05)'; toolbar.innerHTML = `<button class="action-button" onclick="cancelSelectionMode()" style="background:var(--tg-theme-button-color);">Cancel</button><button class="action-button" onclick="confirmHideSelected()" style="background:var(--app-accent-blue);">Hide (${appRuntime.selectedIds.size})</button>`; return; }
-        if (state.inventory.some(g => !g.isCollectible)) { toolbar.className = ''; toolbar.style.borderBottom = 'none'; toolbar.innerHTML = `<button class="action-button" onclick="handleUpgradeAll()" style="background:var(--app-accent-blue);">✨ Upgrade All</button>`; }
+        if (state.inventory.some(g => !g.isCollectible)) { toolbar.className = ''; toolbar.style.borderBottom = 'none'; toolbar.innerHTML = `<button class="action-button glass-pill" onclick="handleUpgradeAll()">✨ Upgrade All</button>`; }
     }
 
     // --- Actions ---
@@ -1864,16 +1938,6 @@
         document.getElementById('collectible-number').innerText = `#${gift.collectibleNumber.toLocaleString('en-US')}`;
         document.getElementById('collectible-model-name').innerText = cd.model.name;
 
-        // Owner Chip
-        const user = tg.initDataUnsafe.user;
-        const ownerImg = document.getElementById('col-owner-img');
-        ownerImg.src = state.userAvatar || user?.photo_url || "https://i.pravatar.cc/150?u=user";
-        document.getElementById('col-owner-name').innerText = user?.first_name || 'You';
-        const handle = (user?.username || user?.first_name || 'giftowner').toLowerCase().replace(/[^a-z0-9_-]/g, '') || 'giftowner';
-        document.getElementById('col-owner-address').innerText = `${handle}.ton`;
-        const wornGift = state.inventory.find(g => g.worn && g.isCollectible);
-        const wornEl = document.getElementById('col-owner-worn');
-        if (wornGift) { wornEl.src = getModelImg(wornGift.name, wornGift.collectibleData.model); wornEl.style.display = 'block'; } else wornEl.style.display = 'none';
         const upEl = document.getElementById('col-upgraded-by');
         if (gift.upgradedBy) {
             const d = new Date(gift.upgradedAt || gift.timestamp);
