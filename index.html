@@ -2354,7 +2354,24 @@
     function haptic(style) { if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred(style || 'light'); }
     function hapticNotify(type) { if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred(type); }
 
-    async function fetchGiftDefinitions() { try { const res = await fetch(`${CDN_BASE}id-to-name.json`, { cache: 'no-cache' }); if (!res.ok) throw new Error(); state.giftDefinitions = await res.json(); } catch (e) {} }
+    // Keep gifts in the exact order of id-to-name.json (release order). JSON.parse would move
+    // number-like keys to the front, so the key order is read from the raw text.
+    let giftOrder = [];
+    async function fetchGiftDefinitions() {
+        try {
+            const res = await fetch(`${CDN_BASE}id-to-name.json`, { cache: 'no-cache' });
+            if (!res.ok) throw new Error();
+            const text = await res.text();
+            state.giftDefinitions = JSON.parse(text);
+            const keys = [...text.matchAll(/"((?:[^"\\]|\\.)*)"\s*:/g)].map(m => JSON.parse(`"${m[1]}"`));
+            giftOrder = [...new Set(keys.filter(k => k in state.giftDefinitions))];
+            Object.keys(state.giftDefinitions).forEach(k => { if (!giftOrder.includes(k)) giftOrder.push(k); });
+        } catch (e) {}
+    }
+    function giftEntries() {
+        const order = giftOrder.length ? giftOrder : Object.keys(state.giftDefinitions);
+        return order.filter(id => id in state.giftDefinitions).map(id => [id, state.giftDefinitions[id]]);
+    }
     async function fetchGiftParts(giftName) {
         if(cachedParts[giftName]) return cachedParts[giftName];
         try {
@@ -2445,10 +2462,9 @@
     function renderShop() {
         const grid = document.getElementById('shop-grid'); grid.innerHTML = '';
         if (shopView === 'fun') { renderFunGifts(); return; }
-        const items = Object.entries(state.giftDefinitions)
+        const items = giftEntries()
             .filter(([id, name]) => !['custom_skebob', 'custom_baggin_cat'].includes(id) && canUpgradeName(name))
-            .map(([id, name]) => ({ id, name, price: shopPrice(id) }))
-            .sort((a, b) => parseInt(a.price) - parseInt(b.price));
+            .map(([id, name]) => ({ id, name, price: shopPrice(id) }));
         grid.insertAdjacentHTML('beforeend', `<div class="shop-section-title">Can be upgraded into unique collectibles</div>`);
         items.forEach(({ id, name, price }) => {
             const el = document.createElement('div'); el.className = 'buy-gift-item';
@@ -2499,12 +2515,12 @@
         const defs = state.giftDefinitions;
         const ids = new Set([...(await listCdnOriginals()), ...Object.keys(CLASSIC_GIFTS)]);
         // id-to-name gifts that have no models on the CDN can't be upgraded either
-        Object.entries(defs).forEach(([id, name]) => { if (!canUpgradeName(name) && !['custom_skebob', 'custom_baggin_cat'].includes(id)) ids.add(id); });
+        giftEntries().forEach(([id, name]) => { if (!canUpgradeName(name) && !['custom_skebob', 'custom_baggin_cat'].includes(id)) ids.add(id); });
         funGiftsCache = [...ids].filter(id => id && (!defs[id] || !canUpgradeName(defs[id]))).map(id => {
             const c = CLASSIC_GIFTS[id];
             const price = c ? c.price : defs[id] ? parseInt(shopPrice(id)) : [15, 25, 50, 100, 250][Math.abs([...id].reduce((a, ch) => a + ch.charCodeAt(0), 0)) % 5];
             return { id, name: c ? c.name : (defs[id] || 'Gift'), price };
-        }).sort((a, b) => a.price - b.price);
+        });
         return funGiftsCache;
     }
     async function renderFunGifts() {
@@ -3631,7 +3647,7 @@
     function newQueueItem() { return { id: null, name: null, parts: { model: null, backdrop: null, pattern: null }, random: { model: true, backdrop: true, pattern: true } }; }
     function custCurrent() { return customizationQueue[editingIndex]; }
     function custPartsOf(q) { return q && q.name ? cachedParts[q.name] : null; }
-    function baseGiftList() { return Object.entries(state.giftDefinitions).filter(([id, name]) => !['custom_skebob', 'custom_baggin_cat'].includes(id) && canUpgradeName(name)); }
+    function baseGiftList() { return giftEntries().filter(([id, name]) => !['custom_skebob', 'custom_baggin_cat'].includes(id) && canUpgradeName(name)); }
 
     function openCustomizeModal() {
         haptic('light');
