@@ -1495,6 +1495,9 @@
         .gi-star { font-size: 1.1em; margin-right: 4px; }
         .gift-info-sheet .col-visibility-bar { margin: 2px auto 16px; }
         .gift-info-sheet .big-rounded-btn { width: 100%; }
+
+        .credits-line { text-align: center; color: #6e6e73; font-size: 0.82em; padding: 4px 16px calc(28px + env(safe-area-inset-bottom)); }
+        .credits-line a { color: var(--teal-text); font-weight: 600; text-decoration: none; }
     </style>
 </head>
 <body>
@@ -1578,6 +1581,7 @@
         <div class="gifts-grid" id="shop-grid" style="background-color: #000000 !important;">
             <div class="spinner"></div>
         </div>
+        <p class="credits-line">Gift data thanks to <a href="https://t.me/GiftChanges" onclick="event.preventDefault(); openGiftChanges()">@GiftChanges</a></p>
     </div>
 </div>
 
@@ -1637,6 +1641,14 @@
                 <button class="ios-row danger" onclick="resetAppData()">
                     <span class="ios-ico" style="background:#ff3b30"><svg viewBox="0 0 24 24"><path d="M9 3h6l1 2h4v2H4V5h4zm-3 6h12l-1 12H7z"/></svg></span>
                     <span class="ios-label">Reset All Data</span>
+                </button>
+            </div>
+            <div class="ios-group-title">Credits</div>
+            <div class="ios-group">
+                <button class="ios-row" onclick="openGiftChanges()">
+                    <span class="ios-ico" style="background:#2aabee"><svg viewBox="0 0 24 24"><path d="M21.4 4.3L2.9 11.4c-1.3.5-1.2 1.2-.2 1.5l4.7 1.5 1.8 5.6c.2.6.4.8.8.8.4 0 .6-.2.9-.4l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8l3.1-14.5c.3-1.3-.5-1.9-1.3-1.5zM9.2 14l8.9-5.6c.4-.3.8-.1.5.2l-7.6 6.9-.3 3.3L9.2 14z"/></svg></span>
+                    <span class="ios-label">Thanks to @GiftChanges<small>Gift models, backdrops &amp; symbols data</small></span>
+                    <span class="ios-chev">›</span>
                 </button>
             </div>
             <p class="ios-foot">All gifts are stored on this device only.</p>
@@ -3398,6 +3410,11 @@
 
 
     // --- Generic UI ---
+    function openGiftChanges() {
+        haptic('light');
+        try { tg.openTelegramLink('https://t.me/GiftChanges'); } catch (e) { window.open('https://t.me/GiftChanges', '_blank'); }
+    }
+
     function selfAvatarUrl() {
         const u = tg.initDataUnsafe.user;
         return u?.photo_url || initialsAvatar(u ? [u.first_name, u.last_name].filter(Boolean).join(' ') : 'You', u?.id || 0);
