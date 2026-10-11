@@ -1994,7 +1994,7 @@
             </div>
             <div class="up-feature">
                 <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg>
-                <div><h4>Input Matters</h4><p>Each gift adds to the success chance. Rarer inputs and matching backdrops improve the outcome.</p></div>
+                <div><h4>Input Matters</h4><p>Each gift adds to the success chance. The new gift takes a backdrop and symbol from your inputs — use 4 gifts with the same backdrop to guarantee it.</p></div>
             </div>
             <div class="up-feature">
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16.5 9"/></svg>
@@ -3007,7 +3007,9 @@
         return `radial-gradient(circle, ${center}, ${edge})`;
     }
     
-    const CRAFT_SYMBOL_SHARE = 6; // each input gives its backdrop/symbol a 6% chance to carry over
+    // The crafted gift's backdrop and symbol always come from the inputs, weighted by how many
+    // inputs share them (4 × Black → 100% Black, 3 × Black + 1 × Onyx → 75% / 25%).
+    const craftShare = (count, total) => Math.round(count / Math.max(1, total) * 100);
 
     function giftCraftPct(g) {
         const p = g.collectibleData.model.rarityPermille || 1000;
@@ -3114,13 +3116,13 @@
         probs.innerHTML = '';
         const tally = (keyFn) => { const m = new Map(); gifts.forEach(g => { const k = keyFn(g); m.set(k.name, { ...k, count: (m.get(k.name)?.count || 0) + 1 }); }); return [...m.values()]; };
         tally(g => ({ name: g.collectibleData.backdrop.name, bd: g.collectibleData.backdrop })).forEach(b => {
-            const pct = b.count * CRAFT_SYMBOL_SHARE;
-            probs.insertAdjacentHTML('beforeend', `<div class="prob-chip" title="${b.name}"><div class="prob-ring" style="--p:${pct * 4}%"><div><div class="prob-swatch" style="background:${getBackdropStyle(b.bd)}"></div></div></div>${pct}%</div>`);
+            const pct = craftShare(b.count, gifts.length);
+            probs.insertAdjacentHTML('beforeend', `<div class="prob-chip" title="${b.name}"><div class="prob-ring" style="--p:${pct}%"><div><div class="prob-swatch" style="background:${getBackdropStyle(b.bd)}"></div></div></div>${pct}%</div>`);
         });
         tally(g => ({ name: g.collectibleData.pattern.name, giftName: g.name, pat: g.collectibleData.pattern })).forEach(p => {
-            const pct = p.count * CRAFT_SYMBOL_SHARE;
+            const pct = craftShare(p.count, gifts.length);
             const url = patternUrl(p.giftName, p.pat);
-            probs.insertAdjacentHTML('beforeend', `<div class="prob-chip" title="${p.name}"><div class="prob-ring" style="--p:${pct * 4}%"><div><div class="prob-symbol" style="-webkit-mask-image:url('${url}');mask-image:url('${url}')"></div></div></div>${pct}%</div>`);
+            probs.insertAdjacentHTML('beforeend', `<div class="prob-chip" title="${p.name}"><div class="prob-ring" style="--p:${pct}%"><div><div class="prob-symbol" style="-webkit-mask-image:url('${url}');mask-image:url('${url}')"></div></div></div>${pct}%</div>`);
         });
 
         const mixRow = document.getElementById('craft-mix-container');
@@ -3195,14 +3197,9 @@
         document.getElementById('craft-help-modal').classList.add('active');
     }
 
-    function pickCarryOver(gifts, key, pool) {
-        // Each input gives its own backdrop/symbol a CRAFT_SYMBOL_SHARE% chance; otherwise roll from the full pool
-        let roll = Math.random() * 100;
-        for (const g of gifts) {
-            roll -= CRAFT_SYMBOL_SHARE;
-            if (roll < 0) return g.collectibleData[key];
-        }
-        return pool.length ? pool[Math.floor(Math.random() * pool.length)] : gifts[0].collectibleData[key];
+    function pickCarryOver(gifts, key) {
+        // Picking a random input is exactly "weighted by how many inputs share it"
+        return gifts[Math.floor(Math.random() * gifts.length)].collectibleData[key];
     }
 
     function buildMixedBackdrop(consumed) {
@@ -3281,8 +3278,8 @@
             if (!craftedModels.length) craftedModels = parts.models.filter(m => (m.rarityPermille || 0) < 10);
             if (!craftedModels.length) craftedModels = parts.models;
             const newModel = craftedModels[Math.floor(Math.random() * craftedModels.length)];
-            const newBackdrop = isMix ? buildMixedBackdrop(consumed) : pickCarryOver(consumed, 'backdrop', parts.backdrops);
-            const newPattern = pickCarryOver(consumed, 'pattern', parts.patterns);
+            const newBackdrop = isMix ? buildMixedBackdrop(consumed) : pickCarryOver(consumed, 'backdrop');
+            const newPattern = pickCarryOver(consumed, 'pattern');
 
             const newGift = {
                 uniqueId: Date.now(), originalId: consumed[0].originalId, name: craftingState.baseName,
