@@ -1498,6 +1498,13 @@
 
         .credits-line { text-align: center; color: #6e6e73; font-size: 0.82em; padding: 4px 16px calc(28px + env(safe-area-inset-bottom)); }
         .credits-line a { color: var(--teal-text); font-weight: 600; text-decoration: none; }
+
+        /* Performance: canvas lottie + single-layer patterns */
+        .lottie-lazy > canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; }
+        .pattern-layer { position: absolute; left: 50%; top: 50%; width: 400px; height: 400px; margin: -200px 0 0 -200px; pointer-events: none; }
+        .gift-card { contain: layout style; }
+        /* While scrolling, glass uses a plain blur instead of the SVG lens (cheaper per frame) */
+        html.is-scrolling .lg { -webkit-backdrop-filter: blur(12px) saturate(180%) !important; backdrop-filter: blur(12px) saturate(180%) !important; }
     </style>
 </head>
 <body>
@@ -2123,9 +2130,18 @@
     // Cards show their PNG instantly; the animation is created only while the card is on screen
     // (IntersectionObserver) and destroyed when it scrolls away. JSON is fetched once per URL.
     const LottieManager = (() => {
+        // Grid animations work like Telegram's: every unique animation is rendered by ONE offscreen
+        // lottie canvas, each frame is rendered once and cached as a bitmap, and every card showing
+        // that gift just blits the cached frame. One shared ~30fps clock drives everything and it
+        // pauses while scrolling, behind sheets and in the background.
         const jsonCache = new Map();
-        const live = new Map();
-        const MAX_LIVE = 18;
+        const sources = new Map();      // `${url}@${size}` -> source
+        const cards = new Map();        // wrapper el -> { canvas, ctx, src, lastIdx }
+        const sheetAnims = new Map();   // container -> lottie anim (single big animation in a sheet)
+        const TARGET_FPS = 30, MAX_RENDERS_PER_TICK = 2, CACHE_BYTES = 48 * 1024 * 1024;
+        const DPR = Math.min(window.devicePixelRatio || 1, 1.5);
+        let cachedFrames = 0, cachedBytes = 0, scrolling = false, scrollTimer = null;
+
         function getJSON(url) {
             if (!jsonCache.has(url)) {
                 jsonCache.set(url, fetch(url).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
@@ -2133,33 +2149,115 @@
             }
             return jsonCache.get(url);
         }
-        function stop(el) {
-            const a = live.get(el);
-            if (a) { a.destroy(); live.delete(el); }
-            el.classList.remove('lottie-ready');
+
+        async function getSource(url, size) {
+            const key = `${url}@${size}`;
+            if (sources.has(key)) return sources.get(key);
+            const src = { key, url, size, subs: new Set(), frames: [], cached: 0, anim: null, ctx: null, nFrames: 1, step: 1, lastUsed: 0 };
+            sources.set(key, src);
+            const data = await getJSON(url);
+            const canvas = document.createElement('canvas');
+            canvas.width = canvas.height = size;
+            src.ctx = canvas.getContext('2d');
+            src.anim = lottie.loadAnimation({ renderer: 'canvas', loop: false, autoplay: false, animationData: data,
+                rendererSettings: { context: src.ctx, clearCanvas: true, preserveAspectRatio: 'xMidYMid meet' } });
+            const fr = data.fr || 60, total = Math.max(1, (data.op || 60) - (data.ip || 0));
+            src.step = Math.max(1, fr / TARGET_FPS);
+            src.nFrames = Math.max(1, Math.floor(total / src.step));
+            src.frames = new Array(src.nFrames);
+            return src;
         }
+        function freeSource(src) {
+            src.frames.forEach(f => { if (f) { cachedBytes -= f.width * f.height * 4; f.width = f.height = 0; cachedFrames--; } });
+            src.frames = []; src.cached = 0;
+            if (src.anim) src.anim.destroy();
+            sources.delete(src.key);
+        }
+        function makeRoom(bytes) {
+            if (cachedBytes + bytes <= CACHE_BYTES) return true;
+            const idle = [...sources.values()].filter(x => !x.subs.size).sort((a, b) => a.lastUsed - b.lastUsed);
+            while (cachedBytes + bytes > CACHE_BYTES && idle.length) freeSource(idle.shift());
+            return cachedBytes + bytes <= CACHE_BYTES;
+        }
+        // Returns the cached bitmap for frame idx, rendering it once if needed. When the cache is
+        // full the animation holds its current frame instead of re-rendering every tick.
+        function frameFor(src, idx, budget) {
+            if (src.frames[idx]) return src.frames[idx];
+            if (!src.anim || !src.anim.isLoaded || budget.left <= 0) return null;
+            const bytes = src.size * src.size * 4;
+            if (src.cached > 0 && !makeRoom(bytes)) return null;
+            budget.left--;
+            src.anim.goToAndStop(idx * src.step, true);
+            const f = document.createElement('canvas');
+            f.width = f.height = src.size;
+            f.getContext('2d').drawImage(src.ctx.canvas, 0, 0);
+            src.frames[idx] = f; src.cached++; cachedFrames++; cachedBytes += bytes;
+            if (src.cached === src.nFrames) { src.anim.destroy(); src.anim = null; } // fully cached: renderer no longer needed
+            return f;
+        }
+
+        let last = 0;
+        function tick(t) {
+            requestAnimationFrame(tick);
+            if (t - last < 1000 / TARGET_FPS - 2) return;
+            last = t;
+            if (document.hidden || scrolling || !cards.size) return;
+            const covered = !!document.querySelector('.modal-overlay.active');
+            const globalFrame = Math.floor(t / 1000 * TARGET_FPS);
+            const budget = { left: MAX_RENDERS_PER_TICK };
+            sources.forEach(src => {
+                if (!src.subs.size) return;
+                src.lastUsed = t;
+                const anyNew = [...src.subs].some(el => cards.get(el).lastIdx < 0);
+                if (covered && !anyNew) return;
+                const idx = globalFrame % src.nFrames;
+                const frame = frameFor(src, idx, budget);
+                if (!frame) return;
+                src.subs.forEach(el => {
+                    const c = cards.get(el);
+                    if (c.lastIdx === idx) return;
+                    c.ctx.clearRect(0, 0, c.canvas.width, c.canvas.height);
+                    c.ctx.drawImage(frame, 0, 0);
+                    if (c.lastIdx < 0) el.classList.add('lottie-ready');
+                    c.lastIdx = idx;
+                });
+            });
+        }
+        requestAnimationFrame(tick);
+
+        // Pause while scrolling (Telegram does the same); glass refraction is also downgraded meanwhile
+        window.addEventListener('scroll', () => {
+            if (!scrolling) { scrolling = true; document.documentElement.classList.add('is-scrolling'); }
+            clearTimeout(scrollTimer);
+            scrollTimer = setTimeout(() => { scrolling = false; document.documentElement.classList.remove('is-scrolling'); }, 140);
+        }, { passive: true });
+
         async function start(el) {
-            if (live.has(el) || el._lottieLoading) return;
+            if (cards.has(el) || el._lottieLoading) return;
+            const size = Math.round(el.offsetWidth * DPR);
+            if (!size) return;
             el._lottieLoading = true;
             try {
-                const data = await getJSON(el.dataset.lottie);
-                if (!el.isConnected || el._lottieOff) return;
-                // Keep the number of simultaneously running animations bounded
-                if (live.size >= MAX_LIVE) { const oldest = live.keys().next().value; stop(oldest); }
-                const anim = lottie.loadAnimation({
-                    container: el, renderer: 'svg', loop: true, autoplay: true, animationData: data,
-                    rendererSettings: { progressiveLoad: true, hideOnTransparent: true, preserveAspectRatio: 'xMidYMid meet' }
-                });
-                anim.setSubframe(false);
-                anim.addEventListener('DOMLoaded', () => el.classList.add('lottie-ready'));
-                live.set(el, anim);
+                const src = await getSource(el.dataset.lottie, size);
+                if (!el.isConnected || el._lottieOff || cards.has(el)) return;
+                const canvas = document.createElement('canvas');
+                canvas.width = canvas.height = size;
+                el.appendChild(canvas);
+                cards.set(el, { canvas, ctx: canvas.getContext('2d'), src, lastIdx: -1 });
+                src.subs.add(el);
             } catch (e) { /* keep the PNG poster */ }
             finally { el._lottieLoading = false; }
         }
+        function stop(el) {
+            const c = cards.get(el);
+            if (c) { c.src.subs.delete(el); c.canvas.remove(); cards.delete(el); }
+            el.classList.remove('lottie-ready');
+        }
+
         const io = 'IntersectionObserver' in window ? new IntersectionObserver(entries => entries.forEach(e => {
             e.target._lottieOff = !e.isIntersecting;
             if (e.isIntersecting) start(e.target); else stop(e.target);
-        }), { rootMargin: '120px 0px' }) : null;
+        }), { rootMargin: '80px 0px' }) : null;
 
         function lazyHtml(url, poster) {
             return `<div class="lottie-wrapper lottie-lazy" data-lottie="${url}"><img class="lottie-poster" src="${poster}" loading="lazy" decoding="async" alt=""></div>`;
@@ -2171,20 +2269,19 @@
         function release(root) {
             root.querySelectorAll('.lottie-lazy').forEach(el => { if (io) io.unobserve(el); el._lottieOff = true; stop(el); });
         }
+        // Single large animation in a sheet: normal SVG playback (crisp, only one at a time)
         function play(container, url, onReady) {
-            const prev = live.get(container); if (prev) { prev.destroy(); live.delete(container); }
-            container.innerHTML = '';
-            container._lottieOff = false;
+            stopIn(container);
             getJSON(url).then(data => {
                 if (!container.isConnected) return;
                 const anim = lottie.loadAnimation({ container, renderer: 'svg', loop: true, autoplay: true, animationData: data, rendererSettings: { progressiveLoad: true } });
                 if (onReady) anim.addEventListener('DOMLoaded', onReady);
-                live.set(container, anim);
+                sheetAnims.set(container, anim);
             }).catch(() => {});
         }
-        function stopIn(container) { const a = live.get(container); if (a) { a.destroy(); live.delete(container); } container.innerHTML = ''; }
+        function stopIn(container) { const a = sheetAnims.get(container); if (a) { a.destroy(); sheetAnims.delete(container); } container.innerHTML = ''; }
         document.addEventListener('visibilitychange', () => document.hidden ? lottie.freeze() : lottie.unfreeze());
-        return { lazyHtml, observeAll, release, play, stopIn, getJSON };
+        return { lazyHtml, observeAll, release, play, stopIn, getJSON, _stats: () => ({ sources: sources.size, cachedFrames, cachedMB: Math.round(cachedBytes / 1048576), cards: cards.size }) };
     })();
 
     // --- Liquid Glass engine ---
@@ -3552,9 +3649,23 @@
     
     function playLottie(id, path) { LottieManager.play(document.getElementById(id), path); }
     function generatePattern(containerId, patternObj, giftName, isSmall, colorHex, isHeader=false) {
-        const container = document.getElementById(containerId); if (!container) return; const url = `${CDN_BASE}patterns/${encodeURIComponent(giftName)}/png/${encodeURIComponent(patternObj.name)}.png`;
-        let configs = isHeader ? [{ count: 12, radius: 100, size: 40 }, { count: 16, radius: 150, size: 36 }] : [{ count: 10, radius: isSmall ? 38 : 100, size: isSmall ? 12 : 36 }, { count: 12, radius: isSmall ? 62 : 150, size: isSmall ? 10 : 30 }];
-        configs.forEach(conf => { for(let i=0; i<conf.count; i++) { const angle = (i/conf.count)*2*Math.PI; const x = conf.radius*Math.cos(angle); const y = conf.radius*Math.sin(angle); const el = document.createElement('div'); if(isHeader) el.className = 'profile-pattern-item'; else el.className = 'card-pattern-symbol'; el.style.webkitMaskImage = `url('${url}')`; el.style.maskImage = `url('${url}')`; if (colorHex) el.style.backgroundColor = colorHex; el.style.width = `${conf.size}px`; el.style.height = `${conf.size}px`; el.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`; container.appendChild(el); } });
+        const container = document.getElementById(containerId); if (!container) return;
+        const url = `${CDN_BASE}patterns/${encodeURIComponent(giftName)}/png/${encodeURIComponent(patternObj.name)}.png`;
+        const configs = isHeader ? [{ count: 12, radius: 100, size: 40 }, { count: 16, radius: 150, size: 36 }] : [{ count: 10, radius: isSmall ? 38 : 100, size: isSmall ? 12 : 36 }, { count: 12, radius: isSmall ? 62 : 150, size: isSmall ? 10 : 30 }];
+        const layers = [];
+        configs.forEach(conf => { for (let i = 0; i < conf.count; i++) {
+            const a = (i / conf.count) * 2 * Math.PI;
+            const x = (conf.radius * Math.cos(a) - conf.size / 2).toFixed(1), y = (conf.radius * Math.sin(a) - conf.size / 2).toFixed(1);
+            layers.push(`url('${url}') calc(50% + ${x}px) calc(50% + ${y}px) / ${conf.size}px ${conf.size}px no-repeat`);
+        } });
+        // Mask positions are relative to the layer's own box: anchor it so "50%" is the container centre
+        const el = document.createElement('div');
+        el.className = 'pattern-layer';
+        el.style.backgroundColor = colorHex || '#ffffff';
+        el.style.opacity = isHeader ? 1 : 0.15;
+        el.style.webkitMask = layers.join(', ');
+        el.style.mask = layers.join(', ');
+        container.appendChild(el);
     }
     function openSettingsModal() { haptic('light'); document.getElementById('settings-bio-preview').innerText = state.userBio; document.getElementById('settings-modal').classList.add('active'); document.getElementById('setting-animations').checked = state.settings.animations; document.getElementById('setting-hidden').checked = state.settings.showHidden; tg.BackButton.show(); tg.BackButton.onClick(() => closeModal('settings-modal')); }
     function toggleSetting(key, value) { state.settings[key] = value; haptic('light'); saveState(); renderInventory(); }
