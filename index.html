@@ -3042,6 +3042,9 @@
 
         const sheet = document.getElementById('craft-sheet');
         sheet.classList.remove('crafting');
+        // The previous craft's fly-in animations keep their end state (fill: forwards) — clear them
+        (craftingState.flyAnims || []).forEach(a => a.cancel());
+        craftingState.flyAnims = [];
         const cube = document.getElementById('craft-cube');
         cube.className = 'ccube'; cube.style.transform = '';
         const cd = initialGift.collectibleData;
@@ -3228,6 +3231,7 @@
         const chance = craftChance(gifts);
         const isSuccess = (Math.random() * 100) < chance;
         const isMix = document.getElementById('cb-mix-backdrop').checked;
+        craftingState.flyAnims = craftingState.flyAnims || [];
         const sheet = document.getElementById('craft-sheet');
         const cube = document.getElementById('craft-cube');
         const core = document.getElementById('craft-core');
@@ -3254,10 +3258,10 @@
             const el = document.getElementById(`slot-${i}`);
             const r = el.getBoundingClientRect();
             const dx = cx - (r.left + r.width / 2), dy = cy - (r.top + r.height / 2);
-            el.animate([{ transform: 'none', opacity: 1 }, { transform: `translate(${dx}px, ${dy}px) scale(0.5) rotate(${i % 2 ? 25 : -25}deg)`, opacity: 0 }],
-                { duration: 650, delay: i * 70, easing: 'cubic-bezier(0.5, 0, 0.75, 0)', fill: 'forwards' });
+            craftingState.flyAnims.push(el.animate([{ transform: 'none', opacity: 1 }, { transform: `translate(${dx}px, ${dy}px) scale(0.5) rotate(${i % 2 ? 25 : -25}deg)`, opacity: 0 }],
+                { duration: 650, delay: i * 70, easing: 'cubic-bezier(0.5, 0, 0.75, 0)', fill: 'forwards' }));
         });
-        core.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(0.6)', opacity: 0 }], { duration: 500, delay: 250, easing: 'ease-in', fill: 'forwards' });
+        craftingState.flyAnims.push(core.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(0.6)', opacity: 0 }], { duration: 500, delay: 250, easing: 'ease-in', fill: 'forwards' }));
 
         haptic('medium');
         await new Promise(r => setTimeout(r, 650));
