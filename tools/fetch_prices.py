@@ -33,8 +33,6 @@ async def main():
                 "title": getattr(g, "title", None),
                 "stars": g.stars,
                 "upgrade_stars": getattr(g, "upgrade_stars", None),
-                "sold_out": bool(getattr(g, "sold_out", False)),
-                "limited": bool(getattr(g, "limited", False)),
             }
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(prices, f, ensure_ascii=False, indent=1)
