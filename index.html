@@ -1568,6 +1568,9 @@
         .w-card-balance { position: absolute; left: 7%; top: 22%; pointer-events: none; }
         .w-card-amount { font-size: clamp(22px, 7.4vw, 34px); font-weight: 700; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; text-shadow: 0 1px 8px rgba(0,0,0,0.12); }
         .w-card-amount .frac { font-size: 0.8em; }
+        /* On the colored card the Gram mark is inverted: white diamond, card-colored sparkle */
+        .w-card-amount .gem path:first-child { fill: #fff; }
+        .w-card-amount .gem path:last-child { fill: var(--w-accent); }
         .w-card-amount .unit { font-weight: 500; opacity: 0.75; font-size: 0.86em; margin-left: 2px; }
         .w-card-fiat { font-size: 0.85em; opacity: 0.7; margin-top: 2px; margin-left: 2px; font-weight: 500; }
         .w-card-qr {
@@ -1839,7 +1842,7 @@
                     <h1 id="user-name">Loading...</h1>
                     <p id="gift-count-display">online</p>
                 </div>
-                <button class="profile-balance-chip" onclick="openWallet()"><span class="lbl">Balance</span> <svg class="gem" viewBox="0 0 24 24"><path fill="#8fd8ff" d="M6 3h12l4 5.6L12 21 2 8.6z"/><path fill="#45aef7" d="M2 8.6h20L12 21z"/><path fill="#c4ecff" d="M6 3l2.6 5.6h6.8L18 3z"/><path fill="#2289ea" d="M8.6 8.6L12 21l3.4-12.4z"/></svg> <span id="profile-balance">0</span><span class="chev">›</span></button>
+                <button class="profile-balance-chip" onclick="openWallet()"><span class="lbl">Balance</span> <svg class="gem" viewBox="0 0 100 100"><path fill="#30A1F5" d="M66.523 11.333H33.477c-4.401 0-6.601 0-8.592.616a13.8 13.8 0 0 0-4.808 2.625c-1.594 1.341-2.784 3.192-5.164 6.894L4.408 37.81c-1.572 2.446-2.358 3.67-2.572 4.956a6.3 6.3 0 0 0 .362 3.37c.482 1.212 1.51 2.24 3.567 4.296l39.033 39.034c1.821 1.82 2.731 2.731 3.781 3.072a4.6 4.6 0 0 0 2.842 0c1.05-.34 1.96-1.251 3.78-3.072l39.035-39.034c2.056-2.056 3.084-3.084 3.566-4.296a6.3 6.3 0 0 0 .362-3.37c-.214-1.287-1-2.51-2.572-4.956L85.087 21.47c-2.38-3.703-3.57-5.554-5.164-6.895a13.8 13.8 0 0 0-4.808-2.625c-1.99-.616-4.191-.616-8.592-.616z"/><path fill="#fff" d="M60.268 24.224c.537-1.45 2.59-1.45 3.126 0l3.71 10.027a2.2 2.2 0 0 0 1.3 1.3l10.027 3.71c1.451.537 1.451 2.59 0 3.126l-10.027 3.71a2.2 2.2 0 0 0-1.3 1.3l-3.71 10.027c-.537 1.451-2.59 1.451-3.126 0l-3.71-10.027a2.2 2.2 0 0 0-1.3-1.3l-10.027-3.71c-1.451-.537-1.451-2.589 0-3.126l10.027-3.71a2.2 2.2 0 0 0 1.3-1.3z"/></svg> <span id="profile-balance">0</span><span class="chev">›</span></button>
             </div>
         </div>
         
@@ -2480,7 +2483,7 @@
         <div class="w-buy-visual" id="w-sell-visual"></div>
         <h2 id="w-sell-title">Sell Gift</h2>
         <p>Set your price. Buyers pick up gifts listed around their value — the cheaper, the faster.</p>
-        <div class="w-sell-input"><svg class="gem" viewBox="0 0 24 24"><path fill="#8fd8ff" d="M6 3h12l4 5.6L12 21 2 8.6z"/><path fill="#45aef7" d="M2 8.6h20L12 21z"/><path fill="#c4ecff" d="M6 3l2.6 5.6h6.8L18 3z"/><path fill="#2289ea" d="M8.6 8.6L12 21l3.4-12.4z"/></svg><input id="w-sell-price" type="text" inputmode="decimal" autocomplete="off" oninput="updateSellSheet()"><span class="unit">GRAM</span></div>
+        <div class="w-sell-input"><svg class="gem" viewBox="0 0 100 100"><path fill="#30A1F5" d="M66.523 11.333H33.477c-4.401 0-6.601 0-8.592.616a13.8 13.8 0 0 0-4.808 2.625c-1.594 1.341-2.784 3.192-5.164 6.894L4.408 37.81c-1.572 2.446-2.358 3.67-2.572 4.956a6.3 6.3 0 0 0 .362 3.37c.482 1.212 1.51 2.24 3.567 4.296l39.033 39.034c1.821 1.82 2.731 2.731 3.781 3.072a4.6 4.6 0 0 0 2.842 0c1.05-.34 1.96-1.251 3.78-3.072l39.035-39.034c2.056-2.056 3.084-3.084 3.566-4.296a6.3 6.3 0 0 0 .362-3.37c-.214-1.287-1-2.51-2.572-4.956L85.087 21.47c-2.38-3.703-3.57-5.554-5.164-6.895a13.8 13.8 0 0 0-4.808-2.625c-1.99-.616-4.191-.616-8.592-.616z"/><path fill="#fff" d="M60.268 24.224c.537-1.45 2.59-1.45 3.126 0l3.71 10.027a2.2 2.2 0 0 0 1.3 1.3l10.027 3.71c1.451.537 1.451 2.59 0 3.126l-10.027 3.71a2.2 2.2 0 0 0-1.3 1.3l-3.71 10.027c-.537 1.451-2.59 1.451-3.126 0l-3.71-10.027a2.2 2.2 0 0 0-1.3-1.3l-10.027-3.71c-1.451-.537-1.451-2.589 0-3.126l10.027-3.71a2.2 2.2 0 0 0 1.3-1.3z"/></svg><input id="w-sell-price" type="text" inputmode="decimal" autocomplete="off" oninput="updateSellSheet()"><span class="unit">GRAM</span></div>
         <div class="w-sell-quick" id="w-sell-quick"></div>
         <div class="w-sell-chance" id="w-sell-chance"></div>
         <div class="w-buy-rows" id="w-sell-rows"></div>
@@ -4462,7 +4465,8 @@
     // A pretend Telegram-style wallet: a GRAM balance card that can take a collectible's backdrop + symbol
     // as its theme and carry collectibles as stickers, plus a market of random collectibles.
     // All GRAM is play money that lives in localStorage with the rest of the state.
-    const GEM_SVG = `<svg class="gem" viewBox="0 0 24 24"><path fill="#8fd8ff" d="M6 3h12l4 5.6L12 21 2 8.6z"/><path fill="#45aef7" d="M2 8.6h20L12 21z"/><path fill="#c4ecff" d="M6 3l2.6 5.6h6.8L18 3z"/><path fill="#2289ea" d="M8.6 8.6L12 21l3.4-12.4z"/></svg>`;
+    // Official Gram (GRAM) token icon from ton.org/media
+    const GEM_SVG = `<svg class="gem" viewBox="0 0 100 100"><path fill="#30A1F5" d="M66.523 11.333H33.477c-4.401 0-6.601 0-8.592.616a13.8 13.8 0 0 0-4.808 2.625c-1.594 1.341-2.784 3.192-5.164 6.894L4.408 37.81c-1.572 2.446-2.358 3.67-2.572 4.956a6.3 6.3 0 0 0 .362 3.37c.482 1.212 1.51 2.24 3.567 4.296l39.033 39.034c1.821 1.82 2.731 2.731 3.781 3.072a4.6 4.6 0 0 0 2.842 0c1.05-.34 1.96-1.251 3.78-3.072l39.035-39.034c2.056-2.056 3.084-3.084 3.566-4.296a6.3 6.3 0 0 0 .362-3.37c-.214-1.287-1-2.51-2.572-4.956L85.087 21.47c-2.38-3.703-3.57-5.554-5.164-6.895a13.8 13.8 0 0 0-4.808-2.625c-1.99-.616-4.191-.616-8.592-.616z"/><path fill="#fff" d="M60.268 24.224c.537-1.45 2.59-1.45 3.126 0l3.71 10.027a2.2 2.2 0 0 0 1.3 1.3l10.027 3.71c1.451.537 1.451 2.59 0 3.126l-10.027 3.71a2.2 2.2 0 0 0-1.3 1.3l-3.71 10.027c-.537 1.451-2.59 1.451-3.126 0l-3.71-10.027a2.2 2.2 0 0 0-1.3-1.3l-10.027-3.71c-1.451-.537-1.451-2.589 0-3.126l10.027-3.71a2.2 2.2 0 0 0 1.3-1.3z"/></svg>`;
     const GRAM_CURRENCIES = { USD: { rate: 1.38, fmt: v => `$${v}` }, EUR: { rate: 1.27, fmt: v => `€${v}` }, RUB: { rate: 112.4, fmt: v => `${v} ₽` } };
     const W_ICONS = {
         in: '<svg viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></svg>',
