@@ -3164,6 +3164,7 @@
     function renderInventory() {
         const grid = document.getElementById('inventory-grid');
         if (appRuntime.reordering) return;
+        refreshWalletFromInventory();
         LottieManager.release(grid);
         grid.innerHTML = '';
         grid.classList.toggle('selecting', !!appRuntime.selectionMode);
@@ -4592,6 +4593,15 @@
         document.addEventListener('click', (e) => { if (!e.target.closest('#w-gift-menu, #w-menu')) hideWalletMenus(); });
         window.addEventListener('resize', () => { if (walletUI.open) renderWalletCard(); });
         checkMarketSales(); setInterval(checkMarketSales, 5000);
+    }
+    // Every inventory change goes through renderInventory(), which calls this so an open wallet
+    // (Collectibles grid, Market listings, card stickers/theme) never shows a stale gift list
+    function refreshWalletFromInventory() {
+        if (!walletUI.open) return;
+        const card = state.wallet.card;
+        if (card.themeId != null && !walletGift(card.themeId)) { card.themeId = null; renderWalletCard(); }
+        if (card.stickers.some(st => !walletGift(st.giftId))) { walletUI.sel = -1; renderWalletStickers(); }
+        renderWalletTab();
     }
     function resetCardTilt() { const c = document.getElementById('w-card'); ['--rx', '--ry', '--shx', '--shy', '--ang'].forEach(p => c.style.removeProperty(p)); }
 
