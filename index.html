@@ -1792,6 +1792,10 @@
         .w-sell-chance { font-size: 0.84em; font-weight: 600; margin-bottom: 12px; color: #8d8e93; }
         .w-sell-chance.good { color: #4cd964; } .w-sell-chance.warn { color: #ffb648; } .w-sell-chance.bad { color: #ff595a; }
         .w-mine .w-tx-ico.gift img { padding: 3px; }
+        .w-col-chips { padding: 0 0 10px; }
+        .w-chip .cnt { color: #8d8e93; font-weight: 500; }
+        .w-chip.on .cnt { color: rgba(255,255,255,0.7); }
+        .w-tile.is-hidden img.model { opacity: 0.45; }
         .w-sell-input .gem { width: 26px; height: 26px; }
 
         /* Send flow */
@@ -4528,7 +4532,7 @@
     const W_CONTACTS = [['Alex', '@alex_ton'], ['Maria', '@mashaaa'], ['Kirill', '@kirill_dev'], ['Timur', '@timur_k'], ['Mom', ''], ['Oleg', '@oleg_99'], ['Sasha', '@sanya_gifts']];
     const MAX_CARD_STICKERS = 6;
     const ADDR_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
-    let walletUI = { open: false, tab: 'tx', sel: -1, sendOpen: false, sendStep: 'to', send: { to: null, amount: '0' }, buy: null, mktOpen: false, mkt: null, sell: null };
+    let walletUI = { open: false, tab: 'tx', sel: -1, sendOpen: false, sendStep: 'to', send: { to: null, amount: '0' }, buy: null, colFilter: 'shown', mktOpen: false, mkt: null, sell: null };
     let walletBackFn = null;
 
     const gramRound = v => Math.round(v * 1e4) / 1e4;
@@ -4782,17 +4786,23 @@
             return `<div class="w-tx">${ico}<div class="w-tx-main"><div class="w-tx-title">${escHtml(t.peer)}</div><div class="w-tx-sub">${escHtml(t.note)}</div><div class="w-tx-date">${date}</div></div><div class="w-tx-amt ${pos ? 'in' : ''}">${pos ? '+' : '−'}${gramStr(Math.abs(t.amount))} ${GEM_SVG}</div></div>`;
         }).join('')}</div>`;
     }
+    const COL_FILTERS = [['shown', 'Displayed', g => !g.hidden], ['hidden', 'Hidden', g => g.hidden], ['all', 'All', () => true]];
+    function setWalletColFilter(f) { if (f !== walletUI.colFilter) haptic('light'); walletUI.colFilter = f; renderWalletTab(); }
     function renderWalletCollectibles(body) {
-        const list = state.inventory.filter(g => g.isCollectible && g.collectibleData);
-        if (!list.length) { body.innerHTML = `<div class="w-empty"><b>No collectibles yet</b>Upgrade a gift or buy one in the Market, then use it to color and decorate your card.</div>`; return; }
+        const all = state.inventory.filter(g => g.isCollectible && g.collectibleData);
+        if (!all.length) { body.innerHTML = `<div class="w-empty"><b>No collectibles yet</b>Upgrade a gift or buy one in the Market, then use it to color and decorate your card.</div>`; return; }
+        const active = COL_FILTERS.find(f => f[0] === walletUI.colFilter) || COL_FILTERS[0];
+        const list = all.filter(active[2]);
         const card = state.wallet.card, onCard = new Set(card.stickers.map(s => s.giftId));
-        body.innerHTML = `<div class="w-grid"></div>`;
-        const grid = body.firstChild;
+        body.innerHTML = `<div class="w-chips w-col-chips">${COL_FILTERS.map(([key, label, fn]) => `<button class="w-chip${key === active[0] ? ' on' : ''}" onclick="setWalletColFilter('${key}')">${label} <span class="cnt">${all.filter(fn).length}</span></button>`).join('')}</div>`
+            + (list.length ? `<div class="w-grid"></div>` : `<div class="w-empty">${active[0] === 'hidden' ? 'No hidden collectibles.' : 'All your collectibles are hidden from your profile.'}</div>`);
+        const grid = body.querySelector('.w-grid');
+        if (!grid) return;
         list.forEach(g => {
             const cd = g.collectibleData, isOn = onCard.has(g.uniqueId);
             const rb = cd.backdrop.hex ? `color-mix(in srgb, ${cd.backdrop.hex.edgeColor} 88%, #000)` : '#2a2f3d';
             const el = document.createElement('div');
-            el.className = `w-tile${isOn ? ' on-card' : ''}`;
+            el.className = `w-tile${isOn ? ' on-card' : ''}${g.hidden && active[0] === 'all' ? ' is-hidden' : ''}`;
             el.innerHTML = `<div class="w-tile-bg" style="background:${getBackdropStyle(cd.backdrop)}"></div><div class="gift-ribbon" style="--rb:${rb}"><span>${isListed(g) ? 'on sale' : isOn ? 'on card' : `#${g.collectibleNumber.toLocaleString('en-US')}`}</span></div>${card.themeId === g.uniqueId ? `<div class="w-tile-badge">${W_ICONS.palette}</div>` : ''}<img class="model" src="${getModelImg(g.name, cd.model)}" loading="lazy" alt="">`;
             el.onclick = (e) => openWalletGiftMenu(e, g);
             grid.appendChild(el);
