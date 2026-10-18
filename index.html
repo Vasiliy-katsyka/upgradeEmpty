@@ -1573,6 +1573,13 @@
             mix-blend-mode: soft-light;
         }
         .w-card.dragging .w-card-metal::after { transition: none; }
+        /* On a gift backdrop the metal finish is only a hint: inside the tilted 3D card its blend modes act like
+           a white veil and bleach the colour */
+        .w-card.themed .w-card-bg { filter: saturate(1.12); }
+        .w-card.themed .w-card-addr { color: color-mix(in srgb, var(--w-pat, #000) 70%, transparent); }
+        .w-card.themed .w-card-metal::before { opacity: 0.25; }
+        .w-card.themed .w-card-metal::after { opacity: 0.1; }
+        .w-card.themed .w-card-shine { opacity: 0.5; }
         .w-card-sparkles { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; overflow: hidden; }
         .w-card-sparkles i {
             position: absolute; width: 9px; height: 9px; transform: translate(-50%, -50%); opacity: 0.55;
@@ -4660,15 +4667,18 @@
         const root = document.documentElement, bg = document.getElementById('w-card-bg'), pat = document.getElementById('w-card-pattern');
         pat.innerHTML = '';
         const g = walletTheme();
+        document.getElementById('w-card').classList.toggle('themed', !!g);
         if (!g) {
             bg.style.background = '';
-            ['--w-accent', '--w-accent-2', '--w-accent-text', '--w-card-hi'].forEach(p => root.style.removeProperty(p));
+            ['--w-accent', '--w-accent-2', '--w-accent-text', '--w-card-hi', '--w-pat'].forEach(p => root.style.removeProperty(p));
             return;
         }
         const bd = g.collectibleData.backdrop, hex = bd.hex || { centerColor: '#555', edgeColor: '#222', patternColor: '#000' };
-        bg.style.background = bd.customGradient || `radial-gradient(130% 150% at 28% 18%, ${hex.centerColor} 0%, ${hex.edgeColor} 100%)`;
+        // Same glow as the collectible itself: vivid centre colour in the middle, deepening to the edge colour
+        bg.style.background = bd.customGradient || `radial-gradient(ellipse 72% 95% at 50% 48%, ${hex.centerColor} 0%, color-mix(in srgb, ${hex.centerColor} 45%, ${hex.edgeColor}) 45%, ${hex.edgeColor} 92%)`;
         root.style.setProperty('--w-accent', `color-mix(in srgb, ${hex.centerColor} 75%, ${hex.edgeColor})`);
         root.style.setProperty('--w-accent-2', hex.edgeColor);
+        root.style.setProperty('--w-pat', hex.patternColor || '#000');
         root.style.setProperty('--w-card-hi', `color-mix(in srgb, ${hex.centerColor} 35%, #fff)`);
         root.style.setProperty('--w-accent-text', `color-mix(in srgb, ${hex.centerColor} 70%, #fff)`);
 
