@@ -1523,7 +1523,7 @@
             transform: translateX(100%); visibility: hidden; transition: transform 0.32s cubic-bezier(0.2, 0.9, 0.25, 1), visibility 0.32s;
         }
         .wallet-page.open { transform: none; visibility: visible; }
-        .wallet-view { position: absolute; inset: 0; display: flex; flex-direction: column; max-width: 600px; margin: 0 auto; background: #000; }
+        .wallet-view { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; max-width: 600px; margin: 0 auto; background: #000; }
         .w-top {
             display: flex; align-items: center; gap: 6px; flex-shrink: 0;
             padding: calc(var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px) + 8px) 10px 8px;
@@ -1724,6 +1724,44 @@
         .w-buy-row b { display: flex; align-items: center; gap: 5px; }
         .w-buy-sheet .w-sheet-close { background: rgba(255,255,255,0.08); }
         .w-buy-sheet > *, .w-receive-sheet > * { flex: none; }
+        /* Resale market */
+        .w-resale { z-index: 3; }
+        .w-mkt-title { flex-direction: column; align-items: flex-start; gap: 0; line-height: 1.2; }
+        .w-mkt-title small { display: block; }
+        .w-mkt-bal { text-align: right; font-size: 0.78em; color: #8d8e93; font-weight: 600; padding-right: 4px; }
+        .w-mkt-bal span { display: flex; align-items: center; gap: 4px; justify-content: flex-end; color: #fff; font-size: 1.25em; margin-top: 1px; }
+        .w-chips { display: flex; gap: 8px; padding: 2px 14px 10px; overflow-x: auto; scrollbar-width: none; flex-shrink: 0; }
+        .w-chips::-webkit-scrollbar { display: none; }
+        .w-chip {
+            border: none; background: #1c1c1e; color: #fff; font-weight: 600; font-size: 0.86em; padding: 8px 13px; border-radius: 999px;
+            white-space: nowrap; display: flex; align-items: center; gap: 5px; cursor: pointer; max-width: 170px; overflow: hidden; text-overflow: ellipsis;
+        }
+        .w-chip.on { background: color-mix(in srgb, var(--w-accent) 30%, #1c1c1e); }
+        .w-chip .chev { font-size: 0.65em; opacity: 0.6; letter-spacing: -2px; }
+        #w-menu { max-height: 55vh; overflow-y: auto; }
+        .w-menu-item.on { background: rgba(255,255,255,0.1); }
+        .w-mkt-grid { padding-bottom: 20px; }
+        .w-lst { aspect-ratio: 0.82; }
+        .w-lst img.model { left: 13%; top: 9%; width: 74%; height: 62%; }
+        .w-lst .dynamic-pattern-container, .w-tile .dynamic-pattern-container { border-radius: inherit; }
+        .w-lst .w-price-pill {
+            position: absolute; left: 50%; bottom: 7%; transform: translateX(-50%); margin: 0; z-index: 3; white-space: nowrap;
+            background: rgba(0,0,0,0.28); color: #fff; padding: 4px 10px; font-size: 0.8em;
+            -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+        }
+        .w-buy-thumb { position: relative; width: 130px; height: 130px; border-radius: 30px; overflow: hidden; margin: 0 auto; }
+        .w-buy-thumb img.model { position: absolute; left: 12%; top: 12%; width: 76%; height: 76%; object-fit: contain; }
+        .w-buy-row b em { font-style: normal; font-weight: 600; font-size: 0.8em; color: var(--w-accent-text, #62bcf9); background: color-mix(in srgb, var(--w-accent) 18%, transparent); padding: 2px 7px; border-radius: 999px; margin-left: 4px; }
+        .w-sell-input { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.06); border-radius: 18px; padding: 10px 16px; margin: 0 0 10px; }
+        .w-sell-input input { flex: 1; min-width: 0; background: none; border: none; outline: none; color: #fff; font-size: 1.6em; font-weight: 700; user-select: text; }
+        .w-sell-input .unit { color: var(--w-accent-text, #62bcf9); font-weight: 600; }
+        .w-sell-quick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
+        .w-sell-quick button { border: none; background: rgba(255,255,255,0.08); color: #fff; font-weight: 600; font-size: 0.85em; padding: 8px 0; border-radius: 12px; cursor: pointer; }
+        .w-sell-quick button:active { background: rgba(255,255,255,0.16); }
+        .w-sell-chance { font-size: 0.84em; font-weight: 600; margin-bottom: 12px; color: #8d8e93; }
+        .w-sell-chance.good { color: #4cd964; } .w-sell-chance.warn { color: #ffb648; } .w-sell-chance.bad { color: #ff595a; }
+        .w-mine .w-tx-ico.gift img { padding: 3px; }
+        .w-sell-input .gem { width: 26px; height: 26px; }
 
         /* Send flow */
         .w-send { transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.25, 1); z-index: 2; }
@@ -2314,6 +2352,7 @@
         <li id="menu-wear" onclick="toggleWear()">Wear Gift</li>
         <li id="menu-reorder" class="hidden" onclick="startReorderMode()">Reorder Pins</li>
         <li id="menu-card-theme" onclick="useAsCardTheme()">Use as Card Color</li>
+        <li id="menu-sell" onclick="openSellFromMenu()">Sell</li>
         <li id="menu-hide" onclick="toggleHide()">Hide Gift</li>
         <!-- Craft Option integrated perfectly directly inside ellipsis menus -->
         <li id="menu-craft" onclick="handleMenuCraft()" style="display:none;">Craft Gift</li>
@@ -2395,6 +2434,16 @@
             <p id="w-done-sub"></p>
         </div>
     </div>
+
+    <div class="wallet-view w-send" id="wallet-market">
+        <div class="w-top">
+            <button class="w-hbtn" onclick="closeMarketGift()" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+            <div class="w-title w-mkt-title"><span id="w-mkt-name">Gift</span><small id="w-mkt-count"></small></div>
+            <div class="w-mkt-bal">Balance<span id="w-mkt-bal"></span></div>
+        </div>
+        <div class="w-chips" id="w-mkt-chips"></div>
+        <div class="w-scroll" id="w-mkt-scroll"><div class="w-grid w-mkt-grid" id="w-mkt-grid"></div></div>
+    </div>
 </div>
 
 <div id="w-receive-modal" class="modal-overlay">
@@ -2417,14 +2466,26 @@
 <div id="w-buy-modal" class="modal-overlay">
     <div class="modal-content w-buy-sheet">
         <button class="w-sheet-close" onclick="closeModal('w-buy-modal')" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-        <div class="w-buy-visual"><img id="w-buy-img" src="" alt=""></div>
+        <div class="w-buy-visual" id="w-buy-visual"></div>
         <h2 id="w-buy-title">Gift</h2>
         <p id="w-buy-sub"></p>
-        <div class="w-buy-rows">
-            <div class="w-buy-row"><span>Price</span><b id="w-buy-price"></b></div>
-            <div class="w-buy-row"><span>Your balance</span><b id="w-buy-balance"></b></div>
-        </div>
+        <div class="w-buy-rows" id="w-buy-rows"></div>
         <button class="w-btn" id="w-buy-btn" style="width:100%" onclick="confirmMarketBuy()">Buy</button>
+    </div>
+</div>
+
+<div id="w-sell-modal" class="modal-overlay">
+    <div class="modal-content w-buy-sheet">
+        <button class="w-sheet-close" onclick="closeModal('w-sell-modal')" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        <div class="w-buy-visual" id="w-sell-visual"></div>
+        <h2 id="w-sell-title">Sell Gift</h2>
+        <p>Set your price. Buyers pick up gifts listed around their value — the cheaper, the faster.</p>
+        <div class="w-sell-input"><svg class="gem" viewBox="0 0 24 24"><path fill="#8fd8ff" d="M6 3h12l4 5.6L12 21 2 8.6z"/><path fill="#45aef7" d="M2 8.6h20L12 21z"/><path fill="#c4ecff" d="M6 3l2.6 5.6h6.8L18 3z"/><path fill="#2289ea" d="M8.6 8.6L12 21l3.4-12.4z"/></svg><input id="w-sell-price" type="text" inputmode="decimal" autocomplete="off" oninput="updateSellSheet()"><span class="unit">GRAM</span></div>
+        <div class="w-sell-quick" id="w-sell-quick"></div>
+        <div class="w-sell-chance" id="w-sell-chance"></div>
+        <div class="w-buy-rows" id="w-sell-rows"></div>
+        <button class="w-btn" id="w-sell-btn" style="width:100%" onclick="confirmSell()">List for Sale</button>
+        <button class="w-btn secondary" id="w-unlist-btn" style="width:100%; margin-top:8px" onclick="unlistGift()">Remove from Sale</button>
     </div>
 </div>
 
@@ -3100,7 +3161,7 @@
                     : `<img src="${imgUrl}" loading="lazy" decoding="async">`;
                 const rb = cd.backdrop.hex ? `color-mix(in srgb, ${cd.backdrop.hex.edgeColor} 88%, #000)` : '#2a2f3d';
                 el.classList.add('has-ribbon');
-                el.innerHTML = `${topIcon}<div class="gift-ribbon" style="--rb:${rb}"><span>#${gift.collectibleNumber.toLocaleString('en-US')}</span></div><div class="gift-card-bg-pattern" style="background:${bgStyle}"></div><div class="dynamic-pattern-container" id="pat-${gift.uniqueId}"></div><div class="image-container">${visualHtml}</div>`; 
+                el.innerHTML = `${topIcon}<div class="gift-ribbon" style="--rb:${rb}"><span>${isListed(gift) ? 'on sale' : `#${gift.collectibleNumber.toLocaleString('en-US')}`}</span></div><div class="gift-card-bg-pattern" style="background:${bgStyle}"></div><div class="dynamic-pattern-container" id="pat-${gift.uniqueId}"></div><div class="image-container">${visualHtml}</div>`; 
                 setTimeout(() => generatePattern(`pat-${gift.uniqueId}`, cd.pattern, gift.name, true, cd.backdrop.hex.patternColor), 0);
                 if (!appRuntime.selectionMode) el.onclick = () => openCollectibleModal(gift, false);
             } else {
@@ -4010,6 +4071,7 @@
         }
         if(id==='collectible-modal') { document.getElementById('col-crafted-ribbon').style.display='none'; LottieManager.stopIn(document.getElementById('collectible-lottie')); document.getElementById('roulette-strip').innerHTML=''; if(appRuntime.animationState) skipAnimation(); }
         if (walletUI.open) { restoreWalletBack(); return; }
+        if (walletBackFn) setWalletBack(null);
         if (document.getElementById('shop-page').classList.contains('active')) { tg.BackButton.show(); tg.BackButton.onClick(() => switchTab('inventory')); }
     }
     
@@ -4070,6 +4132,8 @@
         document.getElementById('menu-wear').style.display = gift.isCollectible?'block':'none'; 
         document.getElementById('menu-wear').innerText = gift.worn?"Take Off":"Wear"; 
         document.getElementById('menu-card-theme').style.display = gift.isCollectible?'block':'none'; 
+        document.getElementById('menu-sell').style.display = gift.isCollectible?'block':'none'; 
+        document.getElementById('menu-sell').innerText = isListed(gift)?"Change Price":"Sell"; 
         document.getElementById('menu-reorder').style.display = (gift.isCollectible&&gift.pinned&&state.inventory.filter(g=>g.pinned).length>1)?'block':'none'; 
         document.getElementById('menu-hide').innerText = gift.hidden?"Unhide":"Hide"; 
         
@@ -4408,12 +4472,13 @@
         card: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18M7 15h4"/></svg>',
         info: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>',
         globe: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>',
+        tag: '<svg viewBox="0 0 24 24"><path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="7.5" cy="7.5" r="1.4"/></svg>',
         eye: '<svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>'
     };
     const W_CONTACTS = [['Alex', '@alex_ton'], ['Maria', '@mashaaa'], ['Kirill', '@kirill_dev'], ['Timur', '@timur_k'], ['Mom', ''], ['Oleg', '@oleg_99'], ['Sasha', '@sanya_gifts']];
-    const MYSTERY_PRICE = 2, MYSTERY_IMG_ID = '5170250947678437525', MAX_CARD_STICKERS = 6;
+    const MAX_CARD_STICKERS = 6;
     const ADDR_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
-    let walletUI = { open: false, tab: 'tx', sel: -1, sendOpen: false, sendStep: 'to', send: { to: null, amount: '0' }, buy: null };
+    let walletUI = { open: false, tab: 'tx', sel: -1, sendOpen: false, sendStep: 'to', send: { to: null, amount: '0' }, buy: null, mktOpen: false, mkt: null, sell: null };
     let walletBackFn = null;
 
     const gramRound = v => Math.round(v * 1e4) / 1e4;
@@ -4432,7 +4497,7 @@
         if (state.wallet) return;
         state.wallet = {
             balance: 10, currency: 'USD', address: seededAddr(`${Date.now()}${Math.random()}`), recents: [],
-            card: { themeId: null, stickers: [] },
+            card: { themeId: null, stickers: [] }, listings: [],
             txs: [{ id: Date.now(), ts: Date.now(), kind: 'in', peer: 'Welcome Bonus', note: 'Incoming transfer', amount: 10 }]
         };
         saveState();
@@ -4451,7 +4516,7 @@
         if (fn) { tg.BackButton.onClick(fn); tg.BackButton.show(); } else tg.BackButton.hide();
     }
     // Called by closeModal: give the Telegram back button back to the wallet
-    function restoreWalletBack() { setWalletBack(walletUI.sendOpen ? walletSendBack : closeWallet); }
+    function restoreWalletBack() { setWalletBack(walletUI.sendOpen ? walletSendBack : walletUI.mktOpen ? closeMarketGift : closeWallet); }
 
     function initWallet() {
         ensureWallet(); updateBalanceViews();
@@ -4477,6 +4542,7 @@
         document.getElementById('w-scroll').addEventListener('scroll', hideWalletMenus, { passive: true });
         document.addEventListener('click', (e) => { if (!e.target.closest('#w-gift-menu, #w-menu')) hideWalletMenus(); });
         window.addEventListener('resize', () => { if (walletUI.open) renderWalletCard(); });
+        checkMarketSales(); setInterval(checkMarketSales, 5000);
     }
     function resetCardTilt() { const c = document.getElementById('w-card'); ['--rx', '--ry', '--shx', '--shy'].forEach(p => c.style.removeProperty(p)); }
 
@@ -4495,6 +4561,7 @@
     function closeWallet() {
         haptic('light'); hideWalletMenus(); closeWalletSendView(true);
         walletUI.open = false; walletUI.sel = -1;
+        closeMarketGift();
         const page = document.getElementById('wallet-page');
         page.classList.remove('open'); page.setAttribute('aria-hidden', 'true');
         setTimeout(() => { if (!walletUI.open) document.querySelectorAll('#w-card-stickers .w-stk-anim').forEach(el => LottieManager.stopIn(el)); }, 350);
@@ -4509,6 +4576,7 @@
         const [int, frac] = gramStr(w.balance).split('.');
         document.getElementById('w-card-amount').innerHTML = `${GEM_SVG}<span>${int}${frac ? `<span class="frac">.${frac}</span>` : ''}<span class="unit"> GRAM</span></span>`;
         document.getElementById('w-card-fiat').innerText = fiatStr(w.balance);
+        if (walletUI.mktOpen) updateMarketBalance();
     }
 
     // --- Card theme: backdrop gradient + a staggered grid of the gift's symbol ---
@@ -4647,7 +4715,7 @@
         if (!txs.length) return `<div class="w-empty"><b>No transactions yet</b>Add funds or buy a gift in the Market.</div>`;
         return `<div class="w-tx-list">${txs.map(t => {
             const pos = t.amount > 0;
-            const ico = t.kind === 'buy'
+            const ico = t.kind === 'buy' || t.kind === 'sale'
                 ? `<div class="w-tx-ico gift">${t.img ? `<img src="${escHtml(t.img)}" alt="" loading="lazy">` : W_ICONS.card}</div>`
                 : `<div class="w-tx-ico">${W_ICONS[t.kind] || W_ICONS[pos ? 'in' : 'out']}</div>`;
             const date = new Date(t.ts).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
@@ -4665,7 +4733,7 @@
             const rb = cd.backdrop.hex ? `color-mix(in srgb, ${cd.backdrop.hex.edgeColor} 88%, #000)` : '#2a2f3d';
             const el = document.createElement('div');
             el.className = `w-tile${isOn ? ' on-card' : ''}`;
-            el.innerHTML = `<div class="w-tile-bg" style="background:${getBackdropStyle(cd.backdrop)}"></div><div class="gift-ribbon" style="--rb:${rb}"><span>${isOn ? 'on card' : `#${g.collectibleNumber.toLocaleString('en-US')}`}</span></div>${card.themeId === g.uniqueId ? `<div class="w-tile-badge">${W_ICONS.palette}</div>` : ''}<img class="model" src="${getModelImg(g.name, cd.model)}" loading="lazy" alt="">`;
+            el.innerHTML = `<div class="w-tile-bg" style="background:${getBackdropStyle(cd.backdrop)}"></div><div class="gift-ribbon" style="--rb:${rb}"><span>${isListed(g) ? 'on sale' : isOn ? 'on card' : `#${g.collectibleNumber.toLocaleString('en-US')}`}</span></div>${card.themeId === g.uniqueId ? `<div class="w-tile-badge">${W_ICONS.palette}</div>` : ''}<img class="model" src="${getModelImg(g.name, cd.model)}" loading="lazy" alt="">`;
             el.onclick = (e) => openWalletGiftMenu(e, g);
             grid.appendChild(el);
         });
@@ -4688,10 +4756,12 @@
         const menu = document.getElementById('w-gift-menu');
         menu.innerHTML = `<button class="w-menu-item" data-a="color">${W_ICONS.palette}${isTheme ? 'Reset Color' : 'Apply Color'}</button>`
             + `<button class="w-menu-item" data-a="card">${W_ICONS.card}${onCard ? 'Remove from Card' : 'Add to Card'}</button>`
+            + `<button class="w-menu-item" data-a="sell">${W_ICONS.tag}${isListed(g) ? 'Change Price' : 'Sell'}</button>`
             + `<button class="w-menu-item" data-a="view">${W_ICONS.eye}View Gift</button>`;
         bindMenuActions(menu, {
             color: () => applyCardTheme(isTheme ? null : g.uniqueId),
             card: () => toggleCardSticker(g.uniqueId),
+            sell: () => openSellSheet(g.uniqueId),
             view: () => { setWalletBack(null); openCollectibleModal(g, false); }
         });
         showWalletPopover(menu, e.clientX, e.clientY);
@@ -4726,71 +4796,259 @@
         openWallet('col'); hapticNotify('success'); showToast('Card color applied');
     }
 
-    // --- Market: random collectibles for GRAM ---
+    // --- Market: pre-upgraded gifts listed for resale, plus selling your own ---
+    // Every collectible has a "fair value" (gift base price × rarity of model/backdrop/symbol).
+    // Listings are generated at or above that value (so flipping them loses the fee); your own listings are picked up by a simulated
+    // buyer at random moments, with odds that drop as the price climbs above the value.
+    const MARKET_FEE = 0.05, MARKET_LISTINGS = 48;
+    const marketCache = {};
+    function roundPrice(v) { return Math.max(0.1, v < 10 ? Math.round(v * 100) / 100 : v < 100 ? Math.round(v * 10) / 10 : Math.round(v)); }
     function marketGifts() { return giftEntries().filter(([id, name]) => !['custom_skebob', 'custom_baggin_cat'].includes(id) && canUpgradeName(name)); }
     function marketPrice(id) {
         const p = realPrices[id], stars = p ? p.stars + (p.upgrade_stars || 0) : (parseInt(shopPrice(id)) || 100);
         return Math.max(0.5, Math.round(stars * 0.012 * 10) / 10);
     }
+    function giftBaseGram(name) { const e = giftEntries().find(([, n]) => n === name); return e ? marketPrice(e[0]) : 3; }
+    function fairValueOf(name, cd) {
+        const rf = (p, ref, k) => p ? Math.max(0.85, Math.pow(ref / Math.max(p, 2), k)) : 1.6;
+        let v = giftBaseGram(name) * 1.6 * rf(cd.model.rarityPermille, 25, 0.7) * rf(cd.backdrop.rarityPermille, 20, 0.35) * rf(cd.pattern.rarityPermille, 15, 0.25);
+        if (cd.model.crafted) v *= 3;
+        return roundPrice(v);
+    }
+    // Rarer parts (lower permille) show up less often in generated listings
+    function rarityPick(arr) {
+        const w = arr.map(x => x.rarityPermille || 10), total = w.reduce((a, b) => a + b, 0);
+        let r = Math.random() * total;
+        for (let i = 0; i < arr.length; i++) { r -= w[i]; if (r <= 0) return arr[i]; }
+        return arr[arr.length - 1];
+    }
+    async function getMarketListings(id, name) {
+        if (marketCache[name]) return marketCache[name];
+        const parts = await fetchGiftParts(name);
+        const valid = parts.models.filter(m => !m.crafted), models = valid.length ? valid : parts.models;
+        const data = { id, name, parts, listings: [], count: 0 };
+        if (models.length && parts.backdrops.length && parts.patterns.length) {
+            const supply = Math.floor(seededRand(name + 'total') * 140000) + 20000;
+            for (let i = 0; i < MARKET_LISTINGS; i++) {
+                const cd = { model: rarityPick(models), backdrop: rarityPick(parts.backdrops), pattern: rarityPick(parts.patterns) };
+                const fair = fairValueOf(name, cd);
+                data.listings.push({ key: `${i}-${Math.random()}`, num: 1 + Math.floor(Math.random() * supply * 0.8), cd, price: roundPrice(fair * (0.98 + Math.random() ** 2 * 0.8)) });
+            }
+            data.count = MARKET_LISTINGS + Math.floor(seededRand(name + 'offers') * 7000);
+        }
+        return marketCache[name] = data;
+    }
+    function marketFloor(id, name) {
+        const c = marketCache[name];
+        if (c && c.listings.length) return Math.min(...c.listings.map(l => l.price));
+        return roundPrice(giftBaseGram(name) * 1.6);
+    }
+    function collectibleThumbHtml(name, cd, patId) {
+        return `<div class="w-tile-bg" style="background:${getBackdropStyle(cd.backdrop)}"></div><div class="dynamic-pattern-container" id="${patId}"></div><img class="model" src="${getModelImg(name, cd.model)}" loading="lazy" alt="">`;
+    }
+    function fillThumbPattern(patId, name, cd) { generatePattern(patId, cd.pattern, name, true, cd.backdrop.hex ? cd.backdrop.hex.patternColor : '#000'); }
+
+    // Your listings
+    function listingOf(giftId) { return ((state.wallet && state.wallet.listings) || []).find(l => l.giftId === giftId) || null; }
+    function isListed(g) { return !!listingOf(g.uniqueId); }
+    function nextBuyerRoll(from) { return from + (15 + Math.random() * 75) * 1000; }
+    function buyerChance(ratio) { return ratio <= 0.7 ? 0.7 : Math.max(0, Math.min(0.5, 1.2 - ratio)); }
+    function checkMarketSales() {
+        const w = state.wallet; if (!w || !w.listings || !w.listings.length) return;
+        const now = Date.now();
+        w.listings = w.listings.filter(l => walletGift(l.giftId));
+        for (const l of [...w.listings]) {
+            const g = walletGift(l.giftId), ratio = l.price / fairValueOf(g.name, g.collectibleData);
+            // Catch up on rolls missed while the app was closed (capped)
+            for (let rolls = 0; now >= l.nextRollAt && rolls < 200; rolls++) {
+                if (Math.random() < buyerChance(ratio)) { completeSale(l, g); break; }
+                l.nextRollAt = nextBuyerRoll(l.nextRollAt);
+            }
+        }
+        saveState();
+    }
+    function completeSale(l, g) {
+        const w = state.wallet, net = gramRound(l.price * (1 - MARKET_FEE));
+        w.listings = w.listings.filter(x => x !== l);
+        state.inventory = state.inventory.filter(x => x.uniqueId !== g.uniqueId);
+        if (w.card.themeId === g.uniqueId) w.card.themeId = null;
+        addWalletTx({ kind: 'sale', peer: `${g.name} #${g.collectibleNumber.toLocaleString('en-US')}`, note: 'Gift sold', amount: net, img: getModelImg(g.name, g.collectibleData.model) });
+        renderInventory(); applyWornGiftVisuals();
+        if (walletUI.open) { renderWalletCard(); renderWalletStickers(); renderWalletTab(); }
+        if (appRuntime.activeGiftId === g.uniqueId && document.getElementById('collectible-modal').classList.contains('active')) closeModal('collectible-modal');
+        hapticNotify('success');
+        showToast(`${g.name} #${g.collectibleNumber.toLocaleString('en-US')} sold for ${gramStr(net)} GRAM`);
+        if (typeof confetti === 'function') confetti({ particleCount: 60, spread: 70, origin: { y: 0.2 }, zIndex: 6000 });
+    }
+
     function renderWalletMarket(body) {
-        body.innerHTML = `<div class="w-market-hero" id="w-mystery"><div class="hero-img"><img src="${CDN_BASE}originals/${MYSTERY_IMG_ID}/Original.png" alt=""></div><div><h3>Mystery Gift</h3><p>A random collectible from any upgradable gift. Model, backdrop and symbol are rolled when you buy.</p><span class="w-price-pill">${GEM_SVG} ${gramStr(MYSTERY_PRICE)}</span></div></div>`
-            + `<div class="w-section-title">Random collectibles</div><div class="w-grid" id="w-market-grid"></div>`;
-        body.querySelector('#w-mystery').onclick = () => openMarketBuy(null);
+        const mine = (state.wallet.listings || []).map(l => ({ l, g: walletGift(l.giftId) })).filter(x => x.g);
+        let html = '';
+        if (mine.length) {
+            html += `<div class="w-section-title">Your listings</div><div class="w-tx-list" style="margin-bottom:16px">${mine.map(({ l, g }, i) => `<div class="w-tx w-mine" data-i="${i}"><div class="w-tx-ico gift" style="background:${getBackdropStyle(g.collectibleData.backdrop)}"><img src="${getModelImg(g.name, g.collectibleData.model)}" alt=""></div><div class="w-tx-main"><div class="w-tx-title">${escHtml(g.name)} #${g.collectibleNumber.toLocaleString('en-US')}</div><div class="w-tx-sub">Waiting for a buyer…</div></div><div class="w-tx-amt">${gramStr(l.price)} ${GEM_SVG}</div></div>`).join('')}</div>`;
+        }
+        html += `<div class="w-section-title">Buy a gift</div><div class="w-grid" id="w-market-grid"></div>`;
+        body.innerHTML = html;
+        body.querySelectorAll('.w-mine').forEach(el => el.onclick = () => openSellSheet(mine[+el.dataset.i].g.uniqueId));
         const grid = body.querySelector('#w-market-grid'), items = marketGifts();
         if (!items.length) { grid.outerHTML = `<div class="w-empty">Loading gifts…</div>`; return; }
         items.forEach(([id, name]) => {
             const el = document.createElement('div');
             el.className = 'w-tile w-offer';
-            el.innerHTML = `<img class="orig" src="${CDN_BASE}originals/${id}/Original.png" loading="lazy" alt="" onerror="this.style.visibility='hidden'"><span class="w-price-pill">${GEM_SVG} ${gramStr(marketPrice(id))}</span>`;
-            el.onclick = () => openMarketBuy([id, name]);
+            el.innerHTML = `<div class="gift-ribbon w-resale" style="--rb:#2fb24c"><span>resale</span></div><img class="orig" src="${CDN_BASE}originals/${id}/Original.png" loading="lazy" alt="" onerror="this.style.visibility='hidden'"><span class="w-price-pill">${GEM_SVG} ${gramStr(marketFloor(id, name))}+</span>`;
+            el.onclick = () => openMarketGift(id, name);
             grid.appendChild(el);
         });
     }
-    function openWalletModal(id) { hideWalletMenus(); document.getElementById(id).classList.add('active'); setWalletBack(() => closeModal(id)); }
-    function openMarketBuy(entry) {
+
+    // Listing page for one gift: filters + grid of offers
+    async function openMarketGift(id, name) {
+        haptic('light'); hideWalletMenus();
+        walletUI.mktOpen = true;
+        walletUI.mkt = { id, name, sort: 'asc', model: null, backdrop: null, pattern: null };
+        document.getElementById('w-mkt-name').innerText = name;
+        document.getElementById('w-mkt-count').innerText = 'Loading offers…';
+        document.getElementById('w-mkt-chips').innerHTML = '';
+        document.getElementById('w-mkt-grid').innerHTML = '<div class="spinner" style="grid-column:1/-1"></div>';
+        document.getElementById('w-mkt-scroll').scrollTop = 0;
+        updateMarketBalance();
+        document.getElementById('wallet-market').classList.add('open');
+        setWalletBack(closeMarketGift);
+        await getMarketListings(id, name);
+        if (walletUI.mktOpen && walletUI.mkt.name === name) renderMarketListings();
+    }
+    function closeMarketGift() {
+        document.getElementById('wallet-market').classList.remove('open');
+        if (!walletUI.mktOpen) return;
+        walletUI.mktOpen = false; hideWalletMenus();
+        if (walletUI.open) { setWalletBack(closeWallet); renderWalletTab(); }
+    }
+    function updateMarketBalance() { document.getElementById('w-mkt-bal').innerHTML = `${GEM_SVG} ${gramStr(state.wallet.balance)}`; }
+    const MKT_FILTERS = [['model', 'Model', 'models'], ['backdrop', 'Backdrop', 'backdrops'], ['pattern', 'Symbol', 'patterns']];
+    function renderMarketListings() {
+        const m = walletUI.mkt, data = marketCache[m.name]; if (!data) return;
+        document.getElementById('w-mkt-count').innerText = `${data.count.toLocaleString('en-US')} offers`;
+        const chips = document.getElementById('w-mkt-chips');
+        chips.innerHTML = `<button class="w-chip" data-f="sort">${GEM_SVG} Price ${m.sort === 'asc' ? '↑' : '↓'}</button>`
+            + MKT_FILTERS.map(([key, label]) => `<button class="w-chip${m[key] ? ' on' : ''}" data-f="${key}">${escHtml(m[key] || label)} <span class="chev">⌃⌄</span></button>`).join('');
+        chips.querySelectorAll('.w-chip').forEach(b => b.onclick = (e) => {
+            e.stopPropagation();
+            if (b.dataset.f === 'sort') { haptic('light'); m.sort = m.sort === 'asc' ? 'desc' : 'asc'; renderMarketListings(); }
+            else openMarketFilter(e, b.dataset.f);
+        });
+        const list = data.listings
+            .filter(l => (!m.model || l.cd.model.name === m.model) && (!m.backdrop || l.cd.backdrop.name === m.backdrop) && (!m.pattern || l.cd.pattern.name === m.pattern))
+            .sort((a, b) => m.sort === 'asc' ? a.price - b.price : b.price - a.price);
+        const grid = document.getElementById('w-mkt-grid');
+        grid.innerHTML = '';
+        if (!list.length) { grid.innerHTML = `<div class="w-empty" style="grid-column:1/-1">${data.listings.length ? 'No offers match these filters.' : 'No offers for this gift right now.'}</div>`; return; }
+        list.forEach(l => {
+            const el = document.createElement('div'), patId = `mkt-pat-${l.key}`;
+            const rb = l.cd.backdrop.hex ? `color-mix(in srgb, ${l.cd.backdrop.hex.edgeColor} 88%, #000)` : '#2a2f3d';
+            el.className = 'w-tile w-lst';
+            el.innerHTML = `${collectibleThumbHtml(m.name, l.cd, patId)}<div class="gift-ribbon" style="--rb:${rb}"><span>#${l.num.toLocaleString('en-US')}</span></div><span class="w-price-pill">${GEM_SVG} ${gramStr(l.price)}</span>`;
+            el.onclick = () => openListingBuy(l);
+            grid.appendChild(el);
+            fillThumbPattern(patId, m.name, l.cd);
+        });
+    }
+    function openMarketFilter(e, key) {
         haptic('light');
-        const b = walletUI.buy = entry ? { id: entry[0], name: entry[1], price: marketPrice(entry[0]) } : { id: null, name: null, price: MYSTERY_PRICE };
-        document.getElementById('w-buy-img').src = `${CDN_BASE}originals/${b.id || MYSTERY_IMG_ID}/Original.png`;
-        document.getElementById('w-buy-title').innerText = b.id ? b.name : 'Mystery Gift';
-        document.getElementById('w-buy-sub').innerText = b.id
-            ? `You'll get a random ${b.name} collectible. Its model, backdrop and symbol are rolled when you buy.`
-            : 'Any upgradable gift, fully random. Could be a common one, or a rare model.';
-        document.getElementById('w-buy-price').innerHTML = `${GEM_SVG} ${gramStr(b.price)}`;
-        document.getElementById('w-buy-balance').innerHTML = `${GEM_SVG} ${gramStr(state.wallet.balance)}`;
+        const m = walletUI.mkt, data = marketCache[m.name], [, label, partsKey] = MKT_FILTERS.find(f => f[0] === key);
+        const opts = data.parts[partsKey].filter(o => key !== 'model' || !o.crafted);
+        const menu = document.getElementById('w-menu');
+        menu.innerHTML = `<button class="w-menu-item" data-v="">All ${label.toLowerCase()}s</button>` + opts.map((o, i) => `<button class="w-menu-item${m[key] === o.name ? ' on' : ''}" data-v="${i}"><span>${escHtml(o.name)}<small>${o.rarityPermille ? `${(o.rarityPermille / 10).toFixed(1)}%` : ''}</small></span></button>`).join('');
+        menu.querySelectorAll('[data-v]').forEach(b => b.onclick = (ev) => {
+            ev.stopPropagation(); hideWalletMenus(); haptic('light');
+            m[key] = b.dataset.v === '' ? null : opts[+b.dataset.v].name;
+            renderMarketListings();
+        });
+        const r = e.currentTarget.getBoundingClientRect();
+        showWalletPopover(menu, r.left, r.bottom + 6);
+    }
+
+    function openWalletModal(id) { hideWalletMenus(); document.getElementById(id).classList.add('active'); setWalletBack(() => closeModal(id)); }
+    function buyVisualHtml(name, cd) { return `<div class="w-buy-thumb">${collectibleThumbHtml(name, cd, 'w-buy-pat')}</div>`; }
+    function attrRow(label, part) { return `<div class="w-buy-row"><span>${label}</span><b>${escHtml(part.name)}${part.rarityPermille ? ` <em>${(part.rarityPermille / 10).toFixed(1)}%</em>` : ''}</b></div>`; }
+    function openListingBuy(l) {
+        haptic('light');
+        const m = walletUI.mkt, enough = state.wallet.balance >= l.price;
+        walletUI.buy = { l, id: m.id, name: m.name };
+        document.getElementById('w-buy-visual').innerHTML = buyVisualHtml(m.name, l.cd);
+        fillThumbPattern('w-buy-pat', m.name, l.cd);
+        document.getElementById('w-buy-title').innerText = `${m.name} #${l.num.toLocaleString('en-US')}`;
+        document.getElementById('w-buy-sub').innerText = 'Resale offer · goes straight to your profile';
+        document.getElementById('w-buy-rows').innerHTML = attrRow('Model', l.cd.model) + attrRow('Backdrop', l.cd.backdrop) + attrRow('Symbol', l.cd.pattern)
+            + `<div class="w-buy-row"><span>Price</span><b>${GEM_SVG} ${gramStr(l.price)}</b></div><div class="w-buy-row"><span>Your balance</span><b>${GEM_SVG} ${gramStr(state.wallet.balance)}</b></div>`;
         const btn = document.getElementById('w-buy-btn');
         btn.disabled = false;
-        btn.innerText = state.wallet.balance >= b.price ? `Buy for ${gramStr(b.price)} GRAM` : 'Not enough GRAM · Add Funds';
+        btn.innerText = enough ? `Buy for ${gramStr(l.price)} GRAM` : 'Not enough GRAM · Add Funds';
         openWalletModal('w-buy-modal');
     }
-    async function confirmMarketBuy() {
-        const b = walletUI.buy; if (!b || b.busy) return;
-        if (state.wallet.balance < b.price) { closeModal('w-buy-modal'); openWalletReceive(true); return; }
-        const btn = document.getElementById('w-buy-btn');
-        b.busy = true; btn.disabled = true; btn.innerText = 'Buying…';
-        let id = b.id, name = b.name, parts = null, pool = [];
-        // A mystery roll retries a few gifts in case one has no parts on the CDN
-        for (let tries = 0; tries < (b.id ? 1 : 5); tries++) {
-            if (!b.id) { const pickEntry = wPick(marketGifts()); if (!pickEntry) break; [id, name] = pickEntry; }
-            parts = await fetchGiftParts(name);
-            const valid = parts.models.filter(m => !m.crafted);
-            pool = valid.length ? valid : parts.models;
-            if (pool.length && parts.backdrops.length && parts.patterns.length) break;
-            pool = [];
-        }
-        b.busy = false; btn.disabled = false;
-        if (!pool.length) { btn.innerText = `Buy for ${gramStr(b.price)} GRAM`; showToast('This gift is not available right now'); return; }
-        state.lastCollectibleNumber++;
-        const gift = {
-            uniqueId: Date.now() + Math.random(), originalId: id, name, isCollectible: true, timestamp: Date.now(),
-            collectibleNumber: state.lastCollectibleNumber,
-            collectibleData: { model: wPick(pool), backdrop: wPick(parts.backdrops), pattern: wPick(parts.patterns) }
-        };
+    function confirmMarketBuy() {
+        const b = walletUI.buy; if (!b) return;
+        if (state.wallet.balance < b.l.price) { closeModal('w-buy-modal'); openWalletReceive(true); return; }
+        const data = marketCache[b.name];
+        data.listings = data.listings.filter(x => x !== b.l); data.count = Math.max(data.listings.length, data.count - 1);
+        const gift = { uniqueId: Date.now() + Math.random(), originalId: b.id, name: b.name, isCollectible: true, timestamp: Date.now(), collectibleNumber: b.l.num, collectibleData: b.l.cd, boughtFor: b.l.price };
         state.inventory.unshift(gift);
-        addWalletTx({ kind: 'buy', peer: name, note: b.id ? 'Gift purchase' : 'Mystery gift', amount: -b.price, img: `${CDN_BASE}originals/${id}/Original.png` });
-        renderInventory(); renderWalletTab();
+        addWalletTx({ kind: 'buy', peer: `${b.name} #${b.l.num.toLocaleString('en-US')}`, note: 'Gift purchase', amount: -b.l.price, img: getModelImg(b.name, b.l.cd.model) });
+        walletUI.buy = null;
+        renderInventory(); updateMarketBalance(); renderMarketListings();
         closeModal('w-buy-modal'); hapticNotify('success');
+        showToast('Gift added to your profile');
         setWalletBack(null);
-        openCollectibleModal(gift, true, { ...parts, models: pool });
+        openCollectibleModal(gift, false);
+    }
+
+    // Sell sheet: price your collectible; a buyer shows up at a random time if the price is fair
+    function openSellFromMenu() { document.getElementById('long-press-menu').classList.add('hidden'); openSellSheet(appRuntime.activeGiftId); }
+    function openSellSheet(giftId) {
+        ensureWallet(); hideWalletMenus();
+        const g = walletGift(giftId); if (!g) return;
+        haptic('light');
+        const cd = g.collectibleData, fair = fairValueOf(g.name, cd), l = listingOf(giftId);
+        walletUI.sell = { giftId, fair };
+        document.getElementById('w-sell-visual').innerHTML = buyVisualHtml(g.name, cd);
+        fillThumbPattern('w-buy-pat', g.name, cd);
+        document.getElementById('w-sell-title').innerText = `${g.name} #${g.collectibleNumber.toLocaleString('en-US')}`;
+        document.getElementById('w-sell-price').value = l ? l.price : fair;
+        document.getElementById('w-sell-quick').innerHTML = [['−10%', 0.9], ['Value', 1], ['+10%', 1.1], ['+25%', 1.25]]
+            .map(([t, k]) => `<button onclick="setSellPrice(${k})">${t}</button>`).join('');
+        document.getElementById('w-sell-btn').innerText = l ? 'Update Price' : 'List for Sale';
+        document.getElementById('w-unlist-btn').style.display = l ? '' : 'none';
+        updateSellSheet();
+        openWalletModal('w-sell-modal');
+    }
+    function setSellPrice(k) { haptic('light'); document.getElementById('w-sell-price').value = roundPrice(walletUI.sell.fair * k); updateSellSheet(); }
+    function sellInputPrice() { return parseFloat(document.getElementById('w-sell-price').value.replace(',', '.')) || 0; }
+    function updateSellSheet() {
+        const price = sellInputPrice(), fair = walletUI.sell.fair, ratio = price / fair;
+        const [cls, text] = !price ? ['', 'Enter a price'] : ratio <= 0.9 ? ['good', 'Below value — likely sells within minutes'] : ratio <= 1.05 ? ['good', 'Fair price — a buyer should show up soon']
+            : ratio <= 1.2 ? ['warn', 'A bit high — may take a while'] : ['bad', 'Too expensive — buyers will probably skip it'];
+        const chance = document.getElementById('w-sell-chance');
+        chance.className = `w-sell-chance ${cls}`; chance.innerText = text;
+        document.getElementById('w-sell-rows').innerHTML = `<div class="w-buy-row"><span>Estimated value</span><b>${GEM_SVG} ${gramStr(fair)}</b></div>`
+            + `<div class="w-buy-row"><span>Market fee (${MARKET_FEE * 100}%)</span><b>−${gramStr(price * MARKET_FEE)}</b></div>`
+            + `<div class="w-buy-row"><span>You receive</span><b>${GEM_SVG} ${gramStr(price * (1 - MARKET_FEE))}</b></div>`;
+        document.getElementById('w-sell-btn').disabled = price <= 0;
+    }
+    function confirmSell() {
+        const s = walletUI.sell, price = roundPrice(sellInputPrice()); if (!s || price <= 0) return;
+        const w = state.wallet; w.listings = w.listings || [];
+        const l = listingOf(s.giftId), now = Date.now();
+        if (l) { l.price = price; l.nextRollAt = nextBuyerRoll(now); }
+        else w.listings.push({ giftId: s.giftId, price, listedAt: now, nextRollAt: nextBuyerRoll(now) });
+        saveState(); closeModal('w-sell-modal'); hapticNotify('success');
+        showToast(`Listed for ${gramStr(price)} GRAM`);
+        renderInventory(); renderWalletTab();
+    }
+    function unlistGift() {
+        const s = walletUI.sell; if (!s) return;
+        state.wallet.listings = state.wallet.listings.filter(l => l.giftId !== s.giftId);
+        saveState(); closeModal('w-sell-modal'); haptic('medium');
+        showToast('Removed from sale');
+        renderInventory(); renderWalletTab();
     }
 
     // --- Receive / Add funds ---
