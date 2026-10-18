@@ -4875,7 +4875,9 @@
     function roundPrice(v) { return Math.max(0.1, v < 10 ? Math.round(v * 100) / 100 : v < 100 ? Math.round(v * 10) / 10 : Math.round(v)); }
     function marketGifts() { return giftEntries().filter(([id, name]) => !['custom_skebob', 'custom_baggin_cat'].includes(id) && canUpgradeName(name)); }
     function marketPrice(id) {
-        const p = realPrices[id], stars = p ? p.stars + (p.upgrade_stars || 0) : (parseInt(shopPrice(id)) || 100);
+        const p = realPrices[id];
+        if (p && p.floor) return p.floor; // real collection floor in TON (1 GRAM = 1 TON)
+        const stars = p ? p.stars + (p.upgrade_stars || 0) : (parseInt(shopPrice(id)) || 100);
         return Math.max(0.5, Math.round(stars * 0.012 * 10) / 10);
     }
     function giftBaseGram(name) { const e = giftEntries().find(([, n]) => n === name); return e ? marketPrice(e[0]) : 3; }
