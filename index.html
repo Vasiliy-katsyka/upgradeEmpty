@@ -1505,6 +1505,272 @@
         .gift-card { contain: layout style; }
         /* While scrolling, glass uses a plain blur instead of the SVG lens (cheaper per frame) */
         html.is-scrolling .lg { -webkit-backdrop-filter: blur(12px) saturate(180%) !important; backdrop-filter: blur(12px) saturate(180%) !important; }
+
+        /* ---------- Wallet (simulated GRAM balance card) ---------- */
+        .gem { width: 1em; height: 1em; display: inline-block; vertical-align: -0.12em; flex-shrink: 0; }
+        .profile-balance-chip {
+            margin: 10px auto 0; display: flex; align-items: center; gap: 5px; border: none; cursor: pointer;
+            background: rgba(0,0,0,0.24); color: #fff; border-radius: 999px; padding: 5px 12px 5px 10px;
+            font-size: 0.82em; font-weight: 600; transition: transform 0.12s, background 0.2s;
+        }
+        .profile-balance-chip:active { transform: scale(0.96); background: rgba(0,0,0,0.35); }
+        .profile-balance-chip .lbl { opacity: 0.7; font-weight: 500; }
+        .profile-balance-chip .chev { opacity: 0.6; margin-left: 1px; }
+
+        :root { --w-accent: #2f9bf0; --w-accent-2: #1d84e6; --w-row: #1c1c1e; }
+        .wallet-page {
+            position: fixed; inset: 0; z-index: 900; background: #000; color: #fff;
+            transform: translateX(100%); visibility: hidden; transition: transform 0.32s cubic-bezier(0.2, 0.9, 0.25, 1), visibility 0.32s;
+        }
+        .wallet-page.open { transform: none; visibility: visible; }
+        .wallet-view { position: absolute; inset: 0; display: flex; flex-direction: column; max-width: 600px; margin: 0 auto; background: #000; }
+        .w-top {
+            display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+            padding: calc(var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px) + 8px) 10px 8px;
+        }
+        .w-title { flex: 1; font-weight: 700; font-size: 1.12em; letter-spacing: -0.2px; display: flex; align-items: center; gap: 6px; min-width: 0; }
+        .w-title small { font-size: 0.72em; font-weight: 500; color: #8d8e93; }
+        .w-hbtn {
+            width: 38px; height: 38px; border-radius: 50%; border: none; background: #1c1c1e; color: #fff; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .w-hbtn:active { background: #2c2c2e; }
+        .w-hbtn svg { width: 20px; height: 20px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+        .w-hbtn svg.fill { fill: #fff; stroke: none; }
+        .w-scroll { flex: 1; overflow-y: auto; padding: 4px 14px calc(30px + env(safe-area-inset-bottom)); -webkit-overflow-scrolling: touch; }
+
+        .w-card-stage { perspective: 900px; padding: 6px 0 2px; }
+        .w-card {
+            position: relative; width: 100%; aspect-ratio: 1.6; border-radius: 22px; touch-action: none; cursor: grab;
+            transform-style: preserve-3d; transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+            transition: transform 0.6s cubic-bezier(0.2, 1.4, 0.3, 1), box-shadow 0.3s;
+            box-shadow: 0 14px 34px -10px color-mix(in srgb, var(--w-accent) 55%, transparent);
+            color: #fff;
+        }
+        .w-card.dragging { transition: none; cursor: grabbing; }
+        .w-card-bg, .w-card-pattern, .w-card-shine { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; overflow: hidden; }
+        .w-card-bg {
+            background:
+                radial-gradient(90% 120% at 85% 110%, rgba(10, 70, 200, 0.55), transparent 60%),
+                radial-gradient(70% 90% at 15% 0%, rgba(140, 220, 255, 0.55), transparent 60%),
+                linear-gradient(135deg, #38b6ff 0%, #1f8ef1 55%, #1468da 100%);
+            transition: background 0.5s ease;
+        }
+        .w-card-pattern .pattern-layer { position: absolute; inset: 0; }
+        .w-card-shine {
+            background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.22) 45%, rgba(255,255,255,0.05) 55%, transparent 70%);
+            background-size: 250% 250%; background-position: var(--shx, 50%) var(--shy, 50%); mix-blend-mode: soft-light;
+        }
+        .w-card::after { /* fine rim */
+            content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), inset 0 0 0 0.5px rgba(255,255,255,0.18);
+        }
+        .w-card-balance { position: absolute; left: 7%; top: 22%; pointer-events: none; }
+        .w-card-amount { font-size: clamp(22px, 7.4vw, 34px); font-weight: 700; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; text-shadow: 0 1px 8px rgba(0,0,0,0.12); }
+        .w-card-amount .frac { font-size: 0.8em; }
+        .w-card-amount .unit { font-weight: 500; opacity: 0.75; font-size: 0.86em; margin-left: 2px; }
+        .w-card-fiat { font-size: 0.85em; opacity: 0.7; margin-top: 2px; margin-left: 2px; font-weight: 500; }
+        .w-card-qr {
+            position: absolute; right: 12%; top: 22%; width: 42px; height: 34px; border-radius: 9px; border: none; cursor: pointer;
+            background: linear-gradient(145deg, rgba(255,255,255,0.85), rgba(210,225,240,0.75));
+            display: flex; align-items: center; justify-content: center; box-shadow: inset 0 1px 0 #fff, 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .w-card-qr svg { width: 20px; height: 20px; fill: none; stroke: #6a7d92; stroke-width: 2; }
+        .w-card-holder {
+            position: absolute; left: 7%; bottom: 13%; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+            font-size: 0.8em; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; pointer-events: none;
+            max-width: 70%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .w-card-addr {
+            position: absolute; right: 3.2%; top: 8%; bottom: 8%; writing-mode: vertical-rl; pointer-events: none; overflow: hidden;
+            font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 7.5px; line-height: 1.25; letter-spacing: 1px; opacity: 0.35;
+        }
+        .w-card-stickers { position: absolute; inset: 0; border-radius: inherit; transform: translateZ(18px); pointer-events: none; }
+        .w-stk {
+            position: absolute; width: 24%; aspect-ratio: 1; pointer-events: auto; touch-action: none; cursor: move;
+            transform: translate(-50%, -50%) rotate(var(--r, 0deg)) scale(var(--s, 1));
+        }
+        .w-stk-inner { position: absolute; inset: 0; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25)); }
+        .w-stk-inner img, .w-stk-anim { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+        .w-stk-ring, .w-stk-handle, .w-stk-del { display: none; }
+        .w-stk.sel .w-stk-ring { display: block; position: absolute; inset: -14%; border: 1.5px dashed rgba(255,255,255,0.9); border-radius: 50%; pointer-events: none; }
+        .w-stk.sel .w-stk-handle, .w-stk.sel .w-stk-del {
+            display: flex; position: absolute; width: 22px; height: 22px; border-radius: 50%; align-items: center; justify-content: center;
+            transform: translate(-50%, -50%) scale(calc(1 / var(--s, 1)));
+        }
+        .w-stk.sel .w-stk-handle { left: calc(50% + 45.25%); top: calc(50% + 45.25%); background: #fff; box-shadow: 0 1px 6px rgba(0,0,0,0.35); cursor: nwse-resize; }
+        .w-stk.sel .w-stk-handle::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--w-accent); }
+        .w-stk.sel .w-stk-del { left: calc(50% - 45.25%); top: calc(50% - 45.25%); background: rgba(0,0,0,0.55); color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; }
+        .w-card-hint { text-align: center; font-size: 0.78em; color: #8d8e93; min-height: 1.3em; margin: 8px 0 2px; transition: opacity 0.2s; }
+
+        .w-actions { display: flex; gap: 10px; margin: 6px 0 14px; }
+        .w-btn {
+            flex: 1; height: 46px; border-radius: 999px; border: none; cursor: pointer; color: #fff; font-size: 1em; font-weight: 600;
+            background: var(--w-accent); box-shadow: inset 0 1px 0 rgba(255,255,255,0.28); transition: transform 0.12s, filter 0.15s, background 0.4s;
+        }
+        .w-btn:active { transform: scale(0.97); filter: brightness(0.92); }
+        .w-btn:disabled { opacity: 0.45; pointer-events: none; }
+        .w-btn.secondary { background: #1c1c1e; color: var(--w-accent-text, #62bcf9); }
+
+        .w-seg { display: flex; background: #1c1c1e; border-radius: 999px; padding: 3px; margin-bottom: 12px; }
+        .w-seg button {
+            flex: 1; border: none; background: transparent; color: #8d8e93; font-weight: 600; font-size: 0.9em;
+            padding: 8px 6px; border-radius: 999px; cursor: pointer; transition: background 0.2s, color 0.2s;
+        }
+        .w-seg button.active { background: rgba(255,255,255,0.12); color: #fff; box-shadow: inset 0 0.5px 0 rgba(255,255,255,0.3); }
+
+        .w-empty { text-align: center; color: #8d8e93; padding: 34px 16px; font-size: 0.92em; line-height: 1.45; }
+        .w-empty b { display: block; color: #fff; font-size: 1.05em; margin-bottom: 4px; }
+        .w-tx-list { background: var(--w-row); border-radius: 18px; overflow: hidden; }
+        .w-tx { display: flex; align-items: center; gap: 12px; padding: 11px 14px; position: relative; }
+        .w-tx + .w-tx::before { content: ''; position: absolute; top: 0; left: 62px; right: 0; height: 0.5px; background: rgba(255,255,255,0.08); }
+        .w-tx-ico { width: 36px; height: 36px; border-radius: 50%; background: var(--w-accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; position: relative; }
+        .w-tx-ico svg { width: 18px; height: 18px; fill: none; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+        .w-tx-ico img { width: 100%; height: 100%; object-fit: contain; }
+        .w-tx-ico.gift { background: #2c2c2e; }
+        .w-tx-main { flex: 1; min-width: 0; }
+        .w-tx-title { font-weight: 600; font-size: 0.95em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .w-tx-sub { font-size: 0.8em; color: #c7c7cc; margin-top: 1px; }
+        .w-tx-date { font-size: 0.74em; color: #8d8e93; margin-top: 1px; }
+        .w-tx-amt { font-weight: 600; font-size: 0.95em; display: flex; align-items: center; gap: 4px; white-space: nowrap; align-self: flex-start; margin-top: 2px; }
+        .w-tx-amt.in { color: #4cd964; }
+
+        .w-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .w-tile {
+            position: relative; aspect-ratio: 1; border-radius: 18px; cursor: pointer; background: #1c1c1e; container-type: inline-size;
+            transition: transform 0.12s;
+        }
+        .w-tile:active { transform: scale(0.96); }
+        .w-tile-bg { position: absolute; inset: 0; border-radius: inherit; }
+        .w-tile img.model { position: absolute; left: 14%; top: 14%; width: 72%; height: 72%; object-fit: contain; transition: filter 0.3s, opacity 0.3s; }
+        .w-tile.on-card img.model { filter: brightness(0) ; opacity: 0.22; }
+        .w-tile .gift-ribbon { z-index: 3; }
+        .w-tile-badge {
+            position: absolute; left: 7px; top: 7px; z-index: 3; width: 20px; height: 20px; border-radius: 6px; background: rgba(0,0,0,0.35);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .w-tile-badge svg { width: 13px; height: 13px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+        .w-market-hero {
+            position: relative; display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 22px; margin-bottom: 14px; cursor: pointer; overflow: hidden;
+            background: radial-gradient(120% 140% at 0% 0%, #7b5cff 0%, #4a36c9 45%, #22175e 100%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.25); transition: transform 0.12s;
+        }
+        .w-market-hero:active { transform: scale(0.98); }
+        .w-market-hero .hero-img { width: 74px; height: 74px; position: relative; flex-shrink: 0; }
+        .w-market-hero .hero-img img { width: 100%; height: 100%; object-fit: contain; animation: wHeroBob 2.6s ease-in-out infinite; }
+        @keyframes wHeroBob { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-5px) rotate(4deg); } }
+        .w-market-hero h3 { font-size: 1.08em; margin-bottom: 3px; }
+        .w-market-hero p { font-size: 0.8em; opacity: 0.8; line-height: 1.35; }
+        .w-price-pill {
+            display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px;
+            background: rgba(255,255,255,0.18); font-weight: 700; font-size: 0.82em; margin-top: 8px;
+        }
+        .w-section-title { font-size: 0.8em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: #8d8e93; margin: 4px 4px 8px; display: flex; justify-content: space-between; align-items: center; }
+        .w-section-title button { border: none; background: none; color: var(--w-accent-text, #62bcf9); font-weight: 600; font-size: 1em; text-transform: none; letter-spacing: 0; cursor: pointer; }
+        .w-offer { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 8px; }
+        .w-offer img.orig { position: absolute; left: 18%; top: 10%; width: 64%; height: 64%; object-fit: contain; }
+        .w-offer .w-price-pill { position: relative; z-index: 2; background: color-mix(in srgb, var(--w-accent) 25%, transparent); color: #fff; margin: 0; padding: 3px 9px; font-size: 0.78em; }
+
+        #w-gift-menu, #w-menu {
+            position: fixed; z-index: 1500; min-width: 200px; border-radius: 20px; padding: 6px; background: rgba(36,36,40,0.92);
+            -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.45), inset 0 0.5px 0 rgba(255,255,255,0.2);
+            transform-origin: top left; animation: wMenuIn 0.18s cubic-bezier(0.2, 0.9, 0.25, 1.2);
+        }
+        #w-gift-menu.hidden, #w-menu.hidden { display: none; }
+        @keyframes wMenuIn { from { opacity: 0; transform: scale(0.9); } }
+        .w-menu-item {
+            display: flex; align-items: center; gap: 12px; width: 100%; border: none; background: none; color: #fff; text-align: left;
+            padding: 11px 14px; border-radius: 13px; font-size: 0.95em; font-weight: 500; cursor: pointer;
+        }
+        .w-menu-item:active { background: rgba(255,255,255,0.1); }
+        .w-menu-item svg { width: 20px; height: 20px; fill: none; stroke: #fff; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+        .w-menu-item small { display: block; color: #8d8e93; font-size: 0.82em; }
+        .w-menu-item.danger { color: #ff595a; } .w-menu-item.danger svg { stroke: #ff595a; }
+
+        /* Receive / Add funds sheet */
+        #w-receive-modal, #w-buy-modal { z-index: 1200; }
+        .w-receive-sheet { background: linear-gradient(180deg, var(--w-accent) 0%, var(--w-accent-2) 100%) !important; color: #fff; padding: 14px 18px calc(18px + env(safe-area-inset-bottom)); align-items: center; text-align: center; position: relative; }
+        .w-sheet-close { position: absolute; left: 14px; top: 14px; width: 32px; height: 32px; border-radius: 50%; border: none; background: rgba(255,255,255,0.18); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .w-sheet-close svg { width: 14px; height: 14px; stroke: #fff; stroke-width: 2.6; fill: none; stroke-linecap: round; }
+        .w-qr-box { margin: 30px auto 10px; background: #fff; border-radius: 26px; padding: 16px 16px 10px; width: 210px; box-shadow: 0 10px 30px rgba(0,0,0,0.18); }
+        .w-qr { position: relative; width: 178px; height: 178px; }
+        .w-qr svg.code { width: 100%; height: 100%; display: block; }
+        .w-qr .w-qr-gem { position: absolute; left: 50%; top: 50%; width: 34px; height: 34px; transform: translate(-50%, -50%); background: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .w-copy-btn { border: none; background: none; color: var(--w-accent); font-weight: 600; font-size: 0.86em; padding: 8px 4px 2px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+        .w-copy-btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; }
+        .w-addr-full { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.78em; opacity: 0.85; word-break: break-all; max-width: 300px; margin: 6px auto 4px; line-height: 1.4; }
+        .w-receive-text { font-size: 0.88em; opacity: 0.9; margin: 6px auto 16px; max-width: 280px; line-height: 1.4; font-weight: 500; }
+        .w-white-btn { width: 100%; height: 48px; border-radius: 999px; border: none; background: #fff; color: var(--w-accent); font-weight: 700; font-size: 0.98em; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px; }
+        .w-white-btn:active { transform: scale(0.98); }
+        .w-topup { width: 100%; display: none; margin-top: 4px; }
+        .w-topup.show { display: block; }
+        .w-topup-note { font-size: 0.78em; opacity: 0.8; margin: 4px 0 10px; }
+        .w-topup-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .w-topup-grid button { height: 48px; border-radius: 16px; border: none; background: rgba(255,255,255,0.18); color: #fff; font-weight: 700; font-size: 1em; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .w-topup-grid button:active { background: rgba(255,255,255,0.3); }
+
+        /* Buy (market) sheet */
+        .w-buy-sheet { background: #1c1c1e !important; color: #fff; padding: 14px 18px calc(18px + env(safe-area-inset-bottom)); text-align: center; position: relative; }
+        .w-buy-visual { width: 130px; height: 130px; margin: 18px auto 8px; position: relative; }
+        .w-buy-visual img { width: 100%; height: 100%; object-fit: contain; }
+        .w-buy-sheet h2 { font-size: 1.3em; margin-bottom: 4px; }
+        .w-buy-sheet p { color: #8d8e93; font-size: 0.9em; line-height: 1.4; max-width: 300px; margin: 0 auto 14px; }
+        .w-buy-rows { background: rgba(255,255,255,0.05); border-radius: 18px; text-align: left; margin-bottom: 14px; }
+        .w-buy-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; font-size: 0.93em; }
+        .w-buy-row + .w-buy-row { border-top: 0.5px solid rgba(255,255,255,0.08); }
+        .w-buy-row span:first-child { color: #8d8e93; }
+        .w-buy-row b { display: flex; align-items: center; gap: 5px; }
+        .w-buy-sheet .w-sheet-close { background: rgba(255,255,255,0.08); }
+        .w-buy-sheet > *, .w-receive-sheet > * { flex: none; }
+
+        /* Send flow */
+        .w-send { transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.25, 1); z-index: 2; }
+        .w-send.open { transform: none; }
+        .w-send-step { display: none; flex: 1; flex-direction: column; min-height: 0; }
+        .w-send-step.active { display: flex; }
+        .w-field { background: #1c1c1e; border-radius: 16px; margin: 6px 14px 14px; padding: 10px 14px 12px; }
+        .w-field label { font-size: 0.78em; color: #8d8e93; font-weight: 600; }
+        .w-field-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+        .w-field input { flex: 1; min-width: 0; background: none; border: none; outline: none; color: #fff; font-size: 1em; user-select: text; }
+        .w-field input::placeholder { color: #5f6066; }
+        .w-field-row button { border: none; background: none; color: var(--w-accent-text, #62bcf9); font-weight: 600; font-size: 0.88em; cursor: pointer; }
+        .w-recents { background: #1c1c1e; border-radius: 16px; margin: 0 14px; overflow-y: auto; flex: 1; min-height: 0; padding: 6px 0; }
+        .w-recents .w-section-title { margin: 6px 16px 4px; }
+        .w-contact { display: flex; align-items: center; gap: 12px; padding: 8px 16px; cursor: pointer; }
+        .w-contact:active { background: rgba(255,255,255,0.05); }
+        .w-contact img { width: 40px; height: 40px; border-radius: 50%; }
+        .w-contact b { display: block; font-size: 0.95em; font-weight: 600; }
+        .w-contact span { font-size: 0.8em; color: #8d8e93; }
+        .w-send-footer { padding: 12px 14px calc(12px + env(safe-area-inset-bottom)); }
+        .w-to-pill { display: flex; align-items: center; gap: 10px; margin: 6px 14px 0; background: #1c1c1e; border-radius: 18px; padding: 8px 12px; }
+        .w-to-pill img { width: 36px; height: 36px; border-radius: 50%; }
+        .w-to-pill b { font-size: 0.92em; display: block; }
+        .w-to-pill code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.7em; color: #8d8e93; line-height: 1.3; display: block; word-break: break-all; }
+        .w-amount-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 120px; }
+        .w-amount { display: flex; align-items: center; gap: 10px; font-size: 46px; font-weight: 600; letter-spacing: -1px; }
+        .w-amount .gem { width: 36px; height: 36px; }
+        .w-amount .unit { color: var(--w-accent-text, #62bcf9); font-weight: 500; font-size: 0.6em; letter-spacing: 0; }
+        .w-amount .caret { width: 2px; height: 0.9em; background: var(--w-accent); margin-left: -6px; animation: wCaret 1s steps(1) infinite; }
+        @keyframes wCaret { 50% { opacity: 0; } }
+        .w-amount.shake { animation: wShake 0.35s; color: #ff595a; }
+        @keyframes wShake { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
+        .w-amount-fiat { color: #8d8e93; font-size: 0.9em; margin-top: 4px; }
+        .w-amount-bal { color: #8d8e93; font-size: 0.82em; margin-top: 18px; cursor: pointer; }
+        .w-amount-bal b { color: var(--w-accent-text, #62bcf9); font-weight: 600; }
+        .w-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 8px 10px calc(10px + env(safe-area-inset-bottom)); background: #121214; }
+        .w-keypad button { height: 50px; border-radius: 12px; border: none; background: #2c2c2e; color: #fff; font-size: 1.45em; font-weight: 500; cursor: pointer; }
+        .w-keypad button:active { background: #3a3a3c; }
+        .w-keypad button.flat { background: transparent; }
+        .w-keypad button svg { width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+        .w-done { position: absolute; inset: 0; z-index: 5; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 8px; padding: 20px; }
+        .w-done.show { display: flex; animation: wMenuIn 0.25s ease; }
+        .w-done-check { width: 84px; height: 84px; border-radius: 50%; background: var(--w-accent); display: flex; align-items: center; justify-content: center; margin-bottom: 10px; animation: wPop 0.5s cubic-bezier(0.2, 1.6, 0.4, 1); }
+        .w-done-check svg { width: 42px; height: 42px; fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+        @keyframes wPop { from { transform: scale(0.3); } }
+        .w-done h2 { font-size: 1.5em; }
+        .w-done p { color: #8d8e93; }
     </style>
 </head>
 <body>
@@ -1535,6 +1801,7 @@
                     <h1 id="user-name">Loading...</h1>
                     <p id="gift-count-display">online</p>
                 </div>
+                <button class="profile-balance-chip" onclick="openWallet()"><span class="lbl">Balance</span> <svg class="gem" viewBox="0 0 24 24"><path fill="#8fd8ff" d="M6 3h12l4 5.6L12 21 2 8.6z"/><path fill="#45aef7" d="M2 8.6h20L12 21z"/><path fill="#c4ecff" d="M6 3l2.6 5.6h6.8L18 3z"/><path fill="#2289ea" d="M8.6 8.6L12 21l3.4-12.4z"/></svg> <span id="profile-balance">0</span><span class="chev">›</span></button>
             </div>
         </div>
         
@@ -1637,6 +1904,11 @@
 
             <div class="ios-group-title">Profile</div>
             <div class="ios-group">
+                <button class="ios-row" onclick="closeModal('settings-modal'); openWallet()">
+                    <span class="ios-ico" style="background:#2f9bf0"><svg viewBox="0 0 24 24"><path d="M4 7a3 3 0 0 1 3-3h11v3H7v10h13v-6h-6v4h-1a2 2 0 0 1-2-2v-1a2 2 0 0 1 2-2h7V7h1v13H7a3 3 0 0 1-3-3z"/></svg></span>
+                    <span class="ios-label">Wallet<small id="settings-wallet-preview">Balance card &amp; gift market</small></span>
+                    <span class="ios-chev">›</span>
+                </button>
                 <button class="ios-row" onclick="editBio()">
                     <span class="ios-ico" style="background:#007aff"><svg viewBox="0 0 24 24"><path d="M4 5h16v2H4zm0 6h16v2H4zm0 6h10v2H4z"/></svg></span>
                     <span class="ios-label">Edit Bio<small id="settings-bio-preview">Hello world</small></span>
@@ -2041,6 +2313,7 @@
         <li id="menu-pin" onclick="togglePin()">Pin to Profile</li>
         <li id="menu-wear" onclick="toggleWear()">Wear Gift</li>
         <li id="menu-reorder" class="hidden" onclick="startReorderMode()">Reorder Pins</li>
+        <li id="menu-card-theme" onclick="useAsCardTheme()">Use as Card Color</li>
         <li id="menu-hide" onclick="toggleHide()">Hide Gift</li>
         <!-- Craft Option integrated perfectly directly inside ellipsis menus -->
         <li id="menu-craft" onclick="handleMenuCraft()" style="display:none;">Craft Gift</li>
@@ -2050,6 +2323,113 @@
 <div id="reorder-controls" class="page-header hidden" style="position:fixed; top:0; left:0; right:0; background:var(--tg-theme-bg-color); z-index:100; justify-content:center;">
     <button class="action-button" onclick="stopReorderMode()">Done Reordering</button>
 </div>
+
+<!-- Wallet (simulated GRAM balance; nothing here is real money) -->
+<div id="wallet-page" class="wallet-page" aria-hidden="true">
+    <div class="wallet-view" id="wallet-main">
+        <div class="w-top">
+            <button class="w-hbtn" onclick="closeWallet()" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+            <div class="w-title" id="w-title">Wallet</div>
+            <button class="w-hbtn" onclick="openWalletReceive()" aria-label="Receive"><svg viewBox="0 0 24 24"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M4 12h16"/></svg></button>
+            <button class="w-hbtn" onclick="openWalletMenu(event)" aria-label="More"><svg class="fill" viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
+        </div>
+        <div class="w-scroll" id="w-scroll">
+            <div class="w-card-stage">
+                <div class="w-card" id="w-card">
+                    <div class="w-card-bg" id="w-card-bg"></div>
+                    <div class="w-card-pattern" id="w-card-pattern"></div>
+                    <div class="w-card-shine"></div>
+                    <div class="w-card-balance">
+                        <div class="w-card-amount" id="w-card-amount"></div>
+                        <div class="w-card-fiat" id="w-card-fiat"></div>
+                    </div>
+                    <button class="w-card-qr" onclick="openWalletReceive()" aria-label="Show QR"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><path d="M14 14h2v2h-2zM18 18h2v2h-2zM14 18h2M18 14h2"/></svg></button>
+                    <div class="w-card-holder" id="w-card-holder"></div>
+                    <div class="w-card-addr" id="w-card-addr"></div>
+                    <div class="w-card-stickers" id="w-card-stickers"></div>
+                </div>
+            </div>
+            <div class="w-card-hint" id="w-card-hint"></div>
+            <div class="w-actions">
+                <button class="w-btn" onclick="openWalletReceive()">Add Funds</button>
+                <button class="w-btn" onclick="openWalletSend()">Send</button>
+            </div>
+            <div class="w-seg" id="w-seg">
+                <button data-tab="tx" onclick="setWalletTab('tx')">Transactions</button>
+                <button data-tab="col" onclick="setWalletTab('col')">Collectibles</button>
+                <button data-tab="market" onclick="setWalletTab('market')">Market</button>
+            </div>
+            <div id="w-tab-body"></div>
+        </div>
+    </div>
+
+    <div class="wallet-view w-send" id="wallet-send">
+        <div class="w-top">
+            <button class="w-hbtn" onclick="walletSendBack()" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+            <div class="w-title" id="w-send-title">Send GRAM</div>
+        </div>
+        <div class="w-send-step" id="w-step-to">
+            <div class="w-field">
+                <label>Recipient</label>
+                <div class="w-field-row">
+                    <input id="w-to-input" type="text" placeholder="Address or name" autocomplete="off" oninput="updateSendToButton()" onkeydown="if(event.key==='Enter') walletSendNext()">
+                    <button onclick="pasteWalletRecipient()">Paste</button>
+                </div>
+            </div>
+            <div class="w-recents" id="w-recents"></div>
+            <div class="w-send-footer"><button class="w-btn" id="w-to-next" style="width:100%" onclick="walletSendNext()" disabled>Continue</button></div>
+        </div>
+        <div class="w-send-step" id="w-step-amount">
+            <div class="w-to-pill" id="w-to-pill"></div>
+            <div class="w-amount-wrap">
+                <div class="w-amount" id="w-amount"></div>
+                <div class="w-amount-fiat" id="w-amount-fiat"></div>
+                <div class="w-amount-bal" onclick="walletSendMax()">Balance: <b id="w-amount-bal"></b> · Max</div>
+            </div>
+            <div class="w-send-footer" style="padding-bottom:10px"><button class="w-btn" id="w-send-btn" style="width:100%" onclick="confirmWalletSend()" disabled>Send GRAM</button></div>
+            <div class="w-keypad" id="w-keypad"></div>
+        </div>
+        <div class="w-done" id="w-done">
+            <div class="w-done-check"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+            <h2 id="w-done-title">Sent</h2>
+            <p id="w-done-sub"></p>
+        </div>
+    </div>
+</div>
+
+<div id="w-receive-modal" class="modal-overlay">
+    <div class="modal-content w-receive-sheet">
+        <button class="w-sheet-close" onclick="closeModal('w-receive-modal')" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        <div class="w-qr-box">
+            <div class="w-qr"><div id="w-qr-code"></div><div class="w-qr-gem" id="w-qr-gem"></div></div>
+            <button class="w-copy-btn" onclick="copyWalletAddress()"><svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>Copy Address</button>
+        </div>
+        <div class="w-addr-full" id="w-addr-full"></div>
+        <div class="w-receive-text">Share your address or this QR code to receive GRAM.</div>
+        <button class="w-white-btn" id="w-buy-crypto-btn" onclick="toggleWalletTopup()"><span style="font-size:1.1em">$</span> Buy with Cash or Crypto</button>
+        <div class="w-topup" id="w-topup">
+            <div class="w-topup-note">Demo top-up — free play money, not real GRAM.</div>
+            <div class="w-topup-grid" id="w-topup-grid"></div>
+        </div>
+    </div>
+</div>
+
+<div id="w-buy-modal" class="modal-overlay">
+    <div class="modal-content w-buy-sheet">
+        <button class="w-sheet-close" onclick="closeModal('w-buy-modal')" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        <div class="w-buy-visual"><img id="w-buy-img" src="" alt=""></div>
+        <h2 id="w-buy-title">Gift</h2>
+        <p id="w-buy-sub"></p>
+        <div class="w-buy-rows">
+            <div class="w-buy-row"><span>Price</span><b id="w-buy-price"></b></div>
+            <div class="w-buy-row"><span>Your balance</span><b id="w-buy-balance"></b></div>
+        </div>
+        <button class="w-btn" id="w-buy-btn" style="width:100%" onclick="confirmMarketBuy()">Buy</button>
+    </div>
+</div>
+
+<div id="w-gift-menu" class="hidden"></div>
+<div id="w-menu" class="hidden"></div>
 
 <script>
     const tg = window.Telegram.WebApp;
@@ -2089,7 +2469,7 @@
     const PIN_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z" /></svg>`;
     const RANDOM_PRICES = ["15", "25", "50", "100", "250", "50+", "100+", "250+"];
 
-    let state = { inventory: [], giftDefinitions: {}, lastCollectibleNumber: 100, userBio: "Hello world", userPhone: "", settings: { animations: true, showHidden: false } };
+    let state = { inventory: [], giftDefinitions: {}, lastCollectibleNumber: 100, userBio: "Hello world", userPhone: "", settings: { animations: true, showHidden: false }, wallet: null };
     let giftFilter = 'all';
     let customizationQueue = []; let editingIndex = 0; let cachedParts = {};
     let appRuntime = { longPressTimer: null, activeGiftId: null, shopGiftData: null, reordering: false, sortable: null, selectionMode: null, selectedIds: new Set(), animationState: null, detailInterval: null, toastTimer: null };
@@ -2107,7 +2487,7 @@
         applyTelegramTheme(); tg.onEvent('themeChanged', applyTelegramTheme);
         loadState();
         if (!state.userPhone) state.userPhone = `+888 ${Math.floor(Math.random()*9000+1000)} ${Math.floor(Math.random()*9000+1000)}`;
-        updateUserProfile(); applyWornGiftVisuals(); renderInventory(); await fetchGiftDefinitions(); renderShop(); refreshUpgradability(); hideLoader(); classifyAllGifts();
+        updateUserProfile(); applyWornGiftVisuals(); renderInventory(); initWallet(); await fetchGiftDefinitions(); renderShop(); refreshUpgradability(); hideLoader(); classifyAllGifts();
         setInterval(async () => { await fetchGiftDefinitions(); funGiftsCache = null; renderShop(); classifyAllGifts(); }, 15 * 60 * 1000);
         
         document.addEventListener('click', (e) => {
@@ -3629,6 +4009,7 @@
             if(appRuntime.detailInterval) { clearInterval(appRuntime.detailInterval); appRuntime.detailInterval = null; }
         }
         if(id==='collectible-modal') { document.getElementById('col-crafted-ribbon').style.display='none'; LottieManager.stopIn(document.getElementById('collectible-lottie')); document.getElementById('roulette-strip').innerHTML=''; if(appRuntime.animationState) skipAnimation(); }
+        if (walletUI.open) { restoreWalletBack(); return; }
         if (document.getElementById('shop-page').classList.contains('active')) { tg.BackButton.show(); tg.BackButton.onClick(() => switchTab('inventory')); }
     }
     
@@ -3677,7 +4058,7 @@
     function openSettingsModal() { haptic('light'); document.getElementById('settings-bio-preview').innerText = state.userBio; document.getElementById('settings-modal').classList.add('active'); document.getElementById('setting-animations').checked = state.settings.animations; document.getElementById('setting-hidden').checked = state.settings.showHidden; tg.BackButton.show(); tg.BackButton.onClick(() => closeModal('settings-modal')); }
     function toggleSetting(key, value) { state.settings[key] = value; haptic('light'); saveState(); renderInventory(); }
     function saveState() { localStorage.setItem(LS_KEY, JSON.stringify(state)); }
-    function loadState() { const saved = localStorage.getItem(LS_KEY); if (saved) { const parsed = JSON.parse(saved); state.inventory = parsed.inventory || []; state.lastCollectibleNumber = parsed.lastCollectibleNumber || 100; state.userBio = parsed.userBio || "Hello world"; state.userPhone = parsed.userPhone || ""; if (parsed.userAvatar) { delete parsed.userAvatar; localStorage.setItem(LS_KEY, JSON.stringify(parsed)); } if(parsed.settings) state.settings = parsed.settings; } }
+    function loadState() { const saved = localStorage.getItem(LS_KEY); if (saved) { const parsed = JSON.parse(saved); state.inventory = parsed.inventory || []; state.lastCollectibleNumber = parsed.lastCollectibleNumber || 100; state.userBio = parsed.userBio || "Hello world"; state.userPhone = parsed.userPhone || ""; if (parsed.userAvatar) { delete parsed.userAvatar; localStorage.setItem(LS_KEY, JSON.stringify(parsed)); } if(parsed.settings) state.settings = parsed.settings; state.wallet = parsed.wallet || null; } }
     function resetAppData() { tg.showConfirm("Reset App?", (confirmed) => { if(confirmed) { localStorage.removeItem(LS_KEY); location.reload(); }}); }
     
     // --- Context Menu & Queue Logic ---
@@ -3688,6 +4069,7 @@
         document.getElementById('menu-pin').innerText = gift.pinned?"Unpin":"Pin"; 
         document.getElementById('menu-wear').style.display = gift.isCollectible?'block':'none'; 
         document.getElementById('menu-wear').innerText = gift.worn?"Take Off":"Wear"; 
+        document.getElementById('menu-card-theme').style.display = gift.isCollectible?'block':'none'; 
         document.getElementById('menu-reorder').style.display = (gift.isCollectible&&gift.pinned&&state.inventory.filter(g=>g.pinned).length>1)?'block':'none'; 
         document.getElementById('menu-hide').innerText = gift.hidden?"Unhide":"Hide"; 
         
@@ -4011,6 +4393,533 @@
         hapticNotify('success'); saveState(); renderInventory();
         closeModal('customize-modal'); switchTab('inventory');
         if (created) showToast(created === 1 ? 'Collectible created' : `${created} collectibles created`);
+    }
+    // --- WALLET ---
+    // A pretend Telegram-style wallet: a GRAM balance card that can take a collectible's backdrop + symbol
+    // as its theme and carry collectibles as stickers, plus a market of random collectibles.
+    // All GRAM is play money that lives in localStorage with the rest of the state.
+    const GEM_SVG = `<svg class="gem" viewBox="0 0 24 24"><path fill="#8fd8ff" d="M6 3h12l4 5.6L12 21 2 8.6z"/><path fill="#45aef7" d="M2 8.6h20L12 21z"/><path fill="#c4ecff" d="M6 3l2.6 5.6h6.8L18 3z"/><path fill="#2289ea" d="M8.6 8.6L12 21l3.4-12.4z"/></svg>`;
+    const GRAM_CURRENCIES = { USD: { rate: 1.38, fmt: v => `$${v}` }, EUR: { rate: 1.27, fmt: v => `€${v}` }, RUB: { rate: 112.4, fmt: v => `${v} ₽` } };
+    const W_ICONS = {
+        in: '<svg viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></svg>',
+        out: '<svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg>',
+        topup: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+        palette: '<svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1 0 1.7-.8 1.7-1.7 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-.9.8-1.7 1.7-1.7H16a5 5 0 0 0 5-5C21 6.5 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.1"/><circle cx="10" cy="7" r="1.1"/><circle cx="15" cy="7.5" r="1.1"/></svg>',
+        card: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18M7 15h4"/></svg>',
+        info: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>',
+        globe: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>',
+        eye: '<svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>'
+    };
+    const W_CONTACTS = [['Alex', '@alex_ton'], ['Maria', '@mashaaa'], ['Kirill', '@kirill_dev'], ['Timur', '@timur_k'], ['Mom', ''], ['Oleg', '@oleg_99'], ['Sasha', '@sanya_gifts']];
+    const MYSTERY_PRICE = 2, MYSTERY_IMG_ID = '5170250947678437525', MAX_CARD_STICKERS = 6;
+    const ADDR_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+    let walletUI = { open: false, tab: 'tx', sel: -1, sendOpen: false, sendStep: 'to', send: { to: null, amount: '0' }, buy: null };
+    let walletBackFn = null;
+
+    const gramRound = v => Math.round(v * 1e4) / 1e4;
+    const wPick = arr => arr[Math.floor(Math.random() * arr.length)];
+    function gramStr(v) { return gramRound(v).toLocaleString('en-US', { maximumFractionDigits: 4 }); }
+    function fiatStr(v) { const c = GRAM_CURRENCIES[state.wallet.currency] || GRAM_CURRENCIES.USD; return c.fmt((v * c.rate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })); }
+    function seedNum(seed) { let h = 2166136261; for (const c of String(seed)) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return h >>> 0; }
+    function seededAddr(seed) { let h = seedNum(seed) || 1, s = 'UQ'; for (let i = 0; i < 46; i++) { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; s += ADDR_CHARS[(h >>> 0) % 64]; } return s; }
+    function shortAddr(a) { return `${a.slice(0, 4)}…${a.slice(-4)}`; }
+    function walletGift(id) { return state.inventory.find(g => g.uniqueId === id && g.isCollectible && g.collectibleData) || null; }
+    function modelLottieUrl(g) { const m = g.collectibleData.model; return m.isCustom ? m.lottieUrl : `${CDN_BASE}models/${encodeURIComponent(g.name)}/lottie/${encodeURIComponent(m.name)}.json`; }
+    function walletHolderName() { const u = tg.initDataUnsafe.user; return u ? [u.first_name, u.last_name].filter(Boolean).join(' ') : 'Web User'; }
+    function walletAlert(msg) { try { tg.showAlert(msg); } catch (e) { alert(msg); } }
+
+    function ensureWallet() {
+        if (state.wallet) return;
+        state.wallet = {
+            balance: 10, currency: 'USD', address: seededAddr(`${Date.now()}${Math.random()}`), recents: [],
+            card: { themeId: null, stickers: [] },
+            txs: [{ id: Date.now(), ts: Date.now(), kind: 'in', peer: 'Welcome Bonus', note: 'Incoming transfer', amount: 10 }]
+        };
+        saveState();
+    }
+    function addWalletTx(tx) {
+        const w = state.wallet;
+        w.balance = gramRound(w.balance + tx.amount);
+        w.txs.unshift({ id: Date.now() + Math.random(), ts: Date.now(), ...tx });
+        if (w.txs.length > 200) w.txs.length = 200;
+        saveState(); updateBalanceViews();
+    }
+
+    function setWalletBack(fn) {
+        if (walletBackFn) tg.BackButton.offClick(walletBackFn);
+        walletBackFn = fn;
+        if (fn) { tg.BackButton.onClick(fn); tg.BackButton.show(); } else tg.BackButton.hide();
+    }
+    // Called by closeModal: give the Telegram back button back to the wallet
+    function restoreWalletBack() { setWalletBack(walletUI.sendOpen ? walletSendBack : closeWallet); }
+
+    function initWallet() {
+        ensureWallet(); updateBalanceViews();
+        const card = document.getElementById('w-card');
+        // Drag anywhere on the card to tilt it in 3D; it springs back on release. A tap deselects a sticker.
+        card.addEventListener('pointerdown', (e) => {
+            if (e.target.closest('.w-stk, .w-card-qr')) return;
+            const rect = card.getBoundingClientRect(), sx = e.clientX, sy = e.clientY; let moved = false;
+            card.classList.add('dragging'); card.setPointerCapture(e.pointerId);
+            const move = (ev) => {
+                const dx = ev.clientX - sx, dy = ev.clientY - sy; if (Math.abs(dx) + Math.abs(dy) > 6) moved = true;
+                const ry = Math.max(-22, Math.min(22, dx / rect.width * 50)), rx = Math.max(-22, Math.min(22, -dy / rect.height * 50));
+                card.style.setProperty('--ry', `${ry}deg`); card.style.setProperty('--rx', `${rx}deg`);
+                card.style.setProperty('--shx', `${50 + ry * 2}%`); card.style.setProperty('--shy', `${50 - rx * 2}%`);
+            };
+            const up = () => {
+                card.classList.remove('dragging'); resetCardTilt();
+                card.removeEventListener('pointermove', move); card.removeEventListener('pointerup', up); card.removeEventListener('pointercancel', up);
+                if (!moved) selectSticker(-1); else haptic('light');
+            };
+            card.addEventListener('pointermove', move); card.addEventListener('pointerup', up); card.addEventListener('pointercancel', up);
+        });
+        document.getElementById('w-scroll').addEventListener('scroll', hideWalletMenus, { passive: true });
+        document.addEventListener('click', (e) => { if (!e.target.closest('#w-gift-menu, #w-menu')) hideWalletMenus(); });
+        window.addEventListener('resize', () => { if (walletUI.open) renderWalletCard(); });
+    }
+    function resetCardTilt() { const c = document.getElementById('w-card'); ['--rx', '--ry', '--shx', '--shy'].forEach(p => c.style.removeProperty(p)); }
+
+    function openWallet(tab) {
+        haptic('light'); ensureWallet();
+        if (tab) walletUI.tab = tab;
+        walletUI.open = true; walletUI.sel = -1;
+        const page = document.getElementById('wallet-page');
+        page.classList.add('open'); page.setAttribute('aria-hidden', 'false');
+        document.getElementById('w-card-holder').innerText = walletHolderName();
+        document.getElementById('w-card-addr').innerText = state.wallet.address.match(/.{1,4}/g).join(' ');
+        document.getElementById('w-scroll').scrollTop = 0;
+        updateBalanceViews(); renderWalletCard(); renderWalletStickers(); renderWalletTab();
+        setWalletBack(closeWallet);
+    }
+    function closeWallet() {
+        haptic('light'); hideWalletMenus(); closeWalletSendView(true);
+        walletUI.open = false; walletUI.sel = -1;
+        const page = document.getElementById('wallet-page');
+        page.classList.remove('open'); page.setAttribute('aria-hidden', 'true');
+        setTimeout(() => { if (!walletUI.open) document.querySelectorAll('#w-card-stickers .w-stk-anim').forEach(el => LottieManager.stopIn(el)); }, 350);
+        setWalletBack(null);
+        if (document.getElementById('shop-page').classList.contains('active')) tg.BackButton.show();
+    }
+
+    function updateBalanceViews() {
+        const w = state.wallet; if (!w) return;
+        const chip = document.getElementById('profile-balance'); if (chip) chip.innerText = gramStr(w.balance);
+        const setPrev = document.getElementById('settings-wallet-preview'); if (setPrev) setPrev.innerText = `${gramStr(w.balance)} GRAM · ${fiatStr(w.balance)}`;
+        const [int, frac] = gramStr(w.balance).split('.');
+        document.getElementById('w-card-amount').innerHTML = `${GEM_SVG}<span>${int}${frac ? `<span class="frac">.${frac}</span>` : ''}<span class="unit"> GRAM</span></span>`;
+        document.getElementById('w-card-fiat').innerText = fiatStr(w.balance);
+    }
+
+    // --- Card theme: backdrop gradient + a staggered grid of the gift's symbol ---
+    function walletTheme() { const id = state.wallet.card.themeId; return id == null ? null : walletGift(id); }
+    function renderWalletCard() {
+        // Accent vars live on :root so the wallet's sheets (outside #wallet-page) pick up the card color too
+        const root = document.documentElement, bg = document.getElementById('w-card-bg'), pat = document.getElementById('w-card-pattern');
+        pat.innerHTML = '';
+        const g = walletTheme();
+        if (!g) {
+            bg.style.background = '';
+            ['--w-accent', '--w-accent-2', '--w-accent-text'].forEach(p => root.style.removeProperty(p));
+            return;
+        }
+        const bd = g.collectibleData.backdrop, hex = bd.hex || { centerColor: '#555', edgeColor: '#222', patternColor: '#000' };
+        bg.style.background = bd.customGradient || `radial-gradient(130% 150% at 28% 18%, ${hex.centerColor} 0%, ${hex.edgeColor} 100%)`;
+        root.style.setProperty('--w-accent', `color-mix(in srgb, ${hex.centerColor} 75%, ${hex.edgeColor})`);
+        root.style.setProperty('--w-accent-2', hex.edgeColor);
+        root.style.setProperty('--w-accent-text', `color-mix(in srgb, ${hex.centerColor} 70%, #fff)`);
+
+        const rect = document.getElementById('w-card').getBoundingClientRect();
+        const W = rect.width || 340, H = rect.height || 212, size = Math.round(W * 0.075), step = size * 2.4;
+        const url = patternUrl(g.name, g.collectibleData.pattern), layers = [];
+        for (let row = 0, y = step * 0.3; y < H + size; row++, y += step * 0.72) {
+            for (let x = (row % 2 ? step / 2 : 0) + step * 0.15; x < W + size; x += step) {
+                layers.push(`url('${url}') ${(x - size / 2).toFixed(1)}px ${(y - size / 2).toFixed(1)}px / ${size}px ${size}px no-repeat`);
+            }
+        }
+        const el = document.createElement('div');
+        el.className = 'pattern-layer';
+        el.style.backgroundColor = hex.patternColor || '#000';
+        el.style.opacity = 0.28;
+        el.style.webkitMask = layers.join(', ');
+        el.style.mask = layers.join(', ');
+        pat.appendChild(el);
+    }
+    function applyCardTheme(id) {
+        state.wallet.card.themeId = id; saveState();
+        renderWalletCard(); renderWalletTab();
+        hapticNotify('success');
+        showToast(id == null ? 'Card color reset' : 'Card color applied');
+    }
+
+    // --- Card stickers: collectibles placed on the card; drag to move, pull the handle to rotate/scale ---
+    function positionSticker(el, s) {
+        el.style.left = `${s.x * 100}%`; el.style.top = `${s.y * 100}%`;
+        el.style.setProperty('--r', `${s.r}deg`); el.style.setProperty('--s', s.s);
+    }
+    function renderWalletStickers() {
+        const wrap = document.getElementById('w-card-stickers');
+        wrap.querySelectorAll('.w-stk-anim').forEach(el => LottieManager.stopIn(el));
+        wrap.innerHTML = '';
+        const card = state.wallet.card;
+        card.stickers = card.stickers.filter(s => walletGift(s.giftId));
+        card.stickers.forEach((s, i) => {
+            const g = walletGift(s.giftId);
+            const el = document.createElement('div');
+            el.className = `w-stk${i === walletUI.sel ? ' sel' : ''}`; el.dataset.idx = i;
+            positionSticker(el, s);
+            el.innerHTML = `<div class="w-stk-inner"><img src="${getModelImg(g.name, g.collectibleData.model)}" alt=""><div class="w-stk-anim"></div></div><div class="w-stk-ring"></div><div class="w-stk-handle"></div><div class="w-stk-del">×</div>`;
+            wrap.appendChild(el);
+            if (state.settings.animations) {
+                const img = el.querySelector('img');
+                LottieManager.play(el.querySelector('.w-stk-anim'), modelLottieUrl(g), () => { img.style.visibility = 'hidden'; });
+            }
+            bindStickerEvents(el, s);
+        });
+        updateCardHint();
+    }
+    function bindStickerEvents(el, s) {
+        el.addEventListener('pointerdown', (e) => {
+            e.stopPropagation(); e.preventDefault();
+            const idx = state.wallet.card.stickers.indexOf(s); if (idx < 0) return;
+            if (e.target.classList.contains('w-stk-del')) { removeCardSticker(idx); return; }
+            if (walletUI.sel !== idx) haptic('light');
+            selectSticker(idx);
+            const rect = document.getElementById('w-card').getBoundingClientRect();
+            const cx = rect.left + s.x * rect.width, cy = rect.top + s.y * rect.height;
+            const handle = e.target.classList.contains('w-stk-handle');
+            const start = { px: e.clientX, py: e.clientY, x: s.x, y: s.y, r: s.r, s: s.s, ang: Math.atan2(e.clientY - cy, e.clientX - cx), dist: Math.hypot(e.clientX - cx, e.clientY - cy) || 1 };
+            el.setPointerCapture(e.pointerId);
+            const move = (ev) => {
+                if (handle) {
+                    s.r = start.r + (Math.atan2(ev.clientY - cy, ev.clientX - cx) - start.ang) * 180 / Math.PI;
+                    s.s = Math.min(2.4, Math.max(0.45, start.s * Math.hypot(ev.clientX - cx, ev.clientY - cy) / start.dist));
+                } else {
+                    s.x = Math.min(1.05, Math.max(-0.05, start.x + (ev.clientX - start.px) / rect.width));
+                    s.y = Math.min(1.08, Math.max(-0.08, start.y + (ev.clientY - start.py) / rect.height));
+                }
+                positionSticker(el, s);
+            };
+            const up = () => {
+                el.removeEventListener('pointermove', move); el.removeEventListener('pointerup', up); el.removeEventListener('pointercancel', up);
+                s.r = Math.round(s.r * 10) / 10; s.s = Math.round(s.s * 100) / 100;
+                saveState();
+            };
+            el.addEventListener('pointermove', move); el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
+        });
+    }
+    function selectSticker(i) {
+        walletUI.sel = i;
+        document.querySelectorAll('#w-card-stickers .w-stk').forEach(el => el.classList.toggle('sel', +el.dataset.idx === i));
+        updateCardHint();
+    }
+    function updateCardHint() {
+        const n = state.wallet.card.stickers.length;
+        document.getElementById('w-card-hint').innerText = walletUI.sel >= 0 ? 'Drag to move · pull the dot to rotate and resize'
+            : n ? 'Tap a gift on the card to move it · drag the card to tilt' : 'Decorate your card with gifts from Collectibles';
+    }
+    function toggleCardSticker(id) {
+        const card = state.wallet.card, idx = card.stickers.findIndex(s => s.giftId === id);
+        if (idx >= 0) { removeCardSticker(idx); return; }
+        if (card.stickers.length >= MAX_CARD_STICKERS) { showToast(`Up to ${MAX_CARD_STICKERS} gifts fit on the card`); hapticNotify('error'); return; }
+        card.stickers.push({ giftId: id, x: 0.3 + Math.random() * 0.45, y: 0.3 + Math.random() * 0.45, r: Math.round(Math.random() * 30 - 15), s: 1 });
+        walletUI.sel = card.stickers.length - 1;
+        saveState(); renderWalletStickers(); renderWalletTab(); hapticNotify('success');
+        document.getElementById('w-scroll').scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    function removeCardSticker(idx) {
+        state.wallet.card.stickers.splice(idx, 1); walletUI.sel = -1;
+        saveState(); renderWalletStickers(); renderWalletTab(); haptic('medium');
+    }
+
+    // --- Tabs ---
+    function setWalletTab(tab) { if (tab !== walletUI.tab) haptic('light'); walletUI.tab = tab; hideWalletMenus(); renderWalletTab(); }
+    function renderWalletTab() {
+        if (!walletUI.open) return;
+        document.querySelectorAll('#w-seg button').forEach(b => b.classList.toggle('active', b.dataset.tab === walletUI.tab));
+        const body = document.getElementById('w-tab-body');
+        if (walletUI.tab === 'col') renderWalletCollectibles(body);
+        else if (walletUI.tab === 'market') renderWalletMarket(body);
+        else body.innerHTML = walletTxHtml();
+    }
+    function walletTxHtml() {
+        const txs = state.wallet.txs;
+        if (!txs.length) return `<div class="w-empty"><b>No transactions yet</b>Add funds or buy a gift in the Market.</div>`;
+        return `<div class="w-tx-list">${txs.map(t => {
+            const pos = t.amount > 0;
+            const ico = t.kind === 'buy'
+                ? `<div class="w-tx-ico gift">${t.img ? `<img src="${escHtml(t.img)}" alt="" loading="lazy">` : W_ICONS.card}</div>`
+                : `<div class="w-tx-ico">${W_ICONS[t.kind] || W_ICONS[pos ? 'in' : 'out']}</div>`;
+            const date = new Date(t.ts).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+            return `<div class="w-tx">${ico}<div class="w-tx-main"><div class="w-tx-title">${escHtml(t.peer)}</div><div class="w-tx-sub">${escHtml(t.note)}</div><div class="w-tx-date">${date}</div></div><div class="w-tx-amt ${pos ? 'in' : ''}">${pos ? '+' : '−'}${gramStr(Math.abs(t.amount))} ${GEM_SVG}</div></div>`;
+        }).join('')}</div>`;
+    }
+    function renderWalletCollectibles(body) {
+        const list = state.inventory.filter(g => g.isCollectible && g.collectibleData);
+        if (!list.length) { body.innerHTML = `<div class="w-empty"><b>No collectibles yet</b>Upgrade a gift or buy one in the Market, then use it to color and decorate your card.</div>`; return; }
+        const card = state.wallet.card, onCard = new Set(card.stickers.map(s => s.giftId));
+        body.innerHTML = `<div class="w-grid"></div>`;
+        const grid = body.firstChild;
+        list.forEach(g => {
+            const cd = g.collectibleData, isOn = onCard.has(g.uniqueId);
+            const rb = cd.backdrop.hex ? `color-mix(in srgb, ${cd.backdrop.hex.edgeColor} 88%, #000)` : '#2a2f3d';
+            const el = document.createElement('div');
+            el.className = `w-tile${isOn ? ' on-card' : ''}`;
+            el.innerHTML = `<div class="w-tile-bg" style="background:${getBackdropStyle(cd.backdrop)}"></div><div class="gift-ribbon" style="--rb:${rb}"><span>${isOn ? 'on card' : `#${g.collectibleNumber.toLocaleString('en-US')}`}</span></div>${card.themeId === g.uniqueId ? `<div class="w-tile-badge">${W_ICONS.palette}</div>` : ''}<img class="model" src="${getModelImg(g.name, cd.model)}" loading="lazy" alt="">`;
+            el.onclick = (e) => openWalletGiftMenu(e, g);
+            grid.appendChild(el);
+        });
+    }
+
+    // --- Popover menus ---
+    function showWalletPopover(menu, x, y) {
+        menu.classList.remove('hidden');
+        const mw = menu.offsetWidth, mh = menu.offsetHeight;
+        menu.style.left = `${Math.max(10, Math.min(x, innerWidth - mw - 10))}px`;
+        menu.style.top = `${Math.max(10, Math.min(y, innerHeight - mh - 10))}px`;
+    }
+    function hideWalletMenus() { ['w-gift-menu', 'w-menu'].forEach(id => document.getElementById(id).classList.add('hidden')); }
+    function bindMenuActions(menu, actions) {
+        menu.querySelectorAll('[data-a]').forEach(b => b.onclick = (ev) => { ev.stopPropagation(); hideWalletMenus(); actions[b.dataset.a](); });
+    }
+    function openWalletGiftMenu(e, g) {
+        e.stopPropagation(); haptic('light');
+        const card = state.wallet.card, isTheme = card.themeId === g.uniqueId, onCard = card.stickers.some(s => s.giftId === g.uniqueId);
+        const menu = document.getElementById('w-gift-menu');
+        menu.innerHTML = `<button class="w-menu-item" data-a="color">${W_ICONS.palette}${isTheme ? 'Reset Color' : 'Apply Color'}</button>`
+            + `<button class="w-menu-item" data-a="card">${W_ICONS.card}${onCard ? 'Remove from Card' : 'Add to Card'}</button>`
+            + `<button class="w-menu-item" data-a="view">${W_ICONS.eye}View Gift</button>`;
+        bindMenuActions(menu, {
+            color: () => applyCardTheme(isTheme ? null : g.uniqueId),
+            card: () => toggleCardSticker(g.uniqueId),
+            view: () => { setWalletBack(null); openCollectibleModal(g, false); }
+        });
+        showWalletPopover(menu, e.clientX, e.clientY);
+    }
+    function openWalletMenu(e) {
+        e.stopPropagation(); haptic('light');
+        const menu = document.getElementById('w-menu'), card = state.wallet.card;
+        menu.innerHTML = `<button class="w-menu-item" data-a="cur">${W_ICONS.globe}<span>Currency<small>${state.wallet.currency}</small></span></button>`
+            + (card.themeId != null || card.stickers.length ? `<button class="w-menu-item" data-a="reset">${W_ICONS.card}Reset Card Design</button>` : '')
+            + `<button class="w-menu-item" data-a="about">${W_ICONS.info}What is GRAM?</button>`;
+        bindMenuActions(menu, {
+            cur: () => {
+                const keys = Object.keys(GRAM_CURRENCIES);
+                state.wallet.currency = keys[(keys.indexOf(state.wallet.currency) + 1) % keys.length];
+                saveState(); updateBalanceViews(); haptic('light'); showToast(`Currency: ${state.wallet.currency}`);
+            },
+            reset: () => {
+                state.wallet.card = { themeId: null, stickers: [] }; walletUI.sel = -1;
+                saveState(); renderWalletCard(); renderWalletStickers(); renderWalletTab(); haptic('medium');
+            },
+            about: () => walletAlert('GRAM in this app is play money: it lives only on this device, cannot be withdrawn and has no real value. Top it up for free, buy random collectibles in the Market and use them to color and decorate your card.')
+        });
+        const r = e.currentTarget.getBoundingClientRect();
+        showWalletPopover(menu, r.right - 220, r.bottom + 8);
+    }
+    // Long-press menu on a collectible in the profile grid
+    function useAsCardTheme() {
+        document.getElementById('long-press-menu').classList.add('hidden');
+        ensureWallet();
+        state.wallet.card.themeId = appRuntime.activeGiftId; saveState();
+        if (document.getElementById('collectible-modal').classList.contains('active')) closeModal('collectible-modal');
+        openWallet('col'); hapticNotify('success'); showToast('Card color applied');
+    }
+
+    // --- Market: random collectibles for GRAM ---
+    function marketGifts() { return giftEntries().filter(([id, name]) => !['custom_skebob', 'custom_baggin_cat'].includes(id) && canUpgradeName(name)); }
+    function marketPrice(id) {
+        const p = realPrices[id], stars = p ? p.stars + (p.upgrade_stars || 0) : (parseInt(shopPrice(id)) || 100);
+        return Math.max(0.5, Math.round(stars * 0.012 * 10) / 10);
+    }
+    function renderWalletMarket(body) {
+        body.innerHTML = `<div class="w-market-hero" id="w-mystery"><div class="hero-img"><img src="${CDN_BASE}originals/${MYSTERY_IMG_ID}/Original.png" alt=""></div><div><h3>Mystery Gift</h3><p>A random collectible from any upgradable gift. Model, backdrop and symbol are rolled when you buy.</p><span class="w-price-pill">${GEM_SVG} ${gramStr(MYSTERY_PRICE)}</span></div></div>`
+            + `<div class="w-section-title">Random collectibles</div><div class="w-grid" id="w-market-grid"></div>`;
+        body.querySelector('#w-mystery').onclick = () => openMarketBuy(null);
+        const grid = body.querySelector('#w-market-grid'), items = marketGifts();
+        if (!items.length) { grid.outerHTML = `<div class="w-empty">Loading gifts…</div>`; return; }
+        items.forEach(([id, name]) => {
+            const el = document.createElement('div');
+            el.className = 'w-tile w-offer';
+            el.innerHTML = `<img class="orig" src="${CDN_BASE}originals/${id}/Original.png" loading="lazy" alt="" onerror="this.style.visibility='hidden'"><span class="w-price-pill">${GEM_SVG} ${gramStr(marketPrice(id))}</span>`;
+            el.onclick = () => openMarketBuy([id, name]);
+            grid.appendChild(el);
+        });
+    }
+    function openWalletModal(id) { hideWalletMenus(); document.getElementById(id).classList.add('active'); setWalletBack(() => closeModal(id)); }
+    function openMarketBuy(entry) {
+        haptic('light');
+        const b = walletUI.buy = entry ? { id: entry[0], name: entry[1], price: marketPrice(entry[0]) } : { id: null, name: null, price: MYSTERY_PRICE };
+        document.getElementById('w-buy-img').src = `${CDN_BASE}originals/${b.id || MYSTERY_IMG_ID}/Original.png`;
+        document.getElementById('w-buy-title').innerText = b.id ? b.name : 'Mystery Gift';
+        document.getElementById('w-buy-sub').innerText = b.id
+            ? `You'll get a random ${b.name} collectible. Its model, backdrop and symbol are rolled when you buy.`
+            : 'Any upgradable gift, fully random. Could be a common one, or a rare model.';
+        document.getElementById('w-buy-price').innerHTML = `${GEM_SVG} ${gramStr(b.price)}`;
+        document.getElementById('w-buy-balance').innerHTML = `${GEM_SVG} ${gramStr(state.wallet.balance)}`;
+        const btn = document.getElementById('w-buy-btn');
+        btn.disabled = false;
+        btn.innerText = state.wallet.balance >= b.price ? `Buy for ${gramStr(b.price)} GRAM` : 'Not enough GRAM · Add Funds';
+        openWalletModal('w-buy-modal');
+    }
+    async function confirmMarketBuy() {
+        const b = walletUI.buy; if (!b || b.busy) return;
+        if (state.wallet.balance < b.price) { closeModal('w-buy-modal'); openWalletReceive(true); return; }
+        const btn = document.getElementById('w-buy-btn');
+        b.busy = true; btn.disabled = true; btn.innerText = 'Buying…';
+        let id = b.id, name = b.name, parts = null, pool = [];
+        // A mystery roll retries a few gifts in case one has no parts on the CDN
+        for (let tries = 0; tries < (b.id ? 1 : 5); tries++) {
+            if (!b.id) { const pickEntry = wPick(marketGifts()); if (!pickEntry) break; [id, name] = pickEntry; }
+            parts = await fetchGiftParts(name);
+            const valid = parts.models.filter(m => !m.crafted);
+            pool = valid.length ? valid : parts.models;
+            if (pool.length && parts.backdrops.length && parts.patterns.length) break;
+            pool = [];
+        }
+        b.busy = false; btn.disabled = false;
+        if (!pool.length) { btn.innerText = `Buy for ${gramStr(b.price)} GRAM`; showToast('This gift is not available right now'); return; }
+        state.lastCollectibleNumber++;
+        const gift = {
+            uniqueId: Date.now() + Math.random(), originalId: id, name, isCollectible: true, timestamp: Date.now(),
+            collectibleNumber: state.lastCollectibleNumber,
+            collectibleData: { model: wPick(pool), backdrop: wPick(parts.backdrops), pattern: wPick(parts.patterns) }
+        };
+        state.inventory.unshift(gift);
+        addWalletTx({ kind: 'buy', peer: name, note: b.id ? 'Gift purchase' : 'Mystery gift', amount: -b.price, img: `${CDN_BASE}originals/${id}/Original.png` });
+        renderInventory(); renderWalletTab();
+        closeModal('w-buy-modal'); hapticNotify('success');
+        setWalletBack(null);
+        openCollectibleModal(gift, true, { ...parts, models: pool });
+    }
+
+    // --- Receive / Add funds ---
+    // Decorative QR: finder eyes + modules seeded by the address (it does not encode anything)
+    function fakeQrSvg(seed) {
+        const N = 29; let h = seedNum(seed) || 1, rects = '';
+        const rnd = () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 1000) / 1000; };
+        const inEye = (x, y) => (x < 8 && y < 8) || (x >= N - 8 && y < 8) || (x < 8 && y >= N - 8);
+        for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+            if (inEye(x, y) || (Math.abs(x - (N - 1) / 2) < 4 && Math.abs(y - (N - 1) / 2) < 4)) continue;
+            if (rnd() < 0.48) rects += `<rect x="${x}" y="${y}" width="1.02" height="1.02" rx="0.3"/>`;
+        }
+        const eye = (x, y) => `<rect x="${x + 0.5}" y="${y + 0.5}" width="6" height="6" rx="1.8" fill="none" stroke="#000" stroke-width="1"/><rect x="${x + 2}" y="${y + 2}" width="3" height="3" rx="0.9"/>`;
+        return `<svg class="code" viewBox="0 0 ${N} ${N}" fill="#000">${rects}${eye(0, 0)}${eye(N - 7, 0)}${eye(0, N - 7)}</svg>`;
+    }
+    function openWalletReceive(showTopup) {
+        haptic('light');
+        const addr = state.wallet.address;
+        document.getElementById('w-qr-code').innerHTML = fakeQrSvg(addr);
+        document.getElementById('w-qr-gem').innerHTML = GEM_SVG;
+        document.getElementById('w-addr-full').innerText = addr;
+        document.getElementById('w-topup-grid').innerHTML = [1, 5, 10, 25, 50, 100].map(v => `<button onclick="walletTopUp(${v})">+${v} ${GEM_SVG}</button>`).join('');
+        document.getElementById('w-topup').classList.toggle('show', showTopup === true);
+        openWalletModal('w-receive-modal');
+    }
+    function toggleWalletTopup() { haptic('light'); document.getElementById('w-topup').classList.toggle('show'); }
+    function copyWalletAddress() {
+        haptic('light');
+        const a = state.wallet.address;
+        (navigator.clipboard ? navigator.clipboard.writeText(a) : Promise.reject()).then(() => showToast('Address copied'), () => showToast(a));
+    }
+    function walletTopUp(v) {
+        addWalletTx({ kind: 'topup', peer: 'Demo Top-up', note: 'Added with cash', amount: v });
+        hapticNotify('success'); closeModal('w-receive-modal');
+        walletUI.tab = 'tx'; renderWalletTab();
+        showToast(`+${gramStr(v)} GRAM added`);
+        if (typeof confetti === 'function') confetti({ particleCount: 70, spread: 70, origin: { y: 0.25 }, zIndex: 2000 });
+    }
+
+    // --- Send: recipient → amount keypad → done ---
+    function walletContacts() {
+        const seen = new Set();
+        return [...(state.wallet.recents || []), ...W_CONTACTS.map(([name, user]) => ({ name, user, addr: seededAddr(name) }))]
+            .filter(c => !seen.has(c.name) && seen.add(c.name)).slice(0, 12);
+    }
+    function openWalletSend() {
+        haptic('light'); hideWalletMenus();
+        walletUI.sendOpen = true; walletUI.send = { to: null, amount: '0' };
+        document.getElementById('w-to-input').value = '';
+        document.getElementById('w-done').classList.remove('show');
+        showSendStep('to'); renderWalletRecents(); updateSendToButton();
+        document.getElementById('wallet-send').classList.add('open');
+        setWalletBack(walletSendBack);
+    }
+    function showSendStep(step) {
+        walletUI.sendStep = step;
+        document.getElementById('w-step-to').classList.toggle('active', step === 'to');
+        document.getElementById('w-step-amount').classList.toggle('active', step === 'amount');
+        document.getElementById('w-send-title').innerText = step === 'to' ? 'Send GRAM' : 'Send Money to';
+    }
+    function walletSendBack() { if (walletUI.sendStep === 'amount') { haptic('light'); showSendStep('to'); } else closeWalletSendView(); }
+    function closeWalletSendView(silent) {
+        document.getElementById('wallet-send').classList.remove('open');
+        document.getElementById('w-to-input').blur();
+        if (!walletUI.sendOpen) return;
+        walletUI.sendOpen = false;
+        if (!silent) setWalletBack(closeWallet);
+    }
+    function renderWalletRecents() {
+        const list = walletContacts(), box = document.getElementById('w-recents');
+        box.innerHTML = `<div class="w-section-title">Recent</div>` + list.map((c, i) => `<div class="w-contact" data-i="${i}"><img src="${initialsAvatar(c.name, seedNum(c.name))}" alt=""><div><b>${escHtml(c.name)}</b><span>${escHtml(c.user || shortAddr(c.addr))}</span></div></div>`).join('');
+        box.querySelectorAll('.w-contact').forEach(el => el.onclick = () => pickWalletRecipient(list[+el.dataset.i]));
+    }
+    function updateSendToButton() { document.getElementById('w-to-next').disabled = !document.getElementById('w-to-input').value.trim(); }
+    async function pasteWalletRecipient() {
+        try { const t = (await navigator.clipboard.readText()).trim(); if (t) { document.getElementById('w-to-input').value = t; updateSendToButton(); } }
+        catch (e) { showToast('Clipboard is not available'); }
+    }
+    function walletSendNext() {
+        const v = document.getElementById('w-to-input').value.trim(); if (!v) return;
+        const lower = v.toLowerCase(), isAddr = /^(UQ|EQ)[\w-]{40,}$/.test(v);
+        const known = walletContacts().find(c => c.name.toLowerCase() === lower || (c.user && c.user.toLowerCase() === `@${lower.replace(/^@/, '')}`) || c.addr === v);
+        pickWalletRecipient(known || { name: isAddr ? shortAddr(v) : v.replace(/^@/, ''), user: !isAddr && v.startsWith('@') ? v : '', addr: isAddr ? v : seededAddr(lower) });
+    }
+    function pickWalletRecipient(c) {
+        haptic('light');
+        walletUI.send = { to: c, amount: '0' };
+        document.getElementById('w-to-input').blur();
+        document.getElementById('w-to-pill').innerHTML = `<img src="${initialsAvatar(c.name, seedNum(c.name))}" alt=""><div style="min-width:0"><b>${escHtml(c.name)}</b><code>${escHtml(c.addr.match(/.{1,4}/g).join(' '))}</code></div>`;
+        const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', 'del'], pad = document.getElementById('w-keypad');
+        pad.innerHTML = keys.map(k => `<button data-k="${k}" class="${k === 'del' || k === '.' ? 'flat' : ''}">${k === 'del' ? '<svg viewBox="0 0 24 24"><path d="M9 5h11a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H9l-6-7z"/><path d="M12 9.5l5 5M17 9.5l-5 5"/></svg>' : k}</button>`).join('');
+        pad.querySelectorAll('button').forEach(b => b.onclick = () => walletKey(b.dataset.k));
+        showSendStep('amount'); updateSendAmount();
+    }
+    function walletKey(k) {
+        let a = walletUI.send.amount;
+        if (k === 'del') a = a.length > 1 ? a.slice(0, -1) : '0';
+        else if (k === '.') { if (!a.includes('.')) a += '.'; }
+        else {
+            if ((a.includes('.') && a.split('.')[1].length >= 4) || a.replace('.', '').length >= 9) { walletAmountShake(); return; }
+            a = a === '0' ? k : a + k;
+        }
+        haptic('light'); walletUI.send.amount = a; updateSendAmount();
+    }
+    function walletAmountShake() { const el = document.getElementById('w-amount'); el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); hapticNotify('error'); }
+    function walletSendMax() { walletUI.send.amount = String(gramRound(state.wallet.balance)); haptic('light'); updateSendAmount(); }
+    function updateSendAmount() {
+        const a = walletUI.send.amount, v = parseFloat(a) || 0, bal = state.wallet.balance;
+        const el = document.getElementById('w-amount');
+        el.classList.remove('shake'); el.style.fontSize = a.length > 7 ? '34px' : '';
+        el.innerHTML = `${GEM_SVG}<span>${a}</span><span class="caret"></span><span class="unit">GRAM</span>`;
+        document.getElementById('w-amount-fiat').innerText = `≈ ${fiatStr(v)}`;
+        document.getElementById('w-amount-bal').innerText = `${gramStr(bal)} GRAM`;
+        const btn = document.getElementById('w-send-btn');
+        btn.disabled = v <= 0 || v > bal;
+        btn.innerText = v > bal ? 'Insufficient balance' : v > 0 ? `Send ${gramStr(v)} GRAM` : 'Send GRAM';
+    }
+    function confirmWalletSend() {
+        const s = walletUI.send, v = gramRound(parseFloat(s.amount) || 0);
+        if (v <= 0 || v > state.wallet.balance) { walletAmountShake(); return; }
+        const w = state.wallet;
+        w.recents = [s.to, ...(w.recents || []).filter(c => c.name !== s.to.name)].slice(0, 6);
+        addWalletTx({ kind: 'out', peer: s.to.name, note: 'Outgoing transfer', amount: -v });
+        hapticNotify('success');
+        document.getElementById('w-done-title').innerText = `${gramStr(v)} GRAM sent`;
+        document.getElementById('w-done-sub').innerText = `to ${s.to.name}`;
+        document.getElementById('w-done').classList.add('show');
+        walletUI.tab = 'tx'; renderWalletTab();
+        setTimeout(() => { if (walletUI.sendOpen) closeWalletSendView(); }, 1500);
     }
 </script>
 </body>
