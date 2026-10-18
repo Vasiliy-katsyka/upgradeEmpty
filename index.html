@@ -2101,9 +2101,9 @@
                 <div class="sub-header" id="collectible-model-name">Model Name</div>
 
                 <div class="modal-action-row" id="modal-action-row">
-                    <button class="action-row-btn lg locked" id="btn-col-transfer" onclick="handleTransferClick()">
-                        <svg class="action-btn-icon" viewBox="0 0 24 24"><path d="M6 3h10l4 5-9 11L2 8l4-5zm-.9 5h11.8l-2.4-3H7.5L5.1 8zm2.4 1.5L11 15.8l1.3-1.6L9.6 9.5h-2.1zM15 13a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9zm-.3 2.2v1.6H12v1.4h2.7v1.6l2.6-2.3-2.6-2.3z"/></svg>
-                        <span class="action-btn-text"><svg viewBox="0 0 24 24"><path d="M17 9h-1V7a4 4 0 0 0-8 0v2H7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2zm-7-2a2 2 0 0 1 4 0v2h-4V7z"/></svg>Transfer</span>
+                    <button class="action-row-btn lg" id="btn-col-sell" onclick="handleSellClick()">
+                        <svg class="action-btn-icon" viewBox="0 0 24 24"><path d="M2.5 12.6V4a1.5 1.5 0 0 1 1.5-1.5h8.6a1.5 1.5 0 0 1 1.06.44l8.4 8.4a1.5 1.5 0 0 1 0 2.12l-8.6 8.6a1.5 1.5 0 0 1-2.12 0l-8.4-8.4a1.5 1.5 0 0 1-.44-1.06zM7.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg>
+                        <span class="action-btn-text" id="sell-btn-text">Sell</span>
                     </button>
                     <button class="action-row-btn lg" id="btn-col-wear" onclick="handleWearClick()">
                         <svg class="action-btn-icon" viewBox="0 0 24 24"><path d="M2.5 7.5l5 3.8L12 4.5l4.5 6.8 5-3.8-2 9H4.5l-2-9zM4.5 18.5h15v2h-15z"/></svg>
@@ -3373,8 +3373,7 @@
         if (issued <= gift.collectibleNumber) issued = gift.collectibleNumber + Math.floor(seededRand(gift.name + 'extra') * 40000) + 500;
         const supply = Math.max(total, Math.ceil(issued * (1.08 + seededRand(gift.name + 'supply') * 0.2)));
         document.getElementById('col-quantity').innerText = `${issued.toLocaleString('en-US')}/${supply.toLocaleString('en-US')} issued`;
-        const rarityBoost = cd.model.crafted ? 6 : (cd.model.rarityPermille && cd.model.rarityPermille < 10 ? 3 : 1);
-        document.getElementById('col-value').innerText = `~$${Math.floor((seededRand(gift.uniqueId) * 60 + 8) * rarityBoost)}`;
+        document.getElementById('col-value').innerText = `~$${Math.round(fairValueOf(gift.name, cd, gift.collectibleNumber) * GRAM_CURRENCIES.USD.rate).toLocaleString('en-US')}`;
 
         // Load 3 Action buttons states
         updateWearButtonState(gift);
@@ -3486,12 +3485,11 @@
     // --- Action Button Row Functions ---
     function updateWearButtonState(gift) {
         document.getElementById('wear-btn-text').innerText = gift.worn ? "Take Off" : "Wear";
+        document.getElementById('sell-btn-text').innerText = isListed(gift) ? "Change Price" : "Sell";
     }
 
-    function handleTransferClick() {
-        haptic('light');
-        tg.showAlert("Transfer is locked. Collectibles can be transferred 7 days after upgrade.");
-    }
+    function syncSellButton() { const g = walletGift(appRuntime.activeGiftId); if (g) updateWearButtonState(g); }
+    function handleSellClick() { openSellSheet(appRuntime.activeGiftId); }
 
     function handleShareClick() {
         haptic('light');
@@ -4881,9 +4879,36 @@
         return Math.max(0.5, Math.round(stars * 0.012 * 10) / 10);
     }
     function giftBaseGram(name) { const e = giftEntries().find(([, n]) => n === name); return e ? marketPrice(e[0]) : 3; }
-    function fairValueOf(name, cd) {
-        const rf = (p, ref, k) => p ? Math.max(0.85, Math.pow(ref / Math.max(p, 2), k)) : 1.6;
-        let v = giftBaseGram(name) * 1.6 * rf(cd.model.rarityPermille, 25, 0.7) * rf(cd.backdrop.rarityPermille, 20, 0.35) * rf(cd.pattern.rarityPermille, 15, 0.25);
+    // How the gift market prices traits, on top of the collection floor (the cheapest common combo):
+    // backdrop colour matters most (Black is the grail, greens and browns are what floors are made of),
+    // then model rarity, then low / pretty serial numbers; the symbol barely moves the price.
+    const BACKDROP_MULT = {
+        'Black': 10, 'Onyx Black': 4, 'Midnight Blue': 2.2, 'Electric Purple': 1.9, 'Pure Gold': 2, 'Satin Gold': 1.6,
+        'Ivory White': 1.6, 'Platinum': 1.5, 'Cyberpunk': 1.4, 'Mystic Pearl': 1.3, 'Gunmetal': 1.3, 'Neon Blue': 1.3,
+        'Electric Indigo': 1.25, 'Roman Silver': 1.2, 'Silver Blue': 1.15, 'Sapphire': 1.15, 'Navy Blue': 1.1,
+    };
+    function backdropMult(name) {
+        if (BACKDROP_MULT[name]) return BACKDROP_MULT[name];
+        if (/green|olive|lemongrass|pistachio|malachite|emerald|khaki|camo|feldgrau|jade|mint|shamrock|pine|fern/i.test(name)) return 0.8;
+        if (/brown|chestnut|mustard|sand|sienna|chocolate|caramel|khaki/i.test(name)) return 0.9;
+        return 1;
+    }
+    function numberMult(n) {
+        if (!n) return 1;
+        const s = String(n);
+        let k = n === 1 ? 25 : n < 10 ? 6 : n < 100 ? 2.2 : n < 1000 ? 1.3 : 1;
+        if (s.length >= 3 && /^(\d)\1+$/.test(s)) k *= s[0] === '7' ? 3 : 2;         // 777, 8888
+        else if (s.length >= 4 && /^[1-9]0+$/.test(s)) k *= 1.8;                    // 1000, 20000
+        else if (s.length >= 4 && '0123456789'.includes(s)) k *= 1.5;               // 1234, 12345
+        else if (s.length >= 3 && s === [...s].reverse().join('')) k *= 1.2;        // 1221, 12321
+        return k;
+    }
+    function fairValueOf(name, cd, num) {
+        const rare = (p, ref, k) => p ? Math.max(1, Math.pow(ref / Math.max(p, 1), k)) : 2.5; // custom parts (no %) count as rare
+        const floor = giftBaseGram(name);
+        let v = floor * 1.05 * rare(cd.model.rarityPermille, 20, 0.8) * backdropMult(cd.backdrop.name)
+            * rare(cd.backdrop.rarityPermille, 12, 0.3) * rare(cd.pattern.rarityPermille, 8, 0.25) * numberMult(num);
+        v = Math.max(v, floor); // nothing sells under the floor
         if (cd.model.crafted) v *= 3;
         return roundPrice(v);
     }
@@ -4903,8 +4928,8 @@
             const supply = Math.floor(seededRand(name + 'total') * 140000) + 20000;
             for (let i = 0; i < MARKET_LISTINGS; i++) {
                 const cd = { model: rarityPick(models), backdrop: rarityPick(parts.backdrops), pattern: rarityPick(parts.patterns) };
-                const fair = fairValueOf(name, cd);
-                data.listings.push({ key: `${i}-${Math.random()}`, num: 1 + Math.floor(Math.random() * supply * 0.8), cd, price: roundPrice(fair * (0.98 + Math.random() ** 2 * 0.8)) });
+                const num = 1 + Math.floor(Math.random() * supply * 0.8), fair = fairValueOf(name, cd, num);
+                data.listings.push({ key: `${i}-${Math.random()}`, num, cd, price: roundPrice(fair * (0.98 + Math.random() ** 2 * 0.8)) });
             }
             data.count = MARKET_LISTINGS + Math.floor(seededRand(name + 'offers') * 7000);
         }
@@ -4913,7 +4938,7 @@
     function marketFloor(id, name) {
         const c = marketCache[name];
         if (c && c.listings.length) return Math.min(...c.listings.map(l => l.price));
-        return roundPrice(giftBaseGram(name) * 1.6);
+        return roundPrice(giftBaseGram(name));
     }
     function collectibleThumbHtml(name, cd, patId) {
         return `<div class="w-tile-bg" style="background:${getBackdropStyle(cd.backdrop)}"></div><div class="dynamic-pattern-container" id="${patId}"></div><img class="model" src="${getModelImg(name, cd.model)}" loading="lazy" alt="">`;
@@ -4930,7 +4955,7 @@
         const now = Date.now();
         w.listings = w.listings.filter(l => walletGift(l.giftId));
         for (const l of [...w.listings]) {
-            const g = walletGift(l.giftId), ratio = l.price / fairValueOf(g.name, g.collectibleData);
+            const g = walletGift(l.giftId), ratio = l.price / fairValueOf(g.name, g.collectibleData, g.collectibleNumber);
             // Catch up on rolls missed while the app was closed (capped)
             for (let rolls = 0; now >= l.nextRollAt && rolls < 200; rolls++) {
                 if (Math.random() < buyerChance(ratio)) { completeSale(l, g); break; }
@@ -5079,7 +5104,7 @@
         ensureWallet(); hideWalletMenus();
         const g = walletGift(giftId); if (!g) return;
         haptic('light');
-        const cd = g.collectibleData, fair = fairValueOf(g.name, cd), l = listingOf(giftId);
+        const cd = g.collectibleData, fair = fairValueOf(g.name, cd, g.collectibleNumber), l = listingOf(giftId);
         walletUI.sell = { giftId, fair };
         document.getElementById('w-sell-visual').innerHTML = buyVisualHtml(g.name, cd);
         fillThumbPattern('w-buy-pat', g.name, cd);
@@ -5111,14 +5136,14 @@
         const l = listingOf(s.giftId), now = Date.now();
         if (l) { l.price = price; l.nextRollAt = nextBuyerRoll(now); }
         else w.listings.push({ giftId: s.giftId, price, listedAt: now, nextRollAt: nextBuyerRoll(now) });
-        saveState(); closeModal('w-sell-modal'); hapticNotify('success');
+        saveState(); closeModal('w-sell-modal'); hapticNotify('success'); syncSellButton();
         showToast(`Listed for ${gramStr(price)} GRAM`);
         renderInventory(); renderWalletTab();
     }
     function unlistGift() {
         const s = walletUI.sell; if (!s) return;
         state.wallet.listings = state.wallet.listings.filter(l => l.giftId !== s.giftId);
-        saveState(); closeModal('w-sell-modal'); haptic('medium');
+        saveState(); closeModal('w-sell-modal'); haptic('medium'); syncSellButton();
         showToast('Removed from sale');
         renderInventory(); renderWalletTab();
     }
