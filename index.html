@@ -1629,6 +1629,8 @@
         .w-stk.landed .w-stk-inner { animation: wStkLand 0.42s cubic-bezier(0.3, 1.6, 0.5, 1); transform-origin: 50% 92%; }
         @keyframes wStkLand { 0% { transform: translateY(-14%) scale(1.06, 0.94); } 45% { transform: translateY(0) scale(1.08, 0.9); } 100% { transform: none; } }
         .w-card-qr { transition: box-shadow 0.2s, transform 0.2s; }
+        .w-card-balance, .w-card-holder { transition: filter 0.2s; }
+        .w-card-balance.hot, .w-card-holder.hot { filter: drop-shadow(0 0 6px rgba(255,255,255,0.75)); }
         .w-card-qr.hot { transform: scale(1.06); box-shadow: inset 0 1px 0 #fff, inset 0 -1px 1px rgba(0,0,0,0.18), 0 0 0 3px rgba(255,255,255,0.55), 0 3px 14px rgba(255,255,255,0.45); }
         .w-stk-inner { position: absolute; inset: 0; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25)); }
         .w-stk-inner img, .w-stk-anim { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
@@ -4692,25 +4694,36 @@
     }
 
     // --- Card stickers: collectibles placed on the card; drag to move, pull the handle to rotate/scale ---
-    // Seat a sticker snaps into while dragged: sitting on top of the QR chip.
-    // The seat's spot is worked out from the layout each time, so seated gifts stay put at any card size.
+    // Seats a sticker snaps into while dragged: sitting on the QR chip, on the balance, or on the owner's name.
+    // at: where along the element the gift sits; sink: how far its feet sink into the element (share of its height).
+    // A seat's spot is worked out from the layout each time, so seated gifts stay put at any card size.
+    const CARD_SEATS = {
+        qr: { sel: '.w-card-qr', at: 0.5, sink: 0.32, scale: 0.8 },
+        balance: { sel: '.w-card-balance', at: 0.78, sink: 0.02, scale: 0.7 },
+        holder: { sel: '.w-card-holder', at: 0.62, sink: 0.25, scale: 0.6 },
+    };
     const STK_W = 0.24, STK_FOOT = 0.42; // sticker width as a share of card width; feet sit ~42% of its height below centre
     function cardBox() { const c = document.getElementById('w-card'); return { W: c.offsetWidth, H: c.offsetHeight }; }
-    function seatSpot(seat, s, box = cardBox()) {
-        if (!box.W) return null;
-        if (seat === 'qr') {
-            const q = document.querySelector('#w-card .w-card-qr'), scale = 0.8, h = STK_W * box.W * scale;
-            return { x: (q.offsetLeft + q.offsetWidth / 2) / box.W, y: (q.offsetTop + q.offsetHeight * 0.32 - h * STK_FOOT) / box.H, s: scale };
-        }
-        return null;
+    function seatEl(seat) { return document.querySelector(`#w-card ${CARD_SEATS[seat].sel}`); }
+    function seatSpot(seat, box = cardBox()) {
+        const def = CARD_SEATS[seat], el = def && seatEl(seat);
+        if (!el || !box.W || !el.offsetWidth) return null;
+        const h = STK_W * box.W * def.scale;
+        return { x: (el.offsetLeft + el.offsetWidth * def.at) / box.W, y: (el.offsetTop + el.offsetHeight * def.sink - h * STK_FOOT) / box.H, s: def.scale };
     }
     function nearestSeat(s, fx, fy, box) {
-        if (state.wallet.card.stickers.some(o => o !== s && o.seat === 'qr')) return null;
-        const t = seatSpot('qr', s, box);
-        return t && Math.hypot((fx - t.x) * box.W, (fy - t.y) * box.H) < box.W * 0.11 ? { seat: 'qr', ...t } : null;
+        let best = null, bestD = box.W * 0.11;
+        for (const seat in CARD_SEATS) {
+            if (state.wallet.card.stickers.some(o => o !== s && o.seat === seat)) continue;
+            const t = seatSpot(seat, box); if (!t) continue;
+            const d = Math.hypot((fx - t.x) * box.W, (fy - t.y) * box.H);
+            if (d < bestD) { best = { seat, ...t }; bestD = d; }
+        }
+        return best;
     }
+    function markSeat(seat) { for (const k in CARD_SEATS) { const el = seatEl(k); if (el) el.classList.toggle('hot', k === seat); } }
     function positionSticker(el, s) {
-        const spot = s.seat && seatSpot(s.seat, s);
+        const spot = s.seat && seatSpot(s.seat);
         if (spot) { s.x = spot.x; s.y = spot.y; s.s = spot.s; s.r = 0; }
         el.classList.toggle('seated', !!s.seat);
         el.style.left = `${s.x * 100}%`; el.style.top = `${s.y * 100}%`;
@@ -4750,7 +4763,7 @@
             const start = { px: e.clientX, py: e.clientY, x: s.x, y: s.y, r: s.r, s: s.s, ang: Math.atan2(e.clientY - cy, e.clientX - cx), dist: Math.hypot(e.clientX - cx, e.clientY - cy) || 1 };
             // Free pose to fall back to when the gift is pulled out of a seat
             const free = s.seat ? { r: s.free ? s.free.r : 0, s: s.free ? s.free.s : 1 } : { r: s.r, s: s.s };
-            const box = cardBox(), qr = document.querySelector('#w-card .w-card-qr');
+            const box = cardBox();
             el.setPointerCapture(e.pointerId);
             let moved = false;
             const move = (ev) => {
@@ -4770,13 +4783,13 @@
                         s.x = Math.min(1.05, Math.max(-0.05, fx));
                         s.y = Math.min(1.08, Math.max(-0.08, fy));
                     }
-                    qr.classList.toggle('hot', s.seat === 'qr');
+                    markSeat(s.seat);
                 }
                 positionSticker(el, s);
             };
             const up = () => {
                 el.removeEventListener('pointermove', move); el.removeEventListener('pointerup', up); el.removeEventListener('pointercancel', up);
-                qr.classList.remove('hot');
+                markSeat(null);
                 s.r = Math.round(s.r * 10) / 10; s.s = Math.round(s.s * 100) / 100;
                 if (s.seat && moved && !handle) {
                     el.classList.remove('landed'); void el.offsetWidth; el.classList.add('landed');
