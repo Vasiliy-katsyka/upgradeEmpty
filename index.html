@@ -1555,11 +1555,33 @@
         .w-card-bg, .w-card-pattern, .w-card-shine { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; overflow: hidden; }
         .w-card-bg {
             background:
-                radial-gradient(90% 120% at 85% 110%, rgba(10, 70, 200, 0.55), transparent 60%),
-                radial-gradient(70% 90% at 15% 0%, rgba(140, 220, 255, 0.55), transparent 60%),
-                linear-gradient(135deg, #38b6ff 0%, #1f8ef1 55%, #1468da 100%);
+                radial-gradient(60% 80% at 45% 50%, rgba(10, 90, 210, 0.22), transparent 70%),
+                linear-gradient(160deg, #2eacf7 0%, #229ef2 50%, #1c93ec 100%);
             transition: background 0.5s ease;
         }
+        /* Spun-metal finish: fine concentric grooves + light/dark conic sectors that turn as the card tilts */
+        .w-card-metal { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; overflow: hidden; }
+        .w-card-metal::before, .w-card-metal::after { content: ''; position: absolute; inset: 0; }
+        .w-card-metal::before {
+            background: repeating-radial-gradient(circle at 45% 50%, rgba(255,255,255,0.055) 0 0.6px, rgba(0,0,0,0.03) 1.1px 1.6px, transparent 2px 3.2px);
+            mix-blend-mode: overlay;
+        }
+        .w-card-metal::after {
+            background: conic-gradient(from calc(-20deg + var(--ang, 0deg)) at 45% 50%,
+                rgba(255,255,255,0.20), rgba(0,40,120,0.10) 45deg, rgba(255,255,255,0.03) 90deg, rgba(255,255,255,0.18) 135deg, rgba(0,40,120,0.12) 190deg,
+                rgba(255,255,255,0.16) 240deg, rgba(0,40,120,0.10) 300deg, rgba(255,255,255,0.20) 360deg);
+            mix-blend-mode: soft-light;
+        }
+        .w-card.dragging .w-card-metal::after { transition: none; }
+        .w-card-sparkles { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; overflow: hidden; }
+        .w-card-sparkles i {
+            position: absolute; width: 9px; height: 9px; transform: translate(-50%, -50%); opacity: 0.55;
+            background: #fff; clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+            animation: wTwinkle 3.2s ease-in-out infinite;
+        }
+        .w-card-sparkles i:nth-child(2n) { width: 6px; height: 6px; animation-delay: -1.1s; }
+        .w-card-sparkles i:nth-child(3n) { animation-delay: -2.2s; animation-duration: 4s; }
+        @keyframes wTwinkle { 0%, 100% { opacity: 0.15; transform: translate(-50%, -50%) scale(0.7); } 50% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); } }
         .w-card-pattern .pattern-layer { position: absolute; inset: 0; }
         .w-card-shine {
             background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.22) 45%, rgba(255,255,255,0.05) 55%, transparent 70%);
@@ -1571,26 +1593,28 @@
         }
         .w-card-balance { position: absolute; left: 7%; top: 22%; pointer-events: none; }
         .w-card-amount { font-size: clamp(22px, 7.4vw, 34px); font-weight: 700; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; text-shadow: 0 1px 8px rgba(0,0,0,0.12); }
-        .w-card-amount .frac { font-size: 0.8em; }
-        /* On the colored card the Gram mark is inverted: white diamond, card-colored sparkle */
-        .w-card-amount .gem path:first-child { fill: #fff; }
-        .w-card-amount .gem path:last-child { fill: var(--w-accent); }
-        .w-card-amount .unit { font-weight: 500; opacity: 0.75; font-size: 0.86em; margin-left: 2px; }
-        .w-card-fiat { font-size: 0.85em; opacity: 0.7; margin-top: 2px; margin-left: 2px; font-weight: 500; }
+        .w-card-amount { font-weight: 500; }
+        .w-card-amount .frac { font-size: 0.72em; }
+        .w-card-amount .gem { width: 1.05em; height: 1.05em; filter: drop-shadow(0 2px 4px rgba(0,40,120,0.25)); }
+        .w-card-amount .unit { font-weight: 500; color: var(--w-card-hi, #8fe6ff); font-size: 0.95em; margin-left: 4px; }
+        .w-card-fiat { font-size: 0.85em; color: var(--w-card-hi, #8fe6ff); margin-top: 2px; margin-left: 2px; font-weight: 500; }
         .w-card-qr {
             position: absolute; right: 12%; top: 22%; width: 42px; height: 34px; border-radius: 9px; border: none; cursor: pointer;
-            background: linear-gradient(145deg, rgba(255,255,255,0.85), rgba(210,225,240,0.75));
-            display: flex; align-items: center; justify-content: center; box-shadow: inset 0 1px 0 #fff, 0 2px 6px rgba(0,0,0,0.15);
+            background: linear-gradient(160deg, #f4f6f8 0%, #d3d8de 45%, #b9c0c8 55%, #e3e7eb 100%);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: inset 0 1px 0 #fff, inset 0 -1px 1px rgba(0,0,0,0.18), 0 3px 8px rgba(0,40,110,0.3);
         }
-        .w-card-qr svg { width: 20px; height: 20px; fill: none; stroke: #6a7d92; stroke-width: 2; }
+        .w-card-qr svg { width: 20px; height: 20px; fill: none; stroke: #5d6670; stroke-width: 2; filter: drop-shadow(0 1px 0 rgba(255,255,255,0.8)); }
         .w-card-holder {
             position: absolute; left: 7%; bottom: 13%; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
             font-size: 0.8em; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; pointer-events: none;
+            text-shadow: 0 1px 1px rgba(0,30,90,0.35), 0 -0.5px 0 rgba(255,255,255,0.4);
             max-width: 70%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .w-card-addr {
             position: absolute; right: 3.2%; top: 8%; bottom: 8%; writing-mode: vertical-rl; pointer-events: none; overflow: hidden;
-            font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 7.5px; line-height: 1.25; letter-spacing: 1px; opacity: 0.35;
+            font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 9px; font-weight: 700; line-height: 1.3; letter-spacing: 1.2px;
+            color: rgba(0, 45, 140, 0.42); text-shadow: 0.5px 0.5px 0 rgba(255,255,255,0.22), -0.5px -0.5px 0 rgba(0,20,80,0.15);
         }
         .w-card-stickers { position: absolute; inset: 0; border-radius: inherit; transform: translateZ(18px); pointer-events: none; }
         .w-stk {
@@ -2384,6 +2408,8 @@
                 <div class="w-card" id="w-card">
                     <div class="w-card-bg" id="w-card-bg"></div>
                     <div class="w-card-pattern" id="w-card-pattern"></div>
+                    <div class="w-card-metal"></div>
+                    <div class="w-card-sparkles"><i style="left:22%;top:63%"></i><i style="left:43%;top:58%"></i><i style="left:11%;top:91%"></i><i style="left:63%;top:24%"></i><i style="left:78%;top:80%"></i><i style="left:34%;top:14%"></i></div>
                     <div class="w-card-shine"></div>
                     <div class="w-card-balance">
                         <div class="w-card-amount" id="w-card-amount"></div>
@@ -4484,6 +4510,8 @@
     // All GRAM is play money that lives in localStorage with the rest of the state.
     // Official Gram (GRAM) token icon from ton.org/media
     const GEM_SVG = `<svg class="gem" viewBox="0 0 100 100"><path fill="#30A1F5" d="M66.523 11.333H33.477c-4.401 0-6.601 0-8.592.616a13.8 13.8 0 0 0-4.808 2.625c-1.594 1.341-2.784 3.192-5.164 6.894L4.408 37.81c-1.572 2.446-2.358 3.67-2.572 4.956a6.3 6.3 0 0 0 .362 3.37c.482 1.212 1.51 2.24 3.567 4.296l39.033 39.034c1.821 1.82 2.731 2.731 3.781 3.072a4.6 4.6 0 0 0 2.842 0c1.05-.34 1.96-1.251 3.78-3.072l39.035-39.034c2.056-2.056 3.084-3.084 3.566-4.296a6.3 6.3 0 0 0 .362-3.37c-.214-1.287-1-2.51-2.572-4.956L85.087 21.47c-2.38-3.703-3.57-5.554-5.164-6.895a13.8 13.8 0 0 0-4.808-2.625c-1.99-.616-4.191-.616-8.592-.616z"/><path fill="#fff" d="M60.268 24.224c.537-1.45 2.59-1.45 3.126 0l3.71 10.027a2.2 2.2 0 0 0 1.3 1.3l10.027 3.71c1.451.537 1.451 2.59 0 3.126l-10.027 3.71a2.2 2.2 0 0 0-1.3 1.3l-3.71 10.027c-.537 1.451-2.59 1.451-3.126 0l-3.71-10.027a2.2 2.2 0 0 0-1.3-1.3l-10.027-3.71c-1.451-.537-1.451-2.589 0-3.126l10.027-3.71a2.2 2.2 0 0 0 1.3-1.3z"/></svg>`;
+    // Crystal version of the mark for the balance card, like the original
+    const CARD_GEM_SVG = `<svg class="gem" viewBox="0 0 100 100"><defs><linearGradient id="wcg" x1="0" y1="0" x2="0.35" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".55" stop-color="#e2f4ff"/><stop offset="1" stop-color="#a8dbff"/></linearGradient><clipPath id="wcc"><path d="M66.523 11.333H33.477c-4.401 0-6.601 0-8.592.616a13.8 13.8 0 0 0-4.808 2.625c-1.594 1.341-2.784 3.192-5.164 6.894L4.408 37.81c-1.572 2.446-2.358 3.67-2.572 4.956a6.3 6.3 0 0 0 .362 3.37c.482 1.212 1.51 2.24 3.567 4.296l39.033 39.034c1.821 1.82 2.731 2.731 3.781 3.072a4.6 4.6 0 0 0 2.842 0c1.05-.34 1.96-1.251 3.78-3.072l39.035-39.034c2.056-2.056 3.084-3.084 3.566-4.296a6.3 6.3 0 0 0 .362-3.37c-.214-1.287-1-2.51-2.572-4.956L85.087 21.47c-2.38-3.703-3.57-5.554-5.164-6.895a13.8 13.8 0 0 0-4.808-2.625c-1.99-.616-4.191-.616-8.592-.616z"/></clipPath></defs><path fill="url(#wcg)" d="M66.523 11.333H33.477c-4.401 0-6.601 0-8.592.616a13.8 13.8 0 0 0-4.808 2.625c-1.594 1.341-2.784 3.192-5.164 6.894L4.408 37.81c-1.572 2.446-2.358 3.67-2.572 4.956a6.3 6.3 0 0 0 .362 3.37c.482 1.212 1.51 2.24 3.567 4.296l39.033 39.034c1.821 1.82 2.731 2.731 3.781 3.072a4.6 4.6 0 0 0 2.842 0c1.05-.34 1.96-1.251 3.78-3.072l39.035-39.034c2.056-2.056 3.084-3.084 3.566-4.296a6.3 6.3 0 0 0 .362-3.37c-.214-1.287-1-2.51-2.572-4.956L85.087 21.47c-2.38-3.703-3.57-5.554-5.164-6.895a13.8 13.8 0 0 0-4.808-2.625c-1.99-.616-4.191-.616-8.592-.616z"/><g clip-path="url(#wcc)"><path fill="#fff" opacity=".45" d="M30 12h40l3 32H27z"/><path fill="#cfeeff" opacity=".6" d="M0 44h27l23 52z"/><path fill="#8fd0ff" opacity=".45" d="M27 44h46L50 96z"/><path fill="#bfe6ff" opacity=".5" d="M73 44h27L50 96z"/></g><path fill="#4fb5f8" d="M60.268 24.224c.537-1.45 2.59-1.45 3.126 0l3.71 10.027a2.2 2.2 0 0 0 1.3 1.3l10.027 3.71c1.451.537 1.451 2.59 0 3.126l-10.027 3.71a2.2 2.2 0 0 0-1.3 1.3l-3.71 10.027c-.537 1.451-2.59 1.451-3.126 0l-3.71-10.027a2.2 2.2 0 0 0-1.3-1.3l-10.027-3.71c-1.451-.537-1.451-2.589 0-3.126l10.027-3.71a2.2 2.2 0 0 0 1.3-1.3z"/></svg>`;
     const GRAM_CURRENCIES = { USD: { rate: 1.38, fmt: v => `$${v}` }, EUR: { rate: 1.27, fmt: v => `€${v}` }, RUB: { rate: 112.4, fmt: v => `${v} ₽` } };
     const W_ICONS = {
         in: '<svg viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></svg>',
@@ -4551,7 +4579,7 @@
                 const dx = ev.clientX - sx, dy = ev.clientY - sy; if (Math.abs(dx) + Math.abs(dy) > 6) moved = true;
                 const ry = Math.max(-22, Math.min(22, dx / rect.width * 50)), rx = Math.max(-22, Math.min(22, -dy / rect.height * 50));
                 card.style.setProperty('--ry', `${ry}deg`); card.style.setProperty('--rx', `${rx}deg`);
-                card.style.setProperty('--shx', `${50 + ry * 2}%`); card.style.setProperty('--shy', `${50 - rx * 2}%`);
+                card.style.setProperty('--shx', `${50 + ry * 2}%`); card.style.setProperty('--ang', `${ry * 4 - rx * 3}deg`); card.style.setProperty('--shy', `${50 - rx * 2}%`);
             };
             const up = () => {
                 card.classList.remove('dragging'); resetCardTilt();
@@ -4565,7 +4593,7 @@
         window.addEventListener('resize', () => { if (walletUI.open) renderWalletCard(); });
         checkMarketSales(); setInterval(checkMarketSales, 5000);
     }
-    function resetCardTilt() { const c = document.getElementById('w-card'); ['--rx', '--ry', '--shx', '--shy'].forEach(p => c.style.removeProperty(p)); }
+    function resetCardTilt() { const c = document.getElementById('w-card'); ['--rx', '--ry', '--shx', '--shy', '--ang'].forEach(p => c.style.removeProperty(p)); }
 
     function openWallet(tab) {
         haptic('light'); ensureWallet();
@@ -4595,7 +4623,7 @@
         const chip = document.getElementById('profile-balance'); if (chip) chip.innerText = gramStr(w.balance);
         const setPrev = document.getElementById('settings-wallet-preview'); if (setPrev) setPrev.innerText = `${gramStr(w.balance)} GRAM · ${fiatStr(w.balance)}`;
         const [int, frac] = gramStr(w.balance).split('.');
-        document.getElementById('w-card-amount').innerHTML = `${GEM_SVG}<span>${int}${frac ? `<span class="frac">.${frac}</span>` : ''}<span class="unit"> GRAM</span></span>`;
+        document.getElementById('w-card-amount').innerHTML = `${CARD_GEM_SVG}<span>${int}${frac ? `<span class="frac">.${frac}</span>` : ''}<span class="unit"> GRAM</span></span>`;
         document.getElementById('w-card-fiat').innerText = fiatStr(w.balance);
         if (walletUI.mktOpen) updateMarketBalance();
     }
@@ -4609,13 +4637,14 @@
         const g = walletTheme();
         if (!g) {
             bg.style.background = '';
-            ['--w-accent', '--w-accent-2', '--w-accent-text'].forEach(p => root.style.removeProperty(p));
+            ['--w-accent', '--w-accent-2', '--w-accent-text', '--w-card-hi'].forEach(p => root.style.removeProperty(p));
             return;
         }
         const bd = g.collectibleData.backdrop, hex = bd.hex || { centerColor: '#555', edgeColor: '#222', patternColor: '#000' };
         bg.style.background = bd.customGradient || `radial-gradient(130% 150% at 28% 18%, ${hex.centerColor} 0%, ${hex.edgeColor} 100%)`;
         root.style.setProperty('--w-accent', `color-mix(in srgb, ${hex.centerColor} 75%, ${hex.edgeColor})`);
         root.style.setProperty('--w-accent-2', hex.edgeColor);
+        root.style.setProperty('--w-card-hi', `color-mix(in srgb, ${hex.centerColor} 35%, #fff)`);
         root.style.setProperty('--w-accent-text', `color-mix(in srgb, ${hex.centerColor} 70%, #fff)`);
 
         const rect = document.getElementById('w-card').getBoundingClientRect();
