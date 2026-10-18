@@ -1517,7 +1517,11 @@
         .profile-balance-chip .lbl { opacity: 0.7; font-weight: 500; }
         .profile-balance-chip .chev { opacity: 0.6; margin-left: 1px; }
 
-        :root { --w-accent: #2f9bf0; --w-accent-2: #1d84e6; --w-row: #1c1c1e; }
+        :root {
+            --w-accent: #2f9bf0; --w-accent-2: #1d84e6; --w-row: #1c1c1e;
+            /* Filled from Telegram's safe-area insets by applySafeArea(); env() covers plain browsers */
+            --app-safe-top: env(safe-area-inset-top, 0px); --app-safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
         .wallet-page {
             position: fixed; inset: 0; z-index: 900; background: #000; color: #fff;
             transform: translateX(100%); visibility: hidden; transition: transform 0.32s cubic-bezier(0.2, 0.9, 0.25, 1), visibility 0.32s;
@@ -1526,7 +1530,7 @@
         .wallet-view { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; max-width: 600px; margin: 0 auto; background: #000; }
         .w-top {
             display: flex; align-items: center; gap: 6px; flex-shrink: 0;
-            padding: calc(var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px) + 8px) 10px 8px;
+            padding: calc(var(--app-safe-top, 0px) + 8px) 10px 8px;
         }
         .w-title { flex: 1; font-weight: 700; font-size: 1.12em; letter-spacing: -0.2px; display: flex; align-items: center; gap: 6px; min-width: 0; }
         .w-title small { font-size: 0.72em; font-weight: 500; color: #8d8e93; }
@@ -1537,7 +1541,7 @@
         .w-hbtn:active { background: #2c2c2e; }
         .w-hbtn svg { width: 20px; height: 20px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
         .w-hbtn svg.fill { fill: #fff; stroke: none; }
-        .w-scroll { flex: 1; overflow-y: auto; padding: 4px 14px calc(30px + env(safe-area-inset-bottom)); -webkit-overflow-scrolling: touch; }
+        .w-scroll { flex: 1; overflow-y: auto; padding: 4px 14px calc(30px + var(--app-safe-bottom, 0px)); -webkit-overflow-scrolling: touch; }
 
         .w-card-stage { perspective: 900px; padding: 6px 0 2px; }
         .w-card {
@@ -1694,7 +1698,7 @@
 
         /* Receive / Add funds sheet */
         #w-receive-modal, #w-buy-modal { z-index: 1200; }
-        .w-receive-sheet { background: linear-gradient(180deg, var(--w-accent) 0%, var(--w-accent-2) 100%) !important; color: #fff; padding: 14px 18px calc(18px + env(safe-area-inset-bottom)); align-items: center; text-align: center; position: relative; }
+        .w-receive-sheet { background: linear-gradient(180deg, var(--w-accent) 0%, var(--w-accent-2) 100%) !important; color: #fff; padding: 14px 18px calc(18px + var(--app-safe-bottom, 0px)); align-items: center; text-align: center; position: relative; }
         .w-sheet-close { position: absolute; left: 14px; top: 14px; width: 32px; height: 32px; border-radius: 50%; border: none; background: rgba(255,255,255,0.18); cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .w-sheet-close svg { width: 14px; height: 14px; stroke: #fff; stroke-width: 2.6; fill: none; stroke-linecap: round; }
         .w-qr-box { margin: 30px auto 10px; background: #fff; border-radius: 26px; padding: 16px 16px 10px; width: 210px; box-shadow: 0 10px 30px rgba(0,0,0,0.18); }
@@ -1715,7 +1719,7 @@
         .w-topup-grid button:active { background: rgba(255,255,255,0.3); }
 
         /* Buy (market) sheet */
-        .w-buy-sheet { background: #1c1c1e !important; color: #fff; padding: 14px 18px calc(18px + env(safe-area-inset-bottom)); text-align: center; position: relative; }
+        .w-buy-sheet { background: #1c1c1e !important; color: #fff; padding: 14px 18px calc(18px + var(--app-safe-bottom, 0px)); text-align: center; position: relative; }
         .w-buy-visual { width: 130px; height: 130px; margin: 18px auto 8px; position: relative; }
         .w-buy-visual img { width: 100%; height: 100%; object-fit: contain; }
         .w-buy-sheet h2 { font-size: 1.3em; margin-bottom: 4px; }
@@ -1784,7 +1788,7 @@
         .w-contact img { width: 40px; height: 40px; border-radius: 50%; }
         .w-contact b { display: block; font-size: 0.95em; font-weight: 600; }
         .w-contact span { font-size: 0.8em; color: #8d8e93; }
-        .w-send-footer { padding: 12px 14px calc(12px + env(safe-area-inset-bottom)); }
+        .w-send-footer { padding: 12px 14px calc(12px + var(--app-safe-bottom, 0px)); }
         .w-to-pill { display: flex; align-items: center; gap: 10px; margin: 6px 14px 0; background: #1c1c1e; border-radius: 18px; padding: 8px 12px; }
         .w-to-pill img { width: 36px; height: 36px; border-radius: 50%; }
         .w-to-pill b { font-size: 0.92em; display: block; }
@@ -1800,7 +1804,7 @@
         .w-amount-fiat { color: #8d8e93; font-size: 0.9em; margin-top: 4px; }
         .w-amount-bal { color: #8d8e93; font-size: 0.82em; margin-top: 18px; cursor: pointer; }
         .w-amount-bal b { color: var(--w-accent-text, #62bcf9); font-weight: 600; }
-        .w-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 8px 10px calc(10px + env(safe-area-inset-bottom)); background: #121214; }
+        .w-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 8px 10px calc(10px + var(--app-safe-bottom, 0px)); background: #121214; }
         .w-keypad button { height: 50px; border-radius: 12px; border: none; background: #2c2c2e; color: #fff; font-size: 1.45em; font-weight: 500; cursor: pointer; }
         .w-keypad button:active { background: #3a3a3c; }
         .w-keypad button.flat { background: transparent; }
@@ -2507,6 +2511,19 @@
     } catch(err) {
         console.warn("Fullscreen request error", err);
     }
+
+    // Fullscreen safe area: system bars (safeAreaInset) + Telegram's own header controls (contentSafeAreaInset).
+    // Older clients don't report the content inset, so fullscreen falls back to a header-sized gap.
+    function applySafeArea() {
+        const sa = tg.safeAreaInset || {}, csa = tg.contentSafeAreaInset || {}, r = document.documentElement.style;
+        let top = (sa.top || 0) + (csa.top || 0);
+        if (tg.isFullscreen && !csa.top) top = Math.max(top, (sa.top || 0) + 46, 72);
+        if (top) r.setProperty('--app-safe-top', `${top}px`); else r.removeProperty('--app-safe-top');
+        const bottom = (sa.bottom || 0) + (csa.bottom || 0);
+        if (bottom) r.setProperty('--app-safe-bottom', `${bottom}px`); else r.removeProperty('--app-safe-bottom');
+    }
+    applySafeArea();
+    ['safeAreaChanged', 'contentSafeAreaChanged', 'fullscreenChanged', 'viewportChanged'].forEach(ev => { try { tg.onEvent(ev, applySafeArea); } catch (e) {} });
 
     // Bind Native Context Settings Item
     if (tg.SettingsButton) {
