@@ -1543,7 +1543,7 @@
         .w-hbtn svg.fill { fill: #fff; stroke: none; }
         .w-scroll { flex: 1; overflow-y: auto; padding: 4px 14px calc(30px + var(--app-safe-bottom, 0px)); -webkit-overflow-scrolling: touch; }
 
-        .w-card-stage { perspective: 900px; padding: 6px 0 2px; }
+        .w-card-stage { perspective: 900px; padding: 6px 0 2px; container-type: inline-size; }
         .w-card {
             position: relative; width: 100%; aspect-ratio: 1.6; border-radius: 22px; touch-action: none; cursor: grab;
             transform-style: preserve-3d; transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
@@ -1624,7 +1624,8 @@
         }
         .w-card-addr {
             position: absolute; right: 3.2%; top: 8%; bottom: 8%; writing-mode: vertical-rl; pointer-events: none; overflow: hidden;
-            font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 9px; font-weight: 700; line-height: 1.3; letter-spacing: 1.2px;
+            font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+            font-size: 2.35cqw; font-weight: 700; line-height: 1.3; letter-spacing: 0.12em; white-space: nowrap;
             color: rgba(0, 45, 140, 0.42); text-shadow: 0.5px 0.5px 0 rgba(255,255,255,0.22), -0.5px -0.5px 0 rgba(0,20,80,0.15);
         }
         .w-card-stickers { position: absolute; inset: 0; border-radius: inherit; transform: translateZ(18px); pointer-events: none; }
@@ -4632,7 +4633,9 @@
         const page = document.getElementById('wallet-page');
         page.classList.add('open'); page.setAttribute('aria-hidden', 'false');
         document.getElementById('w-card-holder').innerText = walletHolderName();
-        document.getElementById('w-card-addr').innerText = state.wallet.address.match(/.{1,4}/g).join(' ');
+        // Always two lines of six groups; the font scales with the card so they fit on any screen
+        const groups = state.wallet.address.match(/.{1,4}/g);
+        document.getElementById('w-card-addr').innerHTML = `${groups.slice(0, 6).join(' ')}<br>${groups.slice(6).join(' ')}`;
         document.getElementById('w-scroll').scrollTop = 0;
         updateBalanceViews(); renderWalletCard(); renderWalletStickers(); renderWalletTab();
         setWalletBack(closeWallet);
