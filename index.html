@@ -4613,7 +4613,7 @@
         document.getElementById('w-scroll').addEventListener('scroll', hideWalletMenus, { passive: true });
         document.addEventListener('click', (e) => { if (!e.target.closest('#w-gift-menu, #w-menu')) hideWalletMenus(); });
 
-        checkMarketSales(); setInterval(checkMarketSales, 5000);
+        checkMarketSales(); setInterval(checkMarketSales, 1000);
     }
     // Every inventory change goes through renderInventory(), which calls this so an open wallet
     // (Collectibles grid, Market listings, card stickers/theme) never shows a stale gift list
@@ -4942,7 +4942,7 @@
     // --- Market: pre-upgraded gifts listed for resale, plus selling your own ---
     // Every collectible has a "fair value" (gift base price × rarity of model/backdrop/symbol).
     // Listings are generated at or above that value (so flipping them loses the fee); your own listings are picked up by a simulated
-    // buyer at random moments, with odds that drop as the price climbs above the value.
+    // buyer instantly at or under the collection floor, and after a wait that grows steeply as the price climbs above the value.
     const MARKET_FEE = 0.05, MARKET_LISTINGS = 48;
     const marketCache = {};
     function roundPrice(v) { return Math.max(0.1, v < 10 ? Math.round(v * 100) / 100 : v < 100 ? Math.round(v * 10) / 10 : Math.round(v)); }
@@ -5023,21 +5023,30 @@
     // Your listings
     function listingOf(giftId) { return ((state.wallet && state.wallet.listings) || []).find(l => l.giftId === giftId) || null; }
     function isListed(g) { return !!listingOf(g.uniqueId); }
-    function nextBuyerRoll(from) { return from + (15 + Math.random() * 75) * 1000; }
-    function buyerChance(ratio) { return ratio <= 0.7 ? 0.7 : Math.max(0, Math.min(0.5, 1.2 - ratio)); }
+    function giftFloor(name) { const e = giftEntries().find(([, n]) => n === name); return e ? marketFloor(e[0], name) : roundPrice(giftBaseGram(name)); }
+    // How long (ms) the bot buyer takes to pick up a listing. At or under the collection floor it buys at once;
+    // between the floor and the gift's value it takes a few seconds; above the value the wait grows exponentially
+    // (+5% ≈ 10 s, +10% ≈ 20 s, +20% ≈ 1 min, +30% ≈ 3 min, +50% ≈ 30 min, capped at 12 h).
+    function buyerDelayMs(price, name, fair) {
+        const floor = giftFloor(name);
+        if (price <= floor) return 0;
+        const jitter = 0.6 + Math.random() * 0.8;
+        if (price <= fair) return (1 + 4 * (price - floor) / Math.max(fair - floor, 0.01)) * jitter * 1000;
+        const over = price / fair - 1;
+        return Math.min(12 * 3600, 5 * Math.exp(12 * over)) * jitter * 1000;
+    }
+    function scheduleSale(l, g, from) { l.saleAt = from + buyerDelayMs(l.price, g.name, fairValueOf(g.name, g.collectibleData, g.collectibleNumber)); }
     function checkMarketSales() {
         const w = state.wallet; if (!w || !w.listings || !w.listings.length) return;
-        const now = Date.now();
+        const now = Date.now(), before = w.listings.length;
         w.listings = w.listings.filter(l => walletGift(l.giftId));
+        let changed = w.listings.length !== before;
         for (const l of [...w.listings]) {
-            const g = walletGift(l.giftId), ratio = l.price / fairValueOf(g.name, g.collectibleData, g.collectibleNumber);
-            // Catch up on rolls missed while the app was closed (capped)
-            for (let rolls = 0; now >= l.nextRollAt && rolls < 200; rolls++) {
-                if (Math.random() < buyerChance(ratio)) { completeSale(l, g); break; }
-                l.nextRollAt = nextBuyerRoll(l.nextRollAt);
-            }
+            const g = walletGift(l.giftId);
+            if (!l.saleAt) { scheduleSale(l, g, l.listedAt || now); delete l.nextRollAt; changed = true; } // listings from the old random-roll buyer
+            if (now >= l.saleAt) { completeSale(l, g); changed = true; }
         }
-        saveState();
+        if (changed) saveState();
     }
     function completeSale(l, g) {
         const w = state.wallet, net = gramRound(l.price * (1 - MARKET_FEE));
@@ -5180,27 +5189,29 @@
         const g = walletGift(giftId); if (!g) return;
         haptic('light');
         const cd = g.collectibleData, fair = fairValueOf(g.name, cd, g.collectibleNumber), l = listingOf(giftId);
-        walletUI.sell = { giftId, fair };
+        walletUI.sell = { giftId, fair, floor: giftFloor(g.name) };
         document.getElementById('w-sell-visual').innerHTML = buyVisualHtml(g.name, cd);
         fillThumbPattern('w-buy-pat', g.name, cd);
         document.getElementById('w-sell-title').innerText = `${g.name} #${g.collectibleNumber.toLocaleString('en-US')}`;
         document.getElementById('w-sell-price').value = l ? l.price : fair;
-        document.getElementById('w-sell-quick').innerHTML = [['−10%', 0.9], ['Value', 1], ['+10%', 1.1], ['+25%', 1.25]]
+        document.getElementById('w-sell-quick').innerHTML = [['Floor', 0], ['Value', 1], ['+10%', 1.1], ['+25%', 1.25]]
             .map(([t, k]) => `<button onclick="setSellPrice(${k})">${t}</button>`).join('');
         document.getElementById('w-sell-btn').innerText = l ? 'Update Price' : 'List for Sale';
         document.getElementById('w-unlist-btn').style.display = l ? '' : 'none';
         updateSellSheet();
         openWalletModal('w-sell-modal');
     }
-    function setSellPrice(k) { haptic('light'); document.getElementById('w-sell-price').value = roundPrice(walletUI.sell.fair * k); updateSellSheet(); }
+    function setSellPrice(k) { haptic('light'); document.getElementById('w-sell-price').value = k ? roundPrice(walletUI.sell.fair * k) : walletUI.sell.floor; updateSellSheet(); }
     function sellInputPrice() { return parseFloat(document.getElementById('w-sell-price').value.replace(',', '.')) || 0; }
     function updateSellSheet() {
-        const price = sellInputPrice(), fair = walletUI.sell.fair, ratio = price / fair;
-        const [cls, text] = !price ? ['', 'Enter a price'] : ratio <= 0.9 ? ['good', 'Below value — likely sells within minutes'] : ratio <= 1.05 ? ['good', 'Fair price — a buyer should show up soon']
-            : ratio <= 1.2 ? ['warn', 'A bit high — may take a while'] : ['bad', 'Too expensive — buyers will probably skip it'];
+        const price = sellInputPrice(), { fair, floor } = walletUI.sell, ratio = price / fair;
+        const [cls, text] = !price ? ['', 'Enter a price'] : price <= floor ? ['good', 'At or under the floor — sells instantly'] : ratio <= 1 ? ['good', 'Under value — sells within seconds']
+            : ratio <= 1.1 ? ['good', 'Fair price — a buyer shows up in under half a minute'] : ratio <= 1.3 ? ['warn', 'A bit high — may take a few minutes']
+            : ratio <= 1.6 ? ['warn', 'Expensive — could take an hour or so'] : ['bad', 'Way over value — may take many hours'];
         const chance = document.getElementById('w-sell-chance');
         chance.className = `w-sell-chance ${cls}`; chance.innerText = text;
-        document.getElementById('w-sell-rows').innerHTML = `<div class="w-buy-row"><span>Estimated value</span><b>${GEM_SVG} ${gramStr(fair)}</b></div>`
+        document.getElementById('w-sell-rows').innerHTML = `<div class="w-buy-row"><span>Collection floor</span><b>${GEM_SVG} ${gramStr(floor)}</b></div>`
+            + `<div class="w-buy-row"><span>Estimated value</span><b>${GEM_SVG} ${gramStr(fair)}</b></div>`
             + `<div class="w-buy-row"><span>Market fee (${MARKET_FEE * 100}%)</span><b>−${gramStr(price * MARKET_FEE)}</b></div>`
             + `<div class="w-buy-row"><span>You receive</span><b>${GEM_SVG} ${gramStr(price * (1 - MARKET_FEE))}</b></div>`;
         document.getElementById('w-sell-btn').disabled = price <= 0;
@@ -5208,12 +5219,14 @@
     function confirmSell() {
         const s = walletUI.sell, price = roundPrice(sellInputPrice()); if (!s || price <= 0) return;
         const w = state.wallet; w.listings = w.listings || [];
-        const l = listingOf(s.giftId), now = Date.now();
-        if (l) { l.price = price; l.nextRollAt = nextBuyerRoll(now); }
-        else w.listings.push({ giftId: s.giftId, price, listedAt: now, nextRollAt: nextBuyerRoll(now) });
+        let l = listingOf(s.giftId); const now = Date.now();
+        if (l) l.price = price;
+        else w.listings.push(l = { giftId: s.giftId, price, listedAt: now });
+        scheduleSale(l, walletGift(s.giftId), now); delete l.nextRollAt;
         saveState(); closeModal('w-sell-modal'); hapticNotify('success'); syncSellButton();
         showToast(`Listed for ${gramStr(price)} GRAM`);
         renderInventory(); renderWalletTab();
+        if (l.saleAt <= now) setTimeout(checkMarketSales, 700); // floor-priced: the buyer snaps it up right away
     }
     function unlistGift() {
         const s = walletUI.sell; if (!s) return;
