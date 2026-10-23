@@ -69,14 +69,14 @@
         
         #profile-pattern-overlay {
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            overflow: hidden; pointer-events: none; opacity: 0.15;
+            overflow: hidden; pointer-events: none;
         }
-        
+        /* Origin sits on the avatar centre; symbols are placed relative to it */
+        .profile-pattern-origin { position: absolute; left: 50%; top: 140px; width: 0; height: 0; }
         .profile-pattern-item {
-            position: absolute; width: 30px; height: 30px;
-            left: 50%; top: 50%;
-            background-color: currentColor; 
+            position: absolute;
             -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+            -webkit-mask-position: center; mask-position: center;
         }
 
         .profile-main-info { display: flex; flex-direction: column; align-items: center; z-index: 2; position: relative; }
@@ -101,7 +101,7 @@
             position: absolute;
             width: 34px;
             height: 34px;
-            pointer-events: none;
+            cursor: pointer;
             z-index: 5;
             animation: floatGently 5s ease-in-out infinite;
         }
@@ -459,9 +459,17 @@
             opacity: 0.8;
         }
 
-        @keyframes bounceWorn {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-4px); }
+        /* Worn gift next to the name, with faint twinkling stars around it */
+        .worn-gift-badge { position: relative; display: inline-block; width: 26px; height: 26px; margin-left: 6px; flex-shrink: 0; cursor: pointer; }
+        .worn-gift-badge > img, .worn-gift-badge > .lottie-wrapper { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+        .worn-gift-badge .wg-star { position: absolute; width: 8px; height: 8px; fill: #fff; opacity: 0; pointer-events: none; animation: wornTwinkle 2.6s ease-in-out infinite; }
+        .worn-gift-badge .wg-star:nth-of-type(1) { left: -7px; top: -4px; animation-delay: 0s; }
+        .worn-gift-badge .wg-star:nth-of-type(2) { right: -8px; top: 1px; width: 6px; height: 6px; animation-delay: 0.9s; }
+        .worn-gift-badge .wg-star:nth-of-type(3) { right: -6px; bottom: -5px; animation-delay: 1.7s; }
+        .worn-gift-badge .wg-star:nth-of-type(4) { left: -5px; bottom: -2px; width: 5px; height: 5px; animation-delay: 1.2s; }
+        @keyframes wornTwinkle {
+            0%, 100% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 0.75; transform: scale(1); }
         }
 
         /* Roulette Animations */
@@ -2611,7 +2619,7 @@
         const loaderStart = Date.now();
         const hideLoader = () => setTimeout(() => {
             loadingScreen.style.opacity = '0'; document.getElementById('profile-page').classList.add('active'); document.body.classList.add('on-profile');
-            setTimeout(() => { loadingScreen.classList.remove('active'); loaderAnim.destroy(); LottieManager.observeAll(document.getElementById('inventory-grid')); }, 220);
+            setTimeout(() => { loadingScreen.classList.remove('active'); loaderAnim.destroy(); LottieManager.observeAll(document.getElementById('inventory-grid')); LottieManager.observeAll(document.getElementById('profile-bg')); applyWornGiftVisuals(); }, 220);
         }, Math.max(0, 700 - (Date.now() - loaderStart)));
 
         applyTelegramTheme(); tg.onEvent('themeChanged', applyTelegramTheme);
@@ -3171,17 +3179,21 @@
             const el = document.createElement('div');
             el.className = `pinned-floating-gift pos-${idx}`;
             
-            let imgUrl = "";
+            let imgUrl = "", lottieUrl = "";
             if (gift.isCollectible) {
                 const cd = gift.collectibleData;
                 imgUrl = cd.model.isCustom ? cd.model.imageUrl : `${CDN_BASE}models/${encodeURIComponent(gift.name)}/png/${encodeURIComponent(cd.model.name)}.png`;
+                lottieUrl = modelLottieUrl(gift);
             } else {
                 imgUrl = `${CDN_BASE}originals/${gift.originalId}/Original.png`;
+                lottieUrl = `${CDN_BASE}originals/${gift.originalId}/Original.json`;
             }
             
-            el.innerHTML = `<img src="${imgUrl}" alt="">`;
+            el.innerHTML = state.settings.animations ? LottieManager.lazyHtml(lottieUrl, imgUrl) : `<img src="${imgUrl}" alt="">`;
+            el.onclick = () => { haptic('light'); gift.isCollectible ? openCollectibleModal(gift, false) : openGiftInfo(gift); };
             container.appendChild(el);
         });
+        LottieManager.observeAll(container);
     }
     
     function renderInventory() {
@@ -3592,11 +3604,14 @@
             const cd = worn.collectibleData;
             const imgUrl = cd.model.isCustom ? cd.model.imageUrl : `${CDN_BASE}models/${encodeURIComponent(worn.name)}/png/${encodeURIComponent(cd.model.name)}.png`;
             
-            const badge = document.createElement('img');
+            const star = '<svg class="wg-star" viewBox="0 0 10 10"><path d="M5 0C5.4 3.2 6.8 4.6 10 5 6.8 5.4 5.4 6.8 5 10 4.6 6.8 3.2 5.4 0 5 3.2 4.6 4.6 3.2 5 0z"/></svg>';
+            const badge = document.createElement('span');
             badge.id = 'worn-gift-badge';
-            badge.src = imgUrl;
-            badge.style.cssText = "width: 24px; height: 24px; vertical-align: middle; margin-left: 6px; object-fit: contain; animation: bounceWorn 2s ease infinite;";
+            badge.className = 'worn-gift-badge';
+            badge.innerHTML = (state.settings.animations ? LottieManager.lazyHtml(modelLottieUrl(worn), imgUrl) : `<img src="${imgUrl}" alt="">`) + star.repeat(4);
+            badge.onclick = () => { haptic('light'); openCollectibleModal(worn, false); };
             nameEl.appendChild(badge);
+            LottieManager.observeAll(badge);
         }
     }
 
@@ -4154,7 +4169,7 @@
         document.body.classList.toggle('on-profile', tab === 'inventory');
         if (tab === 'inventory') { 
             document.getElementById('profile-page').classList.add('active'); 
-            requestAnimationFrame(() => LottieManager.observeAll(document.getElementById('inventory-grid')));
+            requestAnimationFrame(() => { LottieManager.observeAll(document.getElementById('inventory-grid')); LottieManager.observeAll(document.getElementById('profile-bg')); });
             document.getElementById('tab-pill-inventory').classList.add('active'); 
             tg.BackButton.hide(); 
         } else { 
@@ -4166,10 +4181,10 @@
     }
     
     function playLottie(id, path) { LottieManager.play(document.getElementById(id), path); }
-    function generatePattern(containerId, patternObj, giftName, isSmall, colorHex, isHeader=false) {
+    function generatePattern(containerId, patternObj, giftName, isSmall, colorHex) {
         const container = document.getElementById(containerId); if (!container) return;
         const url = `${CDN_BASE}patterns/${encodeURIComponent(giftName)}/png/${encodeURIComponent(patternObj.name)}.png`;
-        const configs = isHeader ? [{ count: 12, radius: 100, size: 40 }, { count: 16, radius: 150, size: 36 }] : [{ count: 10, radius: isSmall ? 38 : 100, size: isSmall ? 12 : 36 }, { count: 12, radius: isSmall ? 62 : 150, size: isSmall ? 10 : 30 }];
+        const configs = [{ count: 10, radius: isSmall ? 38 : 100, size: isSmall ? 12 : 36 }, { count: 12, radius: isSmall ? 62 : 150, size: isSmall ? 10 : 30 }];
         const layers = [];
         configs.forEach(conf => { for (let i = 0; i < conf.count; i++) {
             const a = (i / conf.count) * 2 * Math.PI;
@@ -4180,7 +4195,7 @@
         const el = document.createElement('div');
         el.className = 'pattern-layer';
         el.style.backgroundColor = colorHex || '#ffffff';
-        el.style.opacity = isHeader ? 1 : 0.15;
+        el.style.opacity = 0.15;
         el.style.webkitMask = layers.join(', ');
         el.style.mask = layers.join(', ');
         container.appendChild(el);
@@ -4246,6 +4261,29 @@
     function togglePin() { const g = state.inventory.find(x=>x.uniqueId===appRuntime.activeGiftId); if(g.pinned) {g.pinned=false;g.pinOrder=null;} else {if(state.inventory.filter(x=>x.pinned).length>=6) return alert("Max 6"); g.pinned=true;g.pinOrder=999;} document.getElementById('long-press-menu').classList.add('hidden'); haptic('light'); saveState(); renderInventory(); }
     function toggleWear() { const g = state.inventory.find(x=>x.uniqueId===appRuntime.activeGiftId); if(g.worn) g.worn=false; else {state.inventory.forEach(x=>x.worn=false); g.worn=true;} document.getElementById('long-press-menu').classList.add('hidden'); hapticNotify('success'); saveState(); renderInventory(); applyWornGiftVisuals(); }
     
+    // Right-hand half of the profile symbol layout (mirrored to the left), in px from the avatar
+    // centre: [x, y, size, alpha]. Inner symbols are the strongest, outer ones fade out.
+    const PROFILE_PATTERN = [
+        [46, -80, 22, 0.42], [72, -34, 25, 0.6], [106, -62, 22, 0.45], [100, 2, 25, 0.55],
+        [68, 38, 25, 0.6], [106, 66, 22, 0.45], [46, 86, 20, 0.3], [142, -26, 21, 0.32],
+        [144, 36, 21, 0.32], [146, -96, 18, 0.2], [184, 4, 18, 0.18], [148, 100, 18, 0.18]
+    ];
+    function renderProfilePattern(patternObj, giftName, color) {
+        const overlay = document.getElementById('profile-pattern-overlay');
+        const avatar = document.getElementById('user-avatar');
+        const url = patternUrl(giftName, patternObj);
+        const origin = document.createElement('div');
+        origin.className = 'profile-pattern-origin';
+        // Anchor on the real avatar centre when it's laid out; CSS default covers a hidden page
+        const ob = overlay.getBoundingClientRect(), ab = avatar.getBoundingClientRect();
+        if (ab.width) { origin.style.left = `${ab.left + ab.width / 2 - ob.left}px`; origin.style.top = `${ab.top + ab.height / 2 - ob.top}px`; }
+        let html = '';
+        PROFILE_PATTERN.forEach(([x, y, size, alpha]) => [x, -x].forEach(px => {
+            html += `<div class="profile-pattern-item" style="left:${px - size / 2}px;top:${y - size / 2}px;width:${size}px;height:${size}px;opacity:${alpha};background-color:${color || '#000'};-webkit-mask-image:url('${url}');mask-image:url('${url}')"></div>`;
+        }));
+        origin.innerHTML = html;
+        overlay.appendChild(origin);
+    }
     function applyWornGiftVisuals() { 
         const worn = state.inventory.find(g => g.worn); 
         const bg = document.getElementById('profile-bg'); 
@@ -4254,7 +4292,7 @@
             const cd = worn.collectibleData; 
             bg.style.background = getBackdropStyle(cd.backdrop); 
             bg.classList.add('has-worn-gift'); 
-            generatePattern('profile-pattern-overlay', cd.pattern, worn.name, false, cd.backdrop.hex.patternColor, true); 
+            renderProfilePattern(cd.pattern, worn.name, cd.backdrop.hex.patternColor); 
         } else { 
             bg.style.background = 'var(--app-profile-gradient-fallback)'; 
             bg.classList.remove('has-worn-gift'); 
